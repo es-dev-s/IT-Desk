@@ -1,0 +1,34 @@
+# This folder wraps the it-desk app. The app repo is it-desk/ and has its own ignore rules.
+# These patterns still apply if files from that tree are added here.
+
+**/.env
+**/.env.*
+!**/.env.example
+**/.envrc
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+**/.seed-credentials.txt
+**/.seed-credentials.txt.tmp
+**/.it-staff-credentials.txt
+
+**/.run/
+**/.cache/
+**/.next/
+**/node_modules/
+**/out/
+**/.qa/
+**/coverage/
+**/.vercel
+**/bin/
+**/tmp/
+
+**/*.log
+**/*.pid
+**/*.coverprofile
+**/.DS_Store
+**/Thumbs.db
+**/.idea/
+**/.vscode/
