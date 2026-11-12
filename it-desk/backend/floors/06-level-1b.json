@@ -1,0 +1,402 @@
+{
+ "name": "Level 1 (B)",
+ "level": 1,
+ "sortOrder": 20,
+ "seatPrefix": "",
+ "cols": 13,
+ "rows": 8,
+ "notes": "Imported from the seating sheet \"Level-1(B)\" dated 2026-08-06.",
+ "source": {
+  "image": "6-level1B.png",
+  "sheetDate": "2026-08-06",
+  "title": "Level-1(B)"
+ },
+ "elements": [
+  {
+   "id": "l1b-seat-A01",
+   "kind": "seat",
+   "x": 1,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "1"
+  },
+  {
+   "id": "l1b-seat-A02",
+   "kind": "seat",
+   "x": 7,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "2",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-B01",
+   "kind": "seat",
+   "x": 1,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "3",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-B02",
+   "kind": "seat",
+   "x": 3,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "4"
+  },
+  {
+   "id": "l1b-seat-B03",
+   "kind": "seat",
+   "x": 4,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "5",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-B04",
+   "kind": "seat",
+   "x": 7,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "6",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-C01",
+   "kind": "seat",
+   "x": 1,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "code": "7",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-C02",
+   "kind": "seat",
+   "x": 3,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "code": "8",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-C03",
+   "kind": "seat",
+   "x": 4,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "code": "9",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-C04",
+   "kind": "seat",
+   "x": 7,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "code": "10",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-D01",
+   "kind": "seat",
+   "x": 1,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "11",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-D02",
+   "kind": "seat",
+   "x": 3,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "12",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-D03",
+   "kind": "seat",
+   "x": 4,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "13",
+   "label": "Audit Team"
+  },
+  {
+   "id": "l1b-seat-D04",
+   "kind": "seat",
+   "x": 7,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "14",
+   "label": "Audit Team",
+   "leadSeat": true
+  },
+  {
+   "id": "l1b-seat-D05",
+   "kind": "seat",
+   "x": 8,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "15"
+  },
+  {
+   "id": "l1b-seat-D06",
+   "kind": "seat",
+   "x": 9,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "16"
+  },
+  {
+   "id": "l1b-seat-D07",
+   "kind": "seat",
+   "x": 10,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "17"
+  },
+  {
+   "id": "l1b-seat-D08",
+   "kind": "seat",
+   "x": 11,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "18"
+  },
+  {
+   "id": "l1b-block-1",
+   "kind": "block",
+   "x": 2,
+   "y": 0,
+   "w": 10,
+   "h": 4
+  },
+  {
+   "id": "l1b-block-2",
+   "kind": "block",
+   "x": 1,
+   "y": 1,
+   "w": 1,
+   "h": 3
+  },
+  {
+   "id": "l1b-block-3",
+   "kind": "block",
+   "x": 2,
+   "y": 4,
+   "w": 5,
+   "h": 1
+  },
+  {
+   "id": "l1b-block-4",
+   "kind": "block",
+   "x": 8,
+   "y": 4,
+   "w": 4,
+   "h": 3
+  },
+  {
+   "id": "l1b-block-5",
+   "kind": "block",
+   "x": 2,
+   "y": 5,
+   "w": 1,
+   "h": 3
+  },
+  {
+   "id": "l1b-block-6",
+   "kind": "block",
+   "x": 5,
+   "y": 5,
+   "w": 2,
+   "h": 3
+  },
+  {
+   "id": "l1b-void-1",
+   "kind": "void",
+   "x": 1,
+   "y": 0,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "id": "l1b-door-1",
+   "kind": "door",
+   "x": 0,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "label": "Door"
+  },
+  {
+   "id": "l1b-room-1",
+   "kind": "room",
+   "x": 12,
+   "y": 0,
+   "w": 1,
+   "h": 2,
+   "label": "Unmarked area"
+  },
+  {
+   "id": "l1b-room-2",
+   "kind": "room",
+   "x": 12,
+   "y": 2,
+   "w": 1,
+   "h": 2,
+   "label": "Unmarked area"
+  },
+  {
+   "id": "l1b-room-3",
+   "kind": "room",
+   "x": 12,
+   "y": 4,
+   "w": 1,
+   "h": 4,
+   "label": "Unmarked area"
+  },
+  {
+   "id": "l1b-label-1",
+   "kind": "label",
+   "x": 2,
+   "y": 1,
+   "w": 5,
+   "h": 1,
+   "label": "Audit Team (not in team list)"
+  }
+ ],
+ "people": [
+  {
+   "seat_code": "L1B-A02",
+   "team": "Audit Team",
+   "person_name": "Prakriti Malla Thakuri",
+   "is_lead": "no",
+   "handover_to": "Jasmin Neupane",
+   "handover_until": "2026-08-06",
+   "notes": "Prakriti Malla Thakuri-JasminNeupane Till Aug-6 | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-B01",
+   "team": "Audit Team",
+   "person_name": "Binisha Mool",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Binisha Mool | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-B03",
+   "team": "Audit Team",
+   "person_name": "Tripti Joshi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Tripti Joshi | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-B04",
+   "team": "Audit Team",
+   "person_name": "Rose Gurung",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rose Gurung | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-C01",
+   "team": "Audit Team",
+   "person_name": "Shwati Srivastav",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Shwati Srivastav | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-C02",
+   "team": "Audit Team",
+   "person_name": "Rachana Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rachana Shrestha | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-C03",
+   "team": "Audit Team",
+   "person_name": "Jasmin Neupane",
+   "is_lead": "no",
+   "handover_to": "Prakriti Malla Thakuri",
+   "handover_until": "2026-08-06",
+   "notes": "JasminNeupane-Prakriti Malla Thakuri Till Aug-6 | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-C04",
+   "team": "Audit Team",
+   "person_name": "Shabbam Rana Magar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Shabbam Rana Magar | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-D01",
+   "team": "Audit Team",
+   "person_name": "Alsana Dhakal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Alsana Dhakal | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-D02",
+   "team": "Audit Team",
+   "person_name": "Monika Kumari Das",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Monika Kumari Das | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-D03",
+   "team": "Audit Team",
+   "person_name": "Ritika Shah",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ritika Shah | Audit Team (not in team list)"
+  },
+  {
+   "seat_code": "L1B-D04",
+   "team": "Audit Team",
+   "person_name": "Youbika Sharma",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Youbika Sharma | Audit Team (not in team list)"
+  }
+ ]
+}

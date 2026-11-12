@@ -1,0 +1,1018 @@
+{
+ "name": "Level 2 (A)",
+ "level": 2,
+ "sortOrder": 30,
+ "seatPrefix": "",
+ "cols": 21,
+ "rows": 8,
+ "notes": "Imported from the seating sheet \"Level-2(A)\" dated 2026-07-31.",
+ "source": {
+  "image": "5-level2A.png",
+  "sheetDate": "2026-07-31",
+  "title": "Level-2(A)"
+ },
+ "elements": [
+  {
+   "id": "l2a-seat-A01",
+   "kind": "seat",
+   "x": 1,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "1"
+  },
+  {
+   "id": "l2a-seat-A02",
+   "kind": "seat",
+   "x": 2,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "2"
+  },
+  {
+   "id": "l2a-seat-A03",
+   "kind": "seat",
+   "x": 3,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "3",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-A04",
+   "kind": "seat",
+   "x": 4,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "4",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-A05",
+   "kind": "seat",
+   "x": 5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "5",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-A06",
+   "kind": "seat",
+   "x": 6,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "6",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-A07",
+   "kind": "seat",
+   "x": 7,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "7",
+   "team": "Victory Magnets",
+   "leadSeat": true
+  },
+  {
+   "id": "l2a-seat-A08",
+   "kind": "seat",
+   "x": 8,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "8",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-A09",
+   "kind": "seat",
+   "x": 9,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "9",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-A10",
+   "kind": "seat",
+   "x": 10,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "10"
+  },
+  {
+   "id": "l2a-seat-A11",
+   "kind": "seat",
+   "x": 11,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "11"
+  },
+  {
+   "id": "l2a-seat-A12",
+   "kind": "seat",
+   "x": 12,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "12"
+  },
+  {
+   "id": "l2a-seat-A13",
+   "kind": "seat",
+   "x": 13,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "13",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-A14",
+   "kind": "seat",
+   "x": 14,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "14",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-A15",
+   "kind": "seat",
+   "x": 15,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "15",
+   "team": "Conversion Queens",
+   "leadSeat": true
+  },
+  {
+   "id": "l2a-seat-A16",
+   "kind": "seat",
+   "x": 16,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "16",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-A17",
+   "kind": "seat",
+   "x": 17,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "17",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-A18",
+   "kind": "seat",
+   "x": 18,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "18",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-A19",
+   "kind": "seat",
+   "x": 19,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "19"
+  },
+  {
+   "id": "l2a-seat-B01",
+   "kind": "seat",
+   "x": 20,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "20",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-C01",
+   "kind": "seat",
+   "x": 20,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "code": "21",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-D01",
+   "kind": "seat",
+   "x": 1,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "22"
+  },
+  {
+   "id": "l2a-seat-D02",
+   "kind": "seat",
+   "x": 2,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "23"
+  },
+  {
+   "id": "l2a-seat-D03",
+   "kind": "seat",
+   "x": 3,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "24"
+  },
+  {
+   "id": "l2a-seat-D04",
+   "kind": "seat",
+   "x": 4,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "25",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-D05",
+   "kind": "seat",
+   "x": 5,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "26",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-D06",
+   "kind": "seat",
+   "x": 6,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "27",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-D07",
+   "kind": "seat",
+   "x": 7,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "28",
+   "team": "Victory Magnets"
+  },
+  {
+   "id": "l2a-seat-D08",
+   "kind": "seat",
+   "x": 10,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "29"
+  },
+  {
+   "id": "l2a-seat-D09",
+   "kind": "seat",
+   "x": 11,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "30"
+  },
+  {
+   "id": "l2a-seat-D10",
+   "kind": "seat",
+   "x": 12,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "31",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-D11",
+   "kind": "seat",
+   "x": 13,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "32",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-D12",
+   "kind": "seat",
+   "x": 14,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "33",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-D13",
+   "kind": "seat",
+   "x": 15,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "34",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-D14",
+   "kind": "seat",
+   "x": 16,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "35",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-D15",
+   "kind": "seat",
+   "x": 17,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "36",
+   "team": "Conversion Queens"
+  },
+  {
+   "id": "l2a-seat-D16",
+   "kind": "seat",
+   "x": 18,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "37"
+  },
+  {
+   "id": "l2a-seat-D17",
+   "kind": "seat",
+   "x": 20,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "38",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-E01",
+   "kind": "seat",
+   "x": 5,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "39",
+   "team": "Peak Achievers",
+   "leadSeat": true
+  },
+  {
+   "id": "l2a-seat-E02",
+   "kind": "seat",
+   "x": 6,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "40",
+   "team": "Peak Achievers"
+  },
+  {
+   "id": "l2a-seat-E03",
+   "kind": "seat",
+   "x": 7,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "41",
+   "team": "Peak Achievers"
+  },
+  {
+   "id": "l2a-seat-E04",
+   "kind": "seat",
+   "x": 16,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "42",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-E05",
+   "kind": "seat",
+   "x": 18,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "43",
+   "team": "Veritas Engines",
+   "leadSeat": true
+  },
+  {
+   "id": "l2a-seat-E06",
+   "kind": "seat",
+   "x": 20,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "44",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-F01",
+   "kind": "seat",
+   "x": 20,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "45",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-G01",
+   "kind": "seat",
+   "x": 20,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "code": "46",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-H01",
+   "kind": "seat",
+   "x": 5,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "47",
+   "team": "Peak Achievers"
+  },
+  {
+   "id": "l2a-seat-H02",
+   "kind": "seat",
+   "x": 6,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "48",
+   "team": "Peak Achievers"
+  },
+  {
+   "id": "l2a-seat-H03",
+   "kind": "seat",
+   "x": 7,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "49",
+   "team": "Peak Achievers"
+  },
+  {
+   "id": "l2a-seat-H04",
+   "kind": "seat",
+   "x": 8,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "50",
+   "team": "Peak Achievers"
+  },
+  {
+   "id": "l2a-seat-H05",
+   "kind": "seat",
+   "x": 9,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "51"
+  },
+  {
+   "id": "l2a-seat-H06",
+   "kind": "seat",
+   "x": 16,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "52",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-H07",
+   "kind": "seat",
+   "x": 17,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "53",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-H08",
+   "kind": "seat",
+   "x": 18,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "54",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-seat-H09",
+   "kind": "seat",
+   "x": 20,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "55",
+   "team": "Veritas Engines"
+  },
+  {
+   "id": "l2a-block-1",
+   "kind": "block",
+   "x": 1,
+   "y": 1,
+   "w": 19,
+   "h": 2
+  },
+  {
+   "id": "l2a-block-2",
+   "kind": "block",
+   "x": 8,
+   "y": 3,
+   "w": 2,
+   "h": 4
+  },
+  {
+   "id": "l2a-block-3",
+   "kind": "block",
+   "x": 19,
+   "y": 3,
+   "w": 1,
+   "h": 5
+  },
+  {
+   "id": "l2a-block-4",
+   "kind": "block",
+   "x": 5,
+   "y": 5,
+   "w": 3,
+   "h": 2
+  },
+  {
+   "id": "l2a-block-5",
+   "kind": "block",
+   "x": 16,
+   "y": 5,
+   "w": 3,
+   "h": 2
+  },
+  {
+   "id": "l2a-void-1",
+   "kind": "void",
+   "x": 20,
+   "y": 0,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "id": "l2a-void-2",
+   "kind": "void",
+   "x": 1,
+   "y": 4,
+   "w": 4,
+   "h": 4
+  },
+  {
+   "id": "l2a-void-3",
+   "kind": "void",
+   "x": 10,
+   "y": 4,
+   "w": 6,
+   "h": 4
+  },
+  {
+   "id": "l2a-void-4",
+   "kind": "void",
+   "x": 17,
+   "y": 4,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "id": "l2a-door-1",
+   "kind": "door",
+   "x": 0,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "label": "Door"
+  }
+ ],
+ "people": [
+  {
+   "seat_code": "L2A-A03",
+   "team": "Victory Magnets",
+   "person_name": "Krisha Maharjan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Krisha Maharjan"
+  },
+  {
+   "seat_code": "L2A-A04",
+   "team": "Victory Magnets",
+   "person_name": "Divya Gupta",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Divya Gupta"
+  },
+  {
+   "seat_code": "L2A-A05",
+   "team": "Victory Magnets",
+   "person_name": "Alisha Rawat",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Alisha Rawat"
+  },
+  {
+   "seat_code": "L2A-A06",
+   "team": "Victory Magnets",
+   "person_name": "Rosy Khatiwada",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rosy Khatiwada"
+  },
+  {
+   "seat_code": "L2A-A07",
+   "team": "Victory Magnets",
+   "person_name": "Sama Shakya",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sama Shakya"
+  },
+  {
+   "seat_code": "L2A-A08",
+   "team": "Victory Magnets",
+   "person_name": "Sandeepa Poudel",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sandeepa Poudel"
+  },
+  {
+   "seat_code": "L2A-A09",
+   "team": "Victory Magnets",
+   "person_name": "Smarika Ghimire",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Smarika Ghimire"
+  },
+  {
+   "seat_code": "L2A-A13",
+   "team": "Conversion Queens",
+   "person_name": "Roshani Poudel",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Roshani Poudel"
+  },
+  {
+   "seat_code": "L2A-A14",
+   "team": "Conversion Queens",
+   "person_name": "Jamuna Acharya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Jamuna Acharya"
+  },
+  {
+   "seat_code": "L2A-A15",
+   "team": "Conversion Queens",
+   "person_name": "Kanchan Suwal",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Kanchan Suwal"
+  },
+  {
+   "seat_code": "L2A-A16",
+   "team": "Conversion Queens",
+   "person_name": "Simran Sharma",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Simran Sharma"
+  },
+  {
+   "seat_code": "L2A-A17",
+   "team": "Conversion Queens",
+   "person_name": "Rabina Chaudhary",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rabina chaudhary"
+  },
+  {
+   "seat_code": "L2A-A18",
+   "team": "Conversion Queens",
+   "person_name": "Sweta Kumari Sah",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sweta Kumari Sah"
+  },
+  {
+   "seat_code": "L2A-B01",
+   "team": "Veritas Engines",
+   "person_name": "Roshani Adhikari",
+   "is_lead": "no",
+   "handover_to": "Sandhya Subedi",
+   "handover_until": "2026-08-04",
+   "notes": "Roshani Adhikari-Sandhya Subedi Till Aug-4"
+  },
+  {
+   "seat_code": "L2A-C01",
+   "team": "Veritas Engines",
+   "person_name": "Sijal Mainali",
+   "is_lead": "no",
+   "handover_to": "Deepika Bishwakarma",
+   "handover_until": "2026-08-04",
+   "notes": "Sijal Mainali - Deepika Bishwakarma Till Aug-4"
+  },
+  {
+   "seat_code": "L2A-D04",
+   "team": "Victory Magnets",
+   "person_name": "Samhriti Khanal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Samhriti Khanal"
+  },
+  {
+   "seat_code": "L2A-D05",
+   "team": "Victory Magnets",
+   "person_name": "Subhani Shakya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Subhani Shakya"
+  },
+  {
+   "seat_code": "L2A-D06",
+   "team": "Victory Magnets",
+   "person_name": "Kritika Prasai",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Kritika Prasai"
+  },
+  {
+   "seat_code": "L2A-D07",
+   "team": "Victory Magnets",
+   "person_name": "Puja Bhatta",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Puja Bhatta"
+  },
+  {
+   "seat_code": "L2A-D10",
+   "team": "Conversion Queens",
+   "person_name": "Anjita Rasaili",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Anjita Rasaili"
+  },
+  {
+   "seat_code": "L2A-D11",
+   "team": "Conversion Queens",
+   "person_name": "Sijal Angdambe",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sijal Angdambe"
+  },
+  {
+   "seat_code": "L2A-D12",
+   "team": "Conversion Queens",
+   "person_name": "Pushpa Thapa",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Pushpa Thapa"
+  },
+  {
+   "seat_code": "L2A-D13",
+   "team": "Conversion Queens",
+   "person_name": "Ushma Rimal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ushma Rimal"
+  },
+  {
+   "seat_code": "L2A-D14",
+   "team": "Conversion Queens",
+   "person_name": "Ishwori Gurung",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ishwori Gurung"
+  },
+  {
+   "seat_code": "L2A-D15",
+   "team": "Conversion Queens",
+   "person_name": "Aashika Magar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Aashika Magar"
+  },
+  {
+   "seat_code": "L2A-D17",
+   "team": "Veritas Engines",
+   "person_name": "Nikisha Niraula",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Nikisha Niraula"
+  },
+  {
+   "seat_code": "L2A-E01",
+   "team": "Peak Achievers",
+   "person_name": "Soniya Shakya",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Soniya Shakya"
+  },
+  {
+   "seat_code": "L2A-E02",
+   "team": "Peak Achievers",
+   "person_name": "Amshu Budhathoki",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Amshu Budhathoki"
+  },
+  {
+   "seat_code": "L2A-E03",
+   "team": "Peak Achievers",
+   "person_name": "Anisha Kapali",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Anisha Kapali"
+  },
+  {
+   "seat_code": "L2A-E04",
+   "team": "Veritas Engines",
+   "person_name": "Sharmila Kashapati",
+   "is_lead": "no",
+   "handover_to": "Swastika Shakya",
+   "handover_until": "2026-07-31",
+   "notes": "Sharmila Kashapati-Swastika Shakya Till Jul-31"
+  },
+  {
+   "seat_code": "L2A-E05",
+   "team": "Veritas Engines",
+   "person_name": "Sayana Magar",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sayana Magar | Red cell with no team colour beside it (void/block around it); zoned to Veritas Engines, the nearest team (cyan) — please confirm"
+  },
+  {
+   "seat_code": "L2A-E06",
+   "team": "Veritas Engines",
+   "person_name": "Salima Maharjan",
+   "is_lead": "no",
+   "handover_to": "Sweta Kumari Singh",
+   "handover_until": "2026-08-04",
+   "notes": "Salima Maharjan-Sweta Kumari Singh Till Aug-4"
+  },
+  {
+   "seat_code": "L2A-F01",
+   "team": "Veritas Engines",
+   "person_name": "Pratigya Mishra",
+   "is_lead": "no",
+   "handover_to": "Salima Maharjan",
+   "handover_until": "2026-08-04",
+   "notes": "Pratigya Mishra-Salima Maharjan Till Aug-4"
+  },
+  {
+   "seat_code": "L2A-G01",
+   "team": "Veritas Engines",
+   "person_name": "Swastika Shakya",
+   "is_lead": "no",
+   "handover_to": "Sharmila Kashapati",
+   "handover_until": "2026-07-31",
+   "notes": "Swastika Shakya-Sharmila Kashapati Till Jul-31"
+  },
+  {
+   "seat_code": "L2A-H01",
+   "team": "Peak Achievers",
+   "person_name": "Anisha Thapa Magar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Anisha Thapa Magar"
+  },
+  {
+   "seat_code": "L2A-H02",
+   "team": "Peak Achievers",
+   "person_name": "Astha Poudel",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Astha Poudel"
+  },
+  {
+   "seat_code": "L2A-H03",
+   "team": "Peak Achievers",
+   "person_name": "Abigail Urau",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Abigail Urau"
+  },
+  {
+   "seat_code": "L2A-H04",
+   "team": "Peak Achievers",
+   "person_name": "Sumina Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sumina Shrestha"
+  },
+  {
+   "seat_code": "L2A-H06",
+   "team": "Veritas Engines",
+   "person_name": "Nisha Karki",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Nisha Karki"
+  },
+  {
+   "seat_code": "L2A-H07",
+   "team": "Veritas Engines",
+   "person_name": "Sweta Kumari Singh",
+   "is_lead": "no",
+   "handover_to": "Roshani Adhikari",
+   "handover_until": "2026-08-04",
+   "notes": "Sweta Kumari Singh-Roshani Adhikari Till Aug-4"
+  },
+  {
+   "seat_code": "L2A-H08",
+   "team": "Veritas Engines",
+   "person_name": "Deepika Bishwakarma",
+   "is_lead": "no",
+   "handover_to": "Sijal Mainali",
+   "handover_until": "2026-08-04",
+   "notes": "Deepika Bishwakarma-Sijal Mainali Till Aug-4"
+  },
+  {
+   "seat_code": "L2A-H09",
+   "team": "Veritas Engines",
+   "person_name": "Samikshya Baniya",
+   "is_lead": "no",
+   "handover_to": "Swastika Shakya",
+   "handover_until": "2026-07-23",
+   "notes": "Samikshya Baniya-Swastika Shakya Till Jul-23"
+  }
+ ]
+}

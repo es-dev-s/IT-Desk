@@ -1,0 +1,1057 @@
+{
+ "name": "Level 3 (A)",
+ "level": 3,
+ "sortOrder": 50,
+ "seatPrefix": "",
+ "cols": 21,
+ "rows": 9,
+ "notes": "Imported from the seating sheet \"Level-3(A)\" dated 2026-08-05.",
+ "source": {
+  "image": "3-level3A.png",
+  "sheetDate": "2026-08-05",
+  "title": "Level-3(A)"
+ },
+ "elements": [
+  {
+   "id": "l3a-seat-A01",
+   "kind": "seat",
+   "x": 1,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "1",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-A02",
+   "kind": "seat",
+   "x": 2,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "2",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-A03",
+   "kind": "seat",
+   "x": 3,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "3",
+   "team": "Trend Setters",
+   "leadSeat": true
+  },
+  {
+   "id": "l3a-seat-A04",
+   "kind": "seat",
+   "x": 4,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "4",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-A05",
+   "kind": "seat",
+   "x": 5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "5",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-A06",
+   "kind": "seat",
+   "x": 6,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "6",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-A07",
+   "kind": "seat",
+   "x": 7,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "7",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-A08",
+   "kind": "seat",
+   "x": 8,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "8",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-A09",
+   "kind": "seat",
+   "x": 9,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "9",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-A10",
+   "kind": "seat",
+   "x": 10,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "10",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-A11",
+   "kind": "seat",
+   "x": 11,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "11",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-A12",
+   "kind": "seat",
+   "x": 12,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "12",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-A13",
+   "kind": "seat",
+   "x": 13,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "13",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-A14",
+   "kind": "seat",
+   "x": 14,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "14",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-A15",
+   "kind": "seat",
+   "x": 15,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "15",
+   "team": "Deal Avengers",
+   "leadSeat": true
+  },
+  {
+   "id": "l3a-seat-A16",
+   "kind": "seat",
+   "x": 16,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "16",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-A17",
+   "kind": "seat",
+   "x": 17,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "17",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-A18",
+   "kind": "seat",
+   "x": 18,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "18",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-A19",
+   "kind": "seat",
+   "x": 19,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "19",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-A20",
+   "kind": "seat",
+   "x": 20,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "20"
+  },
+  {
+   "id": "l3a-seat-B01",
+   "kind": "seat",
+   "x": 20,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "code": "21",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-C01",
+   "kind": "seat",
+   "x": 1,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "22"
+  },
+  {
+   "id": "l3a-seat-C02",
+   "kind": "seat",
+   "x": 2,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "23",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-C03",
+   "kind": "seat",
+   "x": 3,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "24",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-C04",
+   "kind": "seat",
+   "x": 4,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "25",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-C05",
+   "kind": "seat",
+   "x": 5,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "26",
+   "team": "Trend Setters"
+  },
+  {
+   "id": "l3a-seat-C06",
+   "kind": "seat",
+   "x": 6,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "27",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-C07",
+   "kind": "seat",
+   "x": 7,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "28",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-C08",
+   "kind": "seat",
+   "x": 8,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "29",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-C09",
+   "kind": "seat",
+   "x": 10,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "30",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-C10",
+   "kind": "seat",
+   "x": 11,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "31",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-C11",
+   "kind": "seat",
+   "x": 12,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "32",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-C12",
+   "kind": "seat",
+   "x": 13,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "33",
+   "team": "Nitro Negotiators"
+  },
+  {
+   "id": "l3a-seat-C13",
+   "kind": "seat",
+   "x": 14,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "34",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-C14",
+   "kind": "seat",
+   "x": 15,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "35",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-C15",
+   "kind": "seat",
+   "x": 16,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "36",
+   "team": "Deal Avengers"
+  },
+  {
+   "id": "l3a-seat-C16",
+   "kind": "seat",
+   "x": 17,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "37"
+  },
+  {
+   "id": "l3a-seat-C17",
+   "kind": "seat",
+   "x": 20,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "38",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-D01",
+   "kind": "seat",
+   "x": 5,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "39"
+  },
+  {
+   "id": "l3a-seat-D02",
+   "kind": "seat",
+   "x": 6,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "40"
+  },
+  {
+   "id": "l3a-seat-D03",
+   "kind": "seat",
+   "x": 7,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "41"
+  },
+  {
+   "id": "l3a-seat-D04",
+   "kind": "seat",
+   "x": 8,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "42"
+  },
+  {
+   "id": "l3a-seat-D05",
+   "kind": "seat",
+   "x": 18,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "43",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-D06",
+   "kind": "seat",
+   "x": 20,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "44",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-E01",
+   "kind": "seat",
+   "x": 18,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "45",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-E02",
+   "kind": "seat",
+   "x": 20,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "46",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-F01",
+   "kind": "seat",
+   "x": 18,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "code": "47",
+   "team": "Magic Makers",
+   "leadSeat": true
+  },
+  {
+   "id": "l3a-seat-F02",
+   "kind": "seat",
+   "x": 20,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "code": "48",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-G01",
+   "kind": "seat",
+   "x": 18,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "49",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-G02",
+   "kind": "seat",
+   "x": 20,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "50",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-H01",
+   "kind": "seat",
+   "x": 5,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "code": "51"
+  },
+  {
+   "id": "l3a-seat-H02",
+   "kind": "seat",
+   "x": 6,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "code": "52"
+  },
+  {
+   "id": "l3a-seat-H03",
+   "kind": "seat",
+   "x": 7,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "code": "53"
+  },
+  {
+   "id": "l3a-seat-H04",
+   "kind": "seat",
+   "x": 8,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "code": "54"
+  },
+  {
+   "id": "l3a-seat-H05",
+   "kind": "seat",
+   "x": 9,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "code": "55"
+  },
+  {
+   "id": "l3a-seat-H06",
+   "kind": "seat",
+   "x": 18,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "code": "56",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-seat-H07",
+   "kind": "seat",
+   "x": 20,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "code": "57",
+   "team": "Magic Makers"
+  },
+  {
+   "id": "l3a-block-1",
+   "kind": "block",
+   "x": 1,
+   "y": 1,
+   "w": 19,
+   "h": 2
+  },
+  {
+   "id": "l3a-block-2",
+   "kind": "block",
+   "x": 9,
+   "y": 3,
+   "w": 1,
+   "h": 5
+  },
+  {
+   "id": "l3a-block-3",
+   "kind": "block",
+   "x": 19,
+   "y": 3,
+   "w": 1,
+   "h": 6
+  },
+  {
+   "id": "l3a-block-4",
+   "kind": "block",
+   "x": 5,
+   "y": 5,
+   "w": 4,
+   "h": 3
+  },
+  {
+   "id": "l3a-void-1",
+   "kind": "void",
+   "x": 20,
+   "y": 1,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "id": "l3a-void-2",
+   "kind": "void",
+   "x": 18,
+   "y": 3,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "id": "l3a-void-3",
+   "kind": "void",
+   "x": 1,
+   "y": 4,
+   "w": 4,
+   "h": 5
+  },
+  {
+   "id": "l3a-void-4",
+   "kind": "void",
+   "x": 10,
+   "y": 4,
+   "w": 8,
+   "h": 5
+  },
+  {
+   "id": "l3a-door-1",
+   "kind": "door",
+   "x": 0,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "label": "Door"
+  }
+ ],
+ "people": [
+  {
+   "seat_code": "L3A-A01",
+   "team": "Trend Setters",
+   "person_name": "Jeena Nagarkoti",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Jeena Nagarkoti"
+  },
+  {
+   "seat_code": "L3A-A02",
+   "team": "Trend Setters",
+   "person_name": "Anima Adhikari",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Anima Adhikari"
+  },
+  {
+   "seat_code": "L3A-A03",
+   "team": "Trend Setters",
+   "person_name": "Paridhi Regmi",
+   "is_lead": "yes",
+   "handover_to": "Shraddha Guragain",
+   "handover_until": "",
+   "notes": "Paridhi Regmi-Shraddha Guragain (resigned) | resigned"
+  },
+  {
+   "seat_code": "L3A-A04",
+   "team": "Trend Setters",
+   "person_name": "Nita Kumal",
+   "is_lead": "no",
+   "handover_to": "Prinsa Joshi",
+   "handover_until": "2026-07-15",
+   "notes": "Nita Kumal-Prinsa Joshi Till Jul-15"
+  },
+  {
+   "seat_code": "L3A-A05",
+   "team": "Trend Setters",
+   "person_name": "Sonali Gupta",
+   "is_lead": "no",
+   "handover_to": "Paridhi Regmi",
+   "handover_until": "2026-07-15",
+   "notes": "Sonali Gupta-Paridhi Regmi Till Jul-15"
+  },
+  {
+   "seat_code": "L3A-A06",
+   "team": "Trend Setters",
+   "person_name": "Prinsa Joshi",
+   "is_lead": "no",
+   "handover_to": "Nita Kumal",
+   "handover_until": "2026-07-15",
+   "notes": "Prinsa Joshi-Nita Kumal Till Jul-15"
+  },
+  {
+   "seat_code": "L3A-A07",
+   "team": "Nitro Negotiators",
+   "person_name": "Baishali Thapa",
+   "is_lead": "no",
+   "handover_to": "Sonali Gupta",
+   "handover_until": "2026-07-15",
+   "notes": "Baishali Thapa-Sonali Gupta Till Jul-15"
+  },
+  {
+   "seat_code": "L3A-A08",
+   "team": "Nitro Negotiators",
+   "person_name": "Aakriti Rajbahak",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Aakriti Rajbahak"
+  },
+  {
+   "seat_code": "L3A-A09",
+   "team": "Nitro Negotiators",
+   "person_name": "Shristi Pokhrel",
+   "is_lead": "no",
+   "handover_to": "Robsha Shakya",
+   "handover_until": "2026-08-04",
+   "notes": "Shristi Pokhrel-Robsha Shakya Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-A10",
+   "team": "Nitro Negotiators",
+   "person_name": "Pabina Makaju",
+   "is_lead": "no",
+   "handover_to": "Anisha Shakya",
+   "handover_until": "2026-08-04",
+   "notes": "Pabina Makaju-Anisha Shakya Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-A11",
+   "team": "Nitro Negotiators",
+   "person_name": "Robsha Shakya",
+   "is_lead": "no",
+   "handover_to": "Prashamsha Dahal",
+   "handover_until": "2026-08-04",
+   "notes": "Robsha Shakya-Prashamsha Dahal Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-A12",
+   "team": "Deal Avengers",
+   "person_name": "Siya Ojha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Siya OjhaTill"
+  },
+  {
+   "seat_code": "L3A-A13",
+   "team": "Deal Avengers",
+   "person_name": "Pradika Khatri",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Pradika Khatri"
+  },
+  {
+   "seat_code": "L3A-A14",
+   "team": "Deal Avengers",
+   "person_name": "Sarina Pradhan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sarina Pradhan"
+  },
+  {
+   "seat_code": "L3A-A15",
+   "team": "Deal Avengers",
+   "person_name": "Pragya Dahal",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Pragya Dahal"
+  },
+  {
+   "seat_code": "L3A-A16",
+   "team": "Deal Avengers",
+   "person_name": "Riya Khatiwada",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Riya Khatiwada"
+  },
+  {
+   "seat_code": "L3A-A17",
+   "team": "Deal Avengers",
+   "person_name": "Sumiksha Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sumiksha Shrestha"
+  },
+  {
+   "seat_code": "L3A-A18",
+   "team": "Deal Avengers",
+   "person_name": "Sachina Kawadi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sachina Kawadi"
+  },
+  {
+   "seat_code": "L3A-A19",
+   "team": "Deal Avengers",
+   "person_name": "Ankita Kumari Yadav",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ankita Kumari Yadav"
+  },
+  {
+   "seat_code": "L3A-B01",
+   "team": "Magic Makers",
+   "person_name": "Rebika Gochhe",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rebika Gochhe"
+  },
+  {
+   "seat_code": "L3A-C02",
+   "team": "Trend Setters",
+   "person_name": "Reshma Shilpakar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Reshma Shilpakar"
+  },
+  {
+   "seat_code": "L3A-C03",
+   "team": "Trend Setters",
+   "person_name": "Jelisha Raut",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Jelisha Raut"
+  },
+  {
+   "seat_code": "L3A-C04",
+   "team": "Trend Setters",
+   "person_name": "Prinsha Tuladhar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Prinsha Tuladhar"
+  },
+  {
+   "seat_code": "L3A-C05",
+   "team": "Trend Setters",
+   "person_name": "Sunita Tamang",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sunita Tamang"
+  },
+  {
+   "seat_code": "L3A-C06",
+   "team": "Nitro Negotiators",
+   "person_name": "Prashamsha Dahal",
+   "is_lead": "no",
+   "handover_to": "Aakriti Rajbahak",
+   "handover_until": "2026-08-04",
+   "notes": "Prashamsha Dahal-Aakriti Rajbahak Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-C07",
+   "team": "Nitro Negotiators",
+   "person_name": "Anisha Shakya",
+   "is_lead": "no",
+   "handover_to": "Baishali Thapa",
+   "handover_until": "2026-08-04",
+   "notes": "Anisha Shakya-Baishali Thapa Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-C08",
+   "team": "Nitro Negotiators",
+   "person_name": "Esther Tamang",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Esther Tamang"
+  },
+  {
+   "seat_code": "L3A-C09",
+   "team": "Nitro Negotiators",
+   "person_name": "Prashree Phuyal",
+   "is_lead": "no",
+   "handover_to": "Pabina Makaju",
+   "handover_until": "2026-08-04",
+   "notes": "Prashree Phuyal-Pabina Makaju Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-C10",
+   "team": "Nitro Negotiators",
+   "person_name": "Samikshya Gurung",
+   "is_lead": "no",
+   "handover_to": "Shristi Pokhrel",
+   "handover_until": "2026-08-04",
+   "notes": "Samikshya Gurung-Shristi Pokhrel Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-C11",
+   "team": "Nitro Negotiators",
+   "person_name": "Prashree Phuyal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-08-04",
+   "notes": "Prashree Phuyal Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-C12",
+   "team": "Nitro Negotiators",
+   "person_name": "Samikshya Gurung",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-08-04",
+   "notes": "Samikshya Gurung Till-Aug-4"
+  },
+  {
+   "seat_code": "L3A-C13",
+   "team": "Deal Avengers",
+   "person_name": "Shreeja Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Shreeja Shrestha"
+  },
+  {
+   "seat_code": "L3A-C14",
+   "team": "Deal Avengers",
+   "person_name": "Sanisha Lama",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sanisha Lama"
+  },
+  {
+   "seat_code": "L3A-C15",
+   "team": "Deal Avengers",
+   "person_name": "Parbati Bhujel",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Parbati Bhujel"
+  },
+  {
+   "seat_code": "L3A-C17",
+   "team": "Magic Makers",
+   "person_name": "Sushimta Gumanju",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sushimta Gumanju"
+  },
+  {
+   "seat_code": "L3A-D05",
+   "team": "Magic Makers",
+   "person_name": "Apsara Chhetri",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Apsara Chhetri"
+  },
+  {
+   "seat_code": "L3A-D06",
+   "team": "Magic Makers",
+   "person_name": "Yeshika Thapa",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Yeshika Thapa"
+  },
+  {
+   "seat_code": "L3A-E01",
+   "team": "Magic Makers",
+   "person_name": "Anju Sah",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Anju Sah"
+  },
+  {
+   "seat_code": "L3A-E02",
+   "team": "Magic Makers",
+   "person_name": "Rejina Pradhan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-08-04",
+   "notes": "Rejina Pradhan Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-F01",
+   "team": "Magic Makers",
+   "person_name": "Smriti Shrestha",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Smriti Shrestha"
+  },
+  {
+   "seat_code": "L3A-F02",
+   "team": "Magic Makers",
+   "person_name": "Rejina Pradhan",
+   "is_lead": "no",
+   "handover_to": "Rebika Gochhe",
+   "handover_until": "2026-08-04",
+   "notes": "Rejina Pradhan-Rebika Gochhe Till-Aug-4"
+  },
+  {
+   "seat_code": "L3A-G01",
+   "team": "Magic Makers",
+   "person_name": "Sumitra Lama",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sumitra Lama"
+  },
+  {
+   "seat_code": "L3A-G02",
+   "team": "Magic Makers",
+   "person_name": "Sarila Gurung",
+   "is_lead": "no",
+   "handover_to": "Kritika Chaudhary",
+   "handover_until": "2026-08-04",
+   "notes": "Sarila Gurung-Kritika Chaudhary Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-H06",
+   "team": "Magic Makers",
+   "person_name": "Kritika Chaudhary",
+   "is_lead": "no",
+   "handover_to": "Sarila Gurung",
+   "handover_until": "2026-08-04",
+   "notes": "Kritika Chaudhary-Sarila Gurung Till Aug-4"
+  },
+  {
+   "seat_code": "L3A-H07",
+   "team": "Magic Makers",
+   "person_name": "Samikshya Neupane",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Samikshya Neupane"
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+# Secrets — never commit real credentials. Templates (.env.example) stay tracked.
+.env
+.env.*
+!.env.example
+.envrc
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Generated passwords from local seed runs
+**/.seed-credentials.txt
+**/.seed-credentials.txt.tmp
+**/.it-staff-credentials.txt
+
+# Local process logs, pid files, and the built API binary
+.run/
+*.log
+*.pid
+/bin/
+backend/bin/
+backend/tmp/
+__debug_bin*
+
+# Project-local Go caches and test output
+.cache/
+coverage/
+*.coverprofile
+*.out
+
+# Frontend install, build, and local QA (screenshots and browser downloads)
+Frontend/node_modules/
+Frontend/.next/
+Frontend/out/
+Frontend/.qa/
+Frontend/coverage/
+Frontend/.vercel
+
+# OS and editor scratch files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/

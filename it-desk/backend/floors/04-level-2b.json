@@ -1,0 +1,1542 @@
+{
+ "name": "Level 2 (B)",
+ "level": 2,
+ "sortOrder": 40,
+ "seatPrefix": "",
+ "cols": 25,
+ "rows": 8,
+ "notes": "Imported from the seating sheet \"Level-2(B)\" dated 2026-08-25.",
+ "source": {
+  "image": "4-level2B.png",
+  "sheetDate": "2026-08-25",
+  "title": "Level-2(B)"
+ },
+ "elements": [
+  {
+   "id": "l2b-seat-A01",
+   "kind": "seat",
+   "x": 12,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "1",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-A02",
+   "kind": "seat",
+   "x": 13,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "2",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-A03",
+   "kind": "seat",
+   "x": 14,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "3",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-A04",
+   "kind": "seat",
+   "x": 16,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "4",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-A05",
+   "kind": "seat",
+   "x": 17,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "5",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-A06",
+   "kind": "seat",
+   "x": 18,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "6",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-A07",
+   "kind": "seat",
+   "x": 19,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "7",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-A08",
+   "kind": "seat",
+   "x": 20,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "code": "8"
+  },
+  {
+   "id": "l2b-seat-B01",
+   "kind": "seat",
+   "x": 23,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "code": "9",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-B02",
+   "kind": "seat",
+   "x": 24,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "code": "10",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-C01",
+   "kind": "seat",
+   "x": 0,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "11",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-C02",
+   "kind": "seat",
+   "x": 1,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "12",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-C03",
+   "kind": "seat",
+   "x": 2,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "13"
+  },
+  {
+   "id": "l2b-seat-D01",
+   "kind": "seat",
+   "x": 4,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "14"
+  },
+  {
+   "id": "l2b-seat-D02",
+   "kind": "seat",
+   "x": 5,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "15"
+  },
+  {
+   "id": "l2b-seat-D03",
+   "kind": "seat",
+   "x": 6,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "16"
+  },
+  {
+   "id": "l2b-seat-D04",
+   "kind": "seat",
+   "x": 7,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "17"
+  },
+  {
+   "id": "l2b-seat-D05",
+   "kind": "seat",
+   "x": 8,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "18",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D06",
+   "kind": "seat",
+   "x": 9,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "19",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D07",
+   "kind": "seat",
+   "x": 10,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "20",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D08",
+   "kind": "seat",
+   "x": 11,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "21",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D09",
+   "kind": "seat",
+   "x": 12,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "22",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D10",
+   "kind": "seat",
+   "x": 13,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "23",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D11",
+   "kind": "seat",
+   "x": 14,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "24",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D12",
+   "kind": "seat",
+   "x": 15,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "25",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D13",
+   "kind": "seat",
+   "x": 16,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "26",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D14",
+   "kind": "seat",
+   "x": 17,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "27",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D15",
+   "kind": "seat",
+   "x": 18,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "28",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D16",
+   "kind": "seat",
+   "x": 19,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "29",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D17",
+   "kind": "seat",
+   "x": 20,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "30",
+   "team": "Fortune Finders"
+  },
+  {
+   "id": "l2b-seat-D18",
+   "kind": "seat",
+   "x": 23,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "31",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-D19",
+   "kind": "seat",
+   "x": 24,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "32",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-E01",
+   "kind": "seat",
+   "x": 0,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "33",
+   "team": "Ace Performers",
+   "leadSeat": true
+  },
+  {
+   "id": "l2b-seat-E02",
+   "kind": "seat",
+   "x": 1,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "34",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-E03",
+   "kind": "seat",
+   "x": 2,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "35",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-E04",
+   "kind": "seat",
+   "x": 4,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "36"
+  },
+  {
+   "id": "l2b-seat-E05",
+   "kind": "seat",
+   "x": 5,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "37",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-E06",
+   "kind": "seat",
+   "x": 6,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "38",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-E07",
+   "kind": "seat",
+   "x": 7,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "39",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-E08",
+   "kind": "seat",
+   "x": 8,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "40",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-E09",
+   "kind": "seat",
+   "x": 9,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "41"
+  },
+  {
+   "id": "l2b-seat-E10",
+   "kind": "seat",
+   "x": 10,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "42",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-E11",
+   "kind": "seat",
+   "x": 11,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "43",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-E12",
+   "kind": "seat",
+   "x": 12,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "44",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-E13",
+   "kind": "seat",
+   "x": 13,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "45",
+   "team": "Elite Closers",
+   "leadSeat": true
+  },
+  {
+   "id": "l2b-seat-E14",
+   "kind": "seat",
+   "x": 14,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "46",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-E15",
+   "kind": "seat",
+   "x": 15,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "47",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-E16",
+   "kind": "seat",
+   "x": 16,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "48",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-E17",
+   "kind": "seat",
+   "x": 17,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "49"
+  },
+  {
+   "id": "l2b-seat-E18",
+   "kind": "seat",
+   "x": 18,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "50",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-E19",
+   "kind": "seat",
+   "x": 19,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "51",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-E20",
+   "kind": "seat",
+   "x": 20,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "52",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-E21",
+   "kind": "seat",
+   "x": 23,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "53",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-E22",
+   "kind": "seat",
+   "x": 24,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "code": "54",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-F01",
+   "kind": "seat",
+   "x": 0,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "55",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-F02",
+   "kind": "seat",
+   "x": 1,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "56",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-F03",
+   "kind": "seat",
+   "x": 2,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "57",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-F04",
+   "kind": "seat",
+   "x": 3,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "58",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-F05",
+   "kind": "seat",
+   "x": 4,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "59",
+   "team": "Ace Performers"
+  },
+  {
+   "id": "l2b-seat-F06",
+   "kind": "seat",
+   "x": 5,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "60"
+  },
+  {
+   "id": "l2b-seat-F07",
+   "kind": "seat",
+   "x": 6,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "61",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-F08",
+   "kind": "seat",
+   "x": 7,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "62",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-F09",
+   "kind": "seat",
+   "x": 8,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "63",
+   "team": "Limit Breakers",
+   "leadSeat": true
+  },
+  {
+   "id": "l2b-seat-F10",
+   "kind": "seat",
+   "x": 9,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "64",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-F11",
+   "kind": "seat",
+   "x": 10,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "65",
+   "team": "Limit Breakers"
+  },
+  {
+   "id": "l2b-seat-F12",
+   "kind": "seat",
+   "x": 11,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "66",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-F13",
+   "kind": "seat",
+   "x": 12,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "67",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-F14",
+   "kind": "seat",
+   "x": 13,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "68",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-F15",
+   "kind": "seat",
+   "x": 14,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "69",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-F16",
+   "kind": "seat",
+   "x": 15,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "70",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-F17",
+   "kind": "seat",
+   "x": 16,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "71",
+   "team": "Elite Closers"
+  },
+  {
+   "id": "l2b-seat-F18",
+   "kind": "seat",
+   "x": 18,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "72",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-F19",
+   "kind": "seat",
+   "x": 19,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "73",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-F20",
+   "kind": "seat",
+   "x": 20,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "74",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-F21",
+   "kind": "seat",
+   "x": 21,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "75",
+   "team": "Victoria",
+   "leadSeat": true
+  },
+  {
+   "id": "l2b-seat-F22",
+   "kind": "seat",
+   "x": 22,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "76",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-F23",
+   "kind": "seat",
+   "x": 23,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "77",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-seat-F24",
+   "kind": "seat",
+   "x": 24,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "78",
+   "team": "Victoria"
+  },
+  {
+   "id": "l2b-block-1",
+   "kind": "block",
+   "x": 3,
+   "y": 1,
+   "w": 1,
+   "h": 6
+  },
+  {
+   "id": "l2b-block-2",
+   "kind": "block",
+   "x": 11,
+   "y": 1,
+   "w": 1,
+   "h": 3
+  },
+  {
+   "id": "l2b-block-3",
+   "kind": "block",
+   "x": 15,
+   "y": 1,
+   "w": 1,
+   "h": 3
+  },
+  {
+   "id": "l2b-block-4",
+   "kind": "block",
+   "x": 4,
+   "y": 2,
+   "w": 7,
+   "h": 2
+  },
+  {
+   "id": "l2b-block-5",
+   "kind": "block",
+   "x": 12,
+   "y": 2,
+   "w": 3,
+   "h": 2
+  },
+  {
+   "id": "l2b-block-6",
+   "kind": "block",
+   "x": 16,
+   "y": 2,
+   "w": 7,
+   "h": 2
+  },
+  {
+   "id": "l2b-block-7",
+   "kind": "block",
+   "x": 23,
+   "y": 3,
+   "w": 2,
+   "h": 1
+  },
+  {
+   "id": "l2b-block-8",
+   "kind": "block",
+   "x": 0,
+   "y": 4,
+   "w": 3,
+   "h": 1
+  },
+  {
+   "id": "l2b-block-9",
+   "kind": "block",
+   "x": 21,
+   "y": 4,
+   "w": 2,
+   "h": 3
+  },
+  {
+   "id": "l2b-block-10",
+   "kind": "block",
+   "x": 0,
+   "y": 6,
+   "w": 3,
+   "h": 1
+  },
+  {
+   "id": "l2b-block-11",
+   "kind": "block",
+   "x": 4,
+   "y": 6,
+   "w": 17,
+   "h": 1
+  },
+  {
+   "id": "l2b-block-12",
+   "kind": "block",
+   "x": 23,
+   "y": 6,
+   "w": 2,
+   "h": 1
+  },
+  {
+   "id": "l2b-void-1",
+   "kind": "void",
+   "x": 0,
+   "y": 1,
+   "w": 3,
+   "h": 2
+  },
+  {
+   "id": "l2b-void-2",
+   "kind": "void",
+   "x": 4,
+   "y": 1,
+   "w": 7,
+   "h": 1
+  },
+  {
+   "id": "l2b-void-3",
+   "kind": "void",
+   "x": 21,
+   "y": 1,
+   "w": 4,
+   "h": 1
+  },
+  {
+   "id": "l2b-door-1",
+   "kind": "door",
+   "x": 3,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "label": "Door"
+  },
+  {
+   "id": "l2b-door-2",
+   "kind": "door",
+   "x": 15,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "label": "2nd Door"
+  }
+ ],
+ "people": [
+  {
+   "seat_code": "L2B-A01",
+   "team": "Fortune Finders",
+   "person_name": "Smriti Nepal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-22",
+   "notes": "Smriti Nepal Till Jul-22"
+  },
+  {
+   "seat_code": "L2B-A02",
+   "team": "Fortune Finders",
+   "person_name": "Trishala Rai",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Trishala Rai"
+  },
+  {
+   "seat_code": "L2B-A03",
+   "team": "Fortune Finders",
+   "person_name": "Linda Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Linda Shrestha"
+  },
+  {
+   "seat_code": "L2B-A04",
+   "team": "Fortune Finders",
+   "person_name": "Aruna Thapa Magar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Aruna Thapa Magar"
+  },
+  {
+   "seat_code": "L2B-A05",
+   "team": "Fortune Finders",
+   "person_name": "Laja Shakya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Laja Shakya"
+  },
+  {
+   "seat_code": "L2B-A06",
+   "team": "Fortune Finders",
+   "person_name": "Karuna Adhikari",
+   "is_lead": "no",
+   "handover_to": "Karuna Budhathoki",
+   "handover_until": "2026-08-02",
+   "notes": "Karuna Adhikari-Karuna Budhathoki Till Aug-2"
+  },
+  {
+   "seat_code": "L2B-A07",
+   "team": "Fortune Finders",
+   "person_name": "Karuna Budhathoki",
+   "is_lead": "no",
+   "handover_to": "Karuna Adhikari",
+   "handover_until": "2026-08-02",
+   "notes": "Karuna Budhathoki-Karuna Adhikari Till Aug-2"
+  },
+  {
+   "seat_code": "L2B-B01",
+   "team": "Victoria",
+   "person_name": "Rubina Basnet",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rubina Basnet"
+  },
+  {
+   "seat_code": "L2B-B02",
+   "team": "Victoria",
+   "person_name": "Sujita Thapaliya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-08-24",
+   "notes": "Sujita Thapaliya Till Aug-24"
+  },
+  {
+   "seat_code": "L2B-C01",
+   "team": "Ace Performers",
+   "person_name": "Keepa Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Keepa Shrestha"
+  },
+  {
+   "seat_code": "L2B-C02",
+   "team": "Ace Performers",
+   "person_name": "Deepika Ale Magar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Deepika Ale Magar"
+  },
+  {
+   "seat_code": "L2B-D05",
+   "team": "Fortune Finders",
+   "person_name": "Karuna Adhikari",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-28",
+   "notes": "Karuna Adhikari Till Jul-28"
+  },
+  {
+   "seat_code": "L2B-D06",
+   "team": "Fortune Finders",
+   "person_name": "Karuna Budhathoki",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-28",
+   "notes": "Karuna Budhathoki till Jul-28"
+  },
+  {
+   "seat_code": "L2B-D07",
+   "team": "Fortune Finders",
+   "person_name": "Laja Shakya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-28",
+   "notes": "Laja Shakya till Jul-28"
+  },
+  {
+   "seat_code": "L2B-D08",
+   "team": "Fortune Finders",
+   "person_name": "Aruna Thapa Magar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-28",
+   "notes": "Aruna Thapa Magar Till Jul-28"
+  },
+  {
+   "seat_code": "L2B-D09",
+   "team": "Fortune Finders",
+   "person_name": "Rakshya Khadka",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rakshya Khadka"
+  },
+  {
+   "seat_code": "L2B-D10",
+   "team": "Fortune Finders",
+   "person_name": "Linda Shrestha",
+   "is_lead": "no",
+   "handover_to": "Rakshya Khadka",
+   "handover_until": "2026-07-22",
+   "notes": "Linda Shrestha-Rakshya Khadka Till Jul-22"
+  },
+  {
+   "seat_code": "L2B-D11",
+   "team": "Fortune Finders",
+   "person_name": "Trishala Rai",
+   "is_lead": "no",
+   "handover_to": "Pragya Mali",
+   "handover_until": "2026-07-22",
+   "notes": "Trishala Rai-Pragya Mali Till Jul-22"
+  },
+  {
+   "seat_code": "L2B-D12",
+   "team": "Fortune Finders",
+   "person_name": "Smriti Nepal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Smriti Nepal"
+  },
+  {
+   "seat_code": "L2B-D13",
+   "team": "Fortune Finders",
+   "person_name": "Rojina Tandukar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rojina Tandukar"
+  },
+  {
+   "seat_code": "L2B-D14",
+   "team": "Fortune Finders",
+   "person_name": "Junu Lama",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Junu Lama"
+  },
+  {
+   "seat_code": "L2B-D15",
+   "team": "Fortune Finders",
+   "person_name": "Wangmo Lama",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Wangmo Lama"
+  },
+  {
+   "seat_code": "L2B-D16",
+   "team": "Fortune Finders",
+   "person_name": "Amisha Gurung",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Amisha Gurung"
+  },
+  {
+   "seat_code": "L2B-D17",
+   "team": "Fortune Finders",
+   "person_name": "Pallavi Pradhanang",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Pallavi Pradhanang"
+  },
+  {
+   "seat_code": "L2B-D18",
+   "team": "Victoria",
+   "person_name": "Sabina Thapa",
+   "is_lead": "no",
+   "handover_to": "Rubina Basnet",
+   "handover_until": "2026-07-12",
+   "notes": "Sabina Thapa-Rubina Basnet Till Jul-12"
+  },
+  {
+   "seat_code": "L2B-D19",
+   "team": "Victoria",
+   "person_name": "Diksha Gharti",
+   "is_lead": "no",
+   "handover_to": "Krishmita Basnet",
+   "handover_until": "2026-07-12",
+   "notes": "Diksha Gharti-Krishmita Basnet Till Jul-12"
+  },
+  {
+   "seat_code": "L2B-E01",
+   "team": "Ace Performers",
+   "person_name": "Jharna Prasai",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Jharna Prasai"
+  },
+  {
+   "seat_code": "L2B-E02",
+   "team": "Ace Performers",
+   "person_name": "Kanchan Maharjan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Kanchan Maharjan"
+  },
+  {
+   "seat_code": "L2B-E03",
+   "team": "Ace Performers",
+   "person_name": "Nibika Khadgi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Nibika Khadgi"
+  },
+  {
+   "seat_code": "L2B-E05",
+   "team": "Limit Breakers",
+   "person_name": "Pushpa Rijal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Pushpa Rijal"
+  },
+  {
+   "seat_code": "L2B-E06",
+   "team": "Limit Breakers",
+   "person_name": "Pramita Pudasaini",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Pramita Pudasaini"
+  },
+  {
+   "seat_code": "L2B-E07",
+   "team": "Limit Breakers",
+   "person_name": "Bitisha Khadka Sear",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Bitisha Khadka Sear"
+  },
+  {
+   "seat_code": "L2B-E08",
+   "team": "Limit Breakers",
+   "person_name": "Roshni Thapa",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Roshni Thapa"
+  },
+  {
+   "seat_code": "L2B-E10",
+   "team": "Elite Closers",
+   "person_name": "Sanjita Dahal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-10",
+   "notes": "- Sanjita Dahal Till Jul-10"
+  },
+  {
+   "seat_code": "L2B-E11",
+   "team": "Elite Closers",
+   "person_name": "Nisha Bharati",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Nisha Bharati"
+  },
+  {
+   "seat_code": "L2B-E12",
+   "team": "Elite Closers",
+   "person_name": "Diksha Rai",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Diksha Rai"
+  },
+  {
+   "seat_code": "L2B-E13",
+   "team": "Elite Closers",
+   "person_name": "Ayushma Shrestha",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ayushma Shrestha"
+  },
+  {
+   "seat_code": "L2B-E14",
+   "team": "Elite Closers",
+   "person_name": "Yogisha Nakarmi",
+   "is_lead": "no",
+   "handover_to": "Sanjita Dahal",
+   "handover_until": "2026-07-17",
+   "notes": "Yogisha Nakarmi -Sanjita Dahal Till Jul-17"
+  },
+  {
+   "seat_code": "L2B-E15",
+   "team": "Elite Closers",
+   "person_name": "Nepal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "…Nepal"
+  },
+  {
+   "seat_code": "L2B-E16",
+   "team": "Elite Closers",
+   "person_name": "Sanjita Dahal",
+   "is_lead": "no",
+   "handover_to": "Yogisha Nakarmi",
+   "handover_until": "2026-07-17",
+   "notes": "Sanjita Dahal-Yogisha Nakarmi Till Jul-17"
+  },
+  {
+   "seat_code": "L2B-E18",
+   "team": "Victoria",
+   "person_name": "Riya Shrestha",
+   "is_lead": "no",
+   "handover_to": "Pranjali Prasai",
+   "handover_until": "2026-07-12",
+   "notes": "Riya Shrestha-Pranjali Prasai Till Jul-12"
+  },
+  {
+   "seat_code": "L2B-E19",
+   "team": "Victoria",
+   "person_name": "Sabita Koirala",
+   "is_lead": "no",
+   "handover_to": "Sujita Thapaliya",
+   "handover_until": "2026-07-13",
+   "notes": "Sabita Koirala-Sujita Thapaliya Till Jul-13"
+  },
+  {
+   "seat_code": "L2B-E20",
+   "team": "Victoria",
+   "person_name": "Krishna Adhikari",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-08-24",
+   "notes": "Krishna Adhikari Till Aug-24"
+  },
+  {
+   "seat_code": "L2B-E21",
+   "team": "Victoria",
+   "person_name": "Menuka Pulami Magar",
+   "is_lead": "no",
+   "handover_to": "Aarju Katel",
+   "handover_until": "2026-07-12",
+   "notes": "Menuka Pulami Magar-Aarju Katel Till Jul-12"
+  },
+  {
+   "seat_code": "L2B-E22",
+   "team": "Victoria",
+   "person_name": "Rubina Basnet",
+   "is_lead": "no",
+   "handover_to": "Sushma Neupane",
+   "handover_until": "2026-08-24",
+   "notes": "Rubina Basnet - Sushma Neupane Till Aug-24"
+  },
+  {
+   "seat_code": "L2B-F01",
+   "team": "Ace Performers",
+   "person_name": "Aditi Dhungana",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Aditi Dhungana"
+  },
+  {
+   "seat_code": "L2B-F02",
+   "team": "Ace Performers",
+   "person_name": "Neha Khanal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Neha Khanal"
+  },
+  {
+   "seat_code": "L2B-F03",
+   "team": "Ace Performers",
+   "person_name": "Malina Maharjan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Malina Maharjan"
+  },
+  {
+   "seat_code": "L2B-F04",
+   "team": "Ace Performers",
+   "person_name": "Anjila Limbu",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Anjila Limbu"
+  },
+  {
+   "seat_code": "L2B-F05",
+   "team": "Ace Performers",
+   "person_name": "Shreya Khadgi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Shreya Khadgi"
+  },
+  {
+   "seat_code": "L2B-F07",
+   "team": "Limit Breakers",
+   "person_name": "Ismarika Baral",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ismarika Baral"
+  },
+  {
+   "seat_code": "L2B-F08",
+   "team": "Limit Breakers",
+   "person_name": "Ruchi Sthapith",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ruchi Sthapith"
+  },
+  {
+   "seat_code": "L2B-F09",
+   "team": "Limit Breakers",
+   "person_name": "Puja Puri",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Puja Puri"
+  },
+  {
+   "seat_code": "L2B-F10",
+   "team": "Limit Breakers",
+   "person_name": "Lilen Nakarmi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Lilen Nakarmi"
+  },
+  {
+   "seat_code": "L2B-F11",
+   "team": "Limit Breakers",
+   "person_name": "Yamuna Hamal",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Yamuna Hamal"
+  },
+  {
+   "seat_code": "L2B-F12",
+   "team": "Elite Closers",
+   "person_name": "Sunita Tamang",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sunita Tamang"
+  },
+  {
+   "seat_code": "L2B-F13",
+   "team": "Elite Closers",
+   "person_name": "Aashma Gaire",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Aashma Gaire"
+  },
+  {
+   "seat_code": "L2B-F14",
+   "team": "Elite Closers",
+   "person_name": "Samridhi Pradhan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Samridhi Pradhan"
+  },
+  {
+   "seat_code": "L2B-F15",
+   "team": "Elite Closers",
+   "person_name": "Nandani Rauniyar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Nandani Rauniyar"
+  },
+  {
+   "seat_code": "L2B-F16",
+   "team": "Elite Closers",
+   "person_name": "Ayusma Lama",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Ayusma Lama"
+  },
+  {
+   "seat_code": "L2B-F17",
+   "team": "Elite Closers",
+   "person_name": "Archana Yadav",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Archana Yadav"
+  },
+  {
+   "seat_code": "L2B-F18",
+   "team": "Victoria",
+   "person_name": "Hna Adhikari",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "…hna Adhikari"
+  },
+  {
+   "seat_code": "L2B-F19",
+   "team": "Victoria",
+   "person_name": "Dristi Poudel",
+   "is_lead": "no",
+   "handover_to": "Asmita Khanal",
+   "handover_until": "2026-07-13",
+   "notes": "Dristi Poudel-Asmita Khanal Till Jul-13"
+  },
+  {
+   "seat_code": "L2B-F20",
+   "team": "Victoria",
+   "person_name": "Asmita Khanal",
+   "is_lead": "no",
+   "handover_to": "Pranjali Prasai",
+   "handover_until": "2026-08-24",
+   "notes": "Asmita Khanal-Pranjali Prasai Till Aug-24"
+  },
+  {
+   "seat_code": "L2B-F21",
+   "team": "Victoria",
+   "person_name": "Meena Kamacharya",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Meena Kamacharya"
+  },
+  {
+   "seat_code": "L2B-F22",
+   "team": "Victoria",
+   "person_name": "Aarju Katel",
+   "is_lead": "no",
+   "handover_to": "Asmita Khanal",
+   "handover_until": "2026-08-24",
+   "notes": "Aarju Katel-Asmita Khanal Till Aug-24"
+  },
+  {
+   "seat_code": "L2B-F23",
+   "team": "Victoria",
+   "person_name": "Krishmita Basnet",
+   "is_lead": "no",
+   "handover_to": "Sabita Koirala",
+   "handover_until": "2026-07-13",
+   "notes": "Krishmita Basnet-Sabita Koirala Till Jul-13"
+  },
+  {
+   "seat_code": "L2B-F24",
+   "team": "Victoria",
+   "person_name": "Sujita Thapaliya",
+   "is_lead": "no",
+   "handover_to": "Aarju Katel",
+   "handover_until": "2026-08-24",
+   "notes": "Sujita Thapaliya-Aarju Katel Till Aug-24"
+  }
+ ]
+}

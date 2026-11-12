@@ -1,0 +1,347 @@
+{
+ "name": "Level 1 (A)",
+ "level": 1,
+ "sortOrder": 10,
+ "seatPrefix": "",
+ "cols": 12,
+ "rows": 8,
+ "notes": "Imported from the seating sheet \"Level-1 (A)\" dated 2026-07-28.",
+ "source": {
+  "image": "7-level1A.png",
+  "sheetDate": "2026-07-28",
+  "title": "Level-1 (A)"
+ },
+ "elements": [
+  {
+   "id": "l1a-seat-A01",
+   "kind": "seat",
+   "x": 1,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "1"
+  },
+  {
+   "id": "l1a-seat-A02",
+   "kind": "seat",
+   "x": 2,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "2",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-A03",
+   "kind": "seat",
+   "x": 3,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "3",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-A04",
+   "kind": "seat",
+   "x": 4,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "4",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-A05",
+   "kind": "seat",
+   "x": 5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "5",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-A06",
+   "kind": "seat",
+   "x": 6,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "6",
+   "team": "Language Warriors",
+   "leadSeat": true
+  },
+  {
+   "id": "l1a-seat-B01",
+   "kind": "seat",
+   "x": 2,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "7"
+  },
+  {
+   "id": "l1a-seat-B02",
+   "kind": "seat",
+   "x": 3,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "8"
+  },
+  {
+   "id": "l1a-seat-B03",
+   "kind": "seat",
+   "x": 4,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "9"
+  },
+  {
+   "id": "l1a-seat-B04",
+   "kind": "seat",
+   "x": 5,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "10",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-C01",
+   "kind": "seat",
+   "x": 1,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "11"
+  },
+  {
+   "id": "l1a-seat-C02",
+   "kind": "seat",
+   "x": 2,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "12",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-C03",
+   "kind": "seat",
+   "x": 3,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "13"
+  },
+  {
+   "id": "l1a-seat-C04",
+   "kind": "seat",
+   "x": 4,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "14"
+  },
+  {
+   "id": "l1a-seat-C05",
+   "kind": "seat",
+   "x": 5,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "code": "15"
+  },
+  {
+   "id": "l1a-seat-D01",
+   "kind": "seat",
+   "x": 1,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "16"
+  },
+  {
+   "id": "l1a-seat-D02",
+   "kind": "seat",
+   "x": 2,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "17",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-D03",
+   "kind": "seat",
+   "x": 3,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "18"
+  },
+  {
+   "id": "l1a-seat-D04",
+   "kind": "seat",
+   "x": 4,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "19",
+   "team": "Language Warriors"
+  },
+  {
+   "id": "l1a-seat-D05",
+   "kind": "seat",
+   "x": 5,
+   "y": 7,
+   "w": 1,
+   "h": 1,
+   "code": "20"
+  },
+  {
+   "id": "l1a-block-1",
+   "kind": "block",
+   "x": 1,
+   "y": 1,
+   "w": 9,
+   "h": 2
+  },
+  {
+   "id": "l1a-block-2",
+   "kind": "block",
+   "x": 6,
+   "y": 3,
+   "w": 1,
+   "h": 5
+  },
+  {
+   "id": "l1a-block-3",
+   "kind": "block",
+   "x": 1,
+   "y": 5,
+   "w": 5,
+   "h": 2
+  },
+  {
+   "id": "l1a-void-1",
+   "kind": "void",
+   "x": 1,
+   "y": 3,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "id": "l1a-void-2",
+   "kind": "void",
+   "x": 7,
+   "y": 3,
+   "w": 5,
+   "h": 5
+  },
+  {
+   "id": "l1a-door-1",
+   "kind": "door",
+   "x": 0,
+   "y": 1,
+   "w": 1,
+   "h": 2,
+   "label": "Door"
+  },
+  {
+   "id": "l1a-room-1",
+   "kind": "room",
+   "x": 10,
+   "y": 0,
+   "w": 2,
+   "h": 3,
+   "label": "Meeting room"
+  }
+ ],
+ "people": [
+  {
+   "seat_code": "L1A-A02",
+   "team": "Language Warriors",
+   "person_name": "Sambhabi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sambhabi"
+  },
+  {
+   "seat_code": "L1A-A03",
+   "team": "Language Warriors",
+   "person_name": "Bipasha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Bipasha"
+  },
+  {
+   "seat_code": "L1A-A04",
+   "team": "Language Warriors",
+   "person_name": "Niba Shrestha",
+   "is_lead": "no",
+   "handover_to": "Rachana",
+   "handover_until": "",
+   "notes": "Niba Shrestha-Rachana (resigned) | resigned"
+  },
+  {
+   "seat_code": "L1A-A05",
+   "team": "Language Warriors",
+   "person_name": "Bandana",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Bandana"
+  },
+  {
+   "seat_code": "L1A-A06",
+   "team": "Language Warriors",
+   "person_name": "Pabitra Chuwan",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Pabitra Chuwan | Lead desk is a merged 2-cell block on the sheet; recorded as one seat"
+  },
+  {
+   "seat_code": "L1A-B04",
+   "team": "Language Warriors",
+   "person_name": "Niba Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-28",
+   "notes": "Niba Shrestha Till Jul-28"
+  },
+  {
+   "seat_code": "L1A-C02",
+   "team": "Language Warriors",
+   "person_name": "Archana Yadav",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Archana Yadav"
+  },
+  {
+   "seat_code": "L1A-D02",
+   "team": "Language Warriors",
+   "person_name": "Neha Thapa",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Neha Thapa"
+  },
+  {
+   "seat_code": "L1A-D04",
+   "team": "Language Warriors",
+   "person_name": "Shraddha Mishra",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Shraddha Mishra"
+  }
+ ]
+}

@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/*
+ * Design tokens. Spacing follows Tailwind's 4px grid (we stick to 1/2/3/4/5/6/8/10/12/16).
+ * Colour: neutral greys + a single accent. Radii: 6 (chips) / 8 (controls) / 12 (cards) / 16 (overlays).
+ */
+@theme {
+  /*
+   * Brand: a warm, slightly deep orange. 500 is the signature hue (graphics, charts);
+   * 600+ carry text and white-on-orange. Contrast vs white: 500 3.0:1 (non-text only),
+   * 600 4.8:1 (AA), 700 6.5:1, 800 8.7:1. On brand-50/100 use 700+ for text (6.2 / 5.7:1).
+   */
+  --color-brand-50: #fff7f1;
+  --color-brand-100: #ffeddf;
+  --color-brand-200: #fdd8bc;
+  --color-brand-300: #fbb98a;
+  --color-brand-400: #f79352;
+  --color-brand-500: #f26b1d;
+  --color-brand-600: #c9480a;
+  --color-brand-700: #a53a0b;
+  --color-brand-800: #84300e;
+  --color-brand-900: #6a2810;
+  --color-brand-950: #3a1206;
+
+  /* Semantic aliases used by components. */
+  --color-accent: var(--color-brand-600);
+  --color-accent-hover: var(--color-brand-700);
+  --color-accent-strong: var(--color-brand-500);
+  --color-accent-ink: var(--color-brand-700);
+  --color-accent-soft: var(--color-brand-50);
+  --color-accent-muted: var(--color-brand-100);
+  --color-accent-line: var(--color-brand-200);
+  --color-line: rgb(0 0 0 / 0.07);
+  --color-line-strong: rgb(0 0 0 / 0.12);
+  --color-canvas: #ffffff;
+  --color-sidebar: #f8f8f9;
+  --color-subtle: #fafafa;
+
+  --radius-card: 12px;
+  --radius-overlay: 16px;
+
+  --shadow-xs: 0 1px 1px rgb(0 0 0 / 0.03);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-pop: 0 0 0 1px rgb(0 0 0 / 0.06), 0 8px 24px -6px rgb(0 0 0 / 0.12);
+  --shadow-overlay: 0 0 0 1px rgb(0 0 0 / 0.06), 0 24px 64px -16px rgb(0 0 0 / 0.22);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --animate-fade-in: fade-in 180ms var(--ease-out-soft);
+  --animate-fade-out: fade-out 140ms ease-in forwards;
+  --animate-pop-in: pop-in 150ms var(--ease-out-soft);
+  --animate-pop-out: fade-out 100ms ease-in forwards;
+  --animate-dialog-in: dialog-in 220ms var(--ease-out-soft);
+  --animate-modal-in: modal-in 180ms var(--ease-out-soft);
+  --animate-modal-out: modal-out 120ms ease-in forwards;
+  --animate-sheet-up: sheet-up 260ms var(--ease-drawer);
+  --animate-sheet-down: sheet-down 180ms ease-in forwards;
+  --animate-dialog-out: dialog-out 150ms ease-in forwards;
+  --animate-sheet-in: sheet-in 260ms var(--ease-drawer);
+  --animate-sheet-out: sheet-out 200ms ease-in forwards;
+  --animate-drawer-in: drawer-in 240ms var(--ease-drawer);
+  --animate-drawer-out: drawer-out 180ms ease-in forwards;
+  --animate-step-in: step-in 200ms var(--ease-out-soft);
+
+  @keyframes fade-in { from { opacity: 0; } }
+  @keyframes fade-out { to { opacity: 0; } }
+  @keyframes pop-in { from { opacity: 0; transform: translateY(-2px); } }
+  @keyframes dialog-in { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes dialog-out { to { opacity: 0; transform: translateY(4px); } }
+  /* Centered modals scale about their centre, so they never drift while opening. */
+  @keyframes modal-in { from { opacity: 0; transform: scale(0.97); } }
+  @keyframes modal-out { to { opacity: 0; transform: scale(0.98); } }
+  @keyframes sheet-up { from { transform: translateY(100%); } }
+  @keyframes sheet-down { to { transform: translateY(100%); } }
+  @keyframes sheet-in { from { transform: translateX(100%); } }
+  @keyframes sheet-out { to { transform: translateX(100%); } }
+  @keyframes drawer-in { from { transform: translateX(-100%); } }
+  @keyframes drawer-out { to { transform: translateX(-100%); } }
+  @keyframes step-in { from { opacity: 0; transform: translateX(8px); } }
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-canvas);
+  /* Reserve the scrollbar's space so pages and overlays never shift sideways. */
+  scrollbar-gutter: stable;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * While a Radix overlay is open, scroll-lock sets `overflow: hidden` on body,
+ * which propagates to the viewport. With `scrollbar-gutter: stable` that made
+ * the browser reserve an empty 15px gutter, shrinking every `position: fixed`
+ * containing block: dialogs sat 7.5px left of centre, the backdrop missed the
+ * right strip, and right-edge sheets floated 15px in. Drop the gutter while
+ * locked; Radix's own margin compensation keeps the page from shifting when
+ * the document really had a scrollbar.
+ */
+html:has(body[data-scroll-locked]) {
+  scrollbar-gutter: auto;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-neutral-900);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-brand-100);
+  color: var(--color-neutral-900);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(0 0 0 / 0.14) transparent;
+}
+
+/* Thin (4px) horizontal/vertical scrollbar: rounded neutral thumb, darker on
+   hover, transparent track. Only appears when the content overflows. */
+.scrollbar-slim {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(0 0 0 / 0.16) transparent;
+}
+.scrollbar-slim:hover {
+  scrollbar-color: rgb(0 0 0 / 0.32) transparent;
+}
+.scrollbar-slim::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.scrollbar-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-slim::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgb(0 0 0 / 0.16);
+}
+.scrollbar-slim:hover::-webkit-scrollbar-thumb {
+  background: rgb(0 0 0 / 0.32);
+}
+
+/* Soft fade on the edge(s) that hide more content (set by ScrollTabs). */
+.fade-x[data-fade="start"] {
+  mask-image: linear-gradient(to right, transparent, black 28px);
+}
+.fade-x[data-fade="end"] {
+  mask-image: linear-gradient(to left, transparent, black 28px);
+}
+.fade-x[data-fade="both"] {
+  mask-image: linear-gradient(to right, transparent, black 28px, black calc(100% - 28px), transparent);
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

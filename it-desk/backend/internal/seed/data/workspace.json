@@ -1,0 +1,4700 @@
+{
+ "currentTeamId": "elite-closers",
+ "lead": {
+  "id": "lead_pawan",
+  "name": "Pawan Ojha",
+  "email": "pawan.ojha@itdesk.io",
+  "title": "Team Lead"
+ },
+ "teams": [
+  {
+   "id": "elite-closers",
+   "slug": "elite-closers",
+   "name": "Elite Closers",
+   "code": "ELC",
+   "leadName": "Pawan Ojha",
+   "location": "Kathmandu · Floor 4"
+  },
+  {
+   "id": "power-players",
+   "slug": "power-players",
+   "name": "Power Players",
+   "code": "PWP",
+   "leadName": "",
+   "location": "Kathmandu · Floor 2"
+  },
+  {
+   "id": "summit-seekers",
+   "slug": "summit-seekers",
+   "name": "Summit Seekers",
+   "code": "SMS",
+   "leadName": "",
+   "location": "Kathmandu · Floor 3"
+  },
+  {
+   "id": "ace-performers",
+   "slug": "ace-performers",
+   "name": "Ace Performers",
+   "code": "ACE",
+   "leadName": "",
+   "location": "Lalitpur · Floor 1"
+  },
+  {
+   "id": "conversion-queens",
+   "slug": "conversion-queens",
+   "name": "Conversion Queens",
+   "code": "CVQ",
+   "leadName": "",
+   "location": "Lalitpur · Floor 2"
+  },
+  {
+   "id": "fortune-finders",
+   "slug": "fortune-finders",
+   "name": "Fortune Finders",
+   "code": "FTF",
+   "leadName": "",
+   "location": "Lalitpur · Floor 3"
+  },
+  {
+   "id": "language-warriors",
+   "slug": "language-warriors",
+   "name": "Language Warriors",
+   "code": "LGW",
+   "leadName": "",
+   "location": "Kathmandu · Floor 1"
+  },
+  {
+   "id": "victoria",
+   "slug": "victoria",
+   "name": "Victoria",
+   "code": "VIC",
+   "leadName": "",
+   "location": "Kathmandu · Floor 2"
+  },
+  {
+   "id": "rapid-response",
+   "slug": "rapid-response",
+   "name": "Rapid Response",
+   "code": "RPR",
+   "leadName": "",
+   "location": "Kathmandu · Floor 3"
+  },
+  {
+   "id": "trend-setters",
+   "slug": "trend-setters",
+   "name": "Trend Setters",
+   "code": "TRS",
+   "leadName": "Sofia Alvarez",
+   "location": "Lalitpur · Floor 2"
+  },
+  {
+   "id": "deal-avengers",
+   "slug": "deal-avengers",
+   "name": "Deal Avengers",
+   "code": "DLA",
+   "leadName": "",
+   "location": "Lalitpur · Floor 2"
+  },
+  {
+   "id": "success-sharks",
+   "slug": "success-sharks",
+   "name": "Success Sharks",
+   "code": "SSH",
+   "leadName": "Meera Iyer",
+   "location": "Lalitpur · Floor 1"
+  },
+  {
+   "id": "growth-gladiators",
+   "slug": "growth-gladiators",
+   "name": "Growth Gladiators",
+   "code": "GRG",
+   "leadName": "",
+   "location": "Kathmandu · Floor 1"
+  },
+  {
+   "id": "limit-breakers",
+   "slug": "limit-breakers",
+   "name": "Limit Breakers",
+   "code": "LMB",
+   "leadName": "",
+   "location": "Kathmandu · Floor 2"
+  },
+  {
+   "id": "alpha-winners",
+   "slug": "alpha-winners",
+   "name": "Alpha Winners",
+   "code": "ALW",
+   "leadName": "",
+   "location": "Kathmandu · Floor 3"
+  },
+  {
+   "id": "nitro-negotiators",
+   "slug": "nitro-negotiators",
+   "name": "Nitro Negotiators",
+   "code": "NTN",
+   "leadName": "",
+   "location": "Lalitpur · Floor 1"
+  },
+  {
+   "id": "compliance-crew",
+   "slug": "compliance-crew",
+   "name": "Compliance Crew",
+   "code": "CMC",
+   "leadName": "Lukas Weber",
+   "location": "Kathmandu · Floor 5"
+  },
+  {
+   "id": "kpi-krushers",
+   "slug": "kpi-krushers",
+   "name": "KPI Krushers",
+   "code": "KPI",
+   "leadName": "Rohan Mehta",
+   "location": "Kathmandu · Floor 2"
+  },
+  {
+   "id": "victory-magnets",
+   "slug": "victory-magnets",
+   "name": "Victory Magnets",
+   "code": "VTM",
+   "leadName": "",
+   "location": "Kathmandu · Floor 1"
+  },
+  {
+   "id": "mountain-movers",
+   "slug": "mountain-movers",
+   "name": "Mountain Movers",
+   "code": "MTM",
+   "leadName": "",
+   "location": "Kathmandu · Floor 2"
+  },
+  {
+   "id": "veritas-engines",
+   "slug": "veritas-engines",
+   "name": "Veritas Engines",
+   "code": "VRE",
+   "leadName": "Daniel Kim",
+   "location": "Kathmandu · Floor 5"
+  },
+  {
+   "id": "learn-lab",
+   "slug": "learn-lab",
+   "name": "Learn Lab",
+   "code": "LRL",
+   "leadName": "",
+   "location": "Lalitpur · Floor 1"
+  },
+  {
+   "id": "magic-makers",
+   "slug": "magic-makers",
+   "name": "Magic Makers",
+   "code": "MGM",
+   "leadName": "Aarati Shrestha",
+   "location": "Kathmandu · Floor 3"
+  },
+  {
+   "id": "peak-achievers",
+   "slug": "peak-achievers",
+   "name": "Peak Achievers",
+   "code": "PKA",
+   "leadName": "",
+   "location": "Lalitpur · Floor 3"
+  }
+ ],
+ "members": [
+  {
+   "id": "mem_006",
+   "name": "Arjun Bhattarai",
+   "email": "arjun.bhattarai@itdesk.io",
+   "role": "Site Reliability Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "D-3",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-07-15",
+   "hue": 140,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0026",
+     "kind": "laptop",
+     "model": "MacBook Pro 16\" M4 Pro",
+     "assetTag": "IT-LP-0303"
+    },
+    {
+     "id": "dev_0027",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0176"
+    },
+    {
+     "id": "dev_0028",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0179"
+    },
+    {
+     "id": "dev_0029",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0259"
+    },
+    {
+     "id": "dev_0030",
+     "kind": "phone",
+     "model": "Poly CCX 400",
+     "assetTag": "IT-PH-0187"
+    }
+   ]
+  },
+  {
+   "id": "mem_003",
+   "name": "Caleb Wright",
+   "email": "caleb.wright@itdesk.io",
+   "role": "Technical Writer",
+   "subGroup": "Reliability",
+   "seat": "D-7",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-11-29",
+   "hue": 280,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0013",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0281"
+    },
+    {
+     "id": "dev_0014",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0166"
+    },
+    {
+     "id": "dev_0015",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0287"
+    }
+   ]
+  },
+  {
+   "id": "mem_035",
+   "name": "Chloe Martin",
+   "email": "chloe.martin@itdesk.io",
+   "role": "Senior Software Engineer",
+   "subGroup": "Core API",
+   "seat": "C-3",
+   "teamId": "trend-setters",
+   "status": "active",
+   "joinedAt": "2026-01-23",
+   "hue": 329,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0180",
+     "kind": "laptop",
+     "model": "MacBook Pro 16\" M4 Pro",
+     "assetTag": "IT-LP-0453"
+    },
+    {
+     "id": "dev_0181",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0372"
+    },
+    {
+     "id": "dev_0182",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0384"
+    }
+   ]
+  },
+  {
+   "id": "mem_001",
+   "name": "Dev Patel",
+   "email": "dev.patel@itdesk.io",
+   "role": "Software Engineer",
+   "subGroup": "Core API",
+   "seat": "C-2",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-12-12",
+   "hue": 229,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0001",
+     "kind": "laptop",
+     "model": "MacBook Pro 16\" M4 Pro",
+     "assetTag": "IT-LP-0268"
+    },
+    {
+     "id": "dev_0002",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0147"
+    },
+    {
+     "id": "dev_0003",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0152"
+    },
+    {
+     "id": "dev_0004",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0244"
+    },
+    {
+     "id": "dev_0005",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0387"
+    },
+    {
+     "id": "dev_0006",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0277"
+    },
+    {
+     "id": "dev_0007",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0183"
+    },
+    {
+     "id": "dev_0008",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0282"
+    }
+   ]
+  },
+  {
+   "id": "mem_008",
+   "name": "Diya Menon",
+   "email": "diya.menon@itdesk.io",
+   "role": "Product Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "E-6",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2023-01-05",
+   "hue": 61,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0037",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0311"
+    },
+    {
+     "id": "dev_0038",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0187"
+    },
+    {
+     "id": "dev_0039",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0270"
+    },
+    {
+     "id": "dev_0040",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0411"
+    },
+    {
+     "id": "dev_0041",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0297"
+    },
+    {
+     "id": "dev_0042",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0196"
+    },
+    {
+     "id": "dev_0043",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0295"
+    }
+   ]
+  },
+  {
+   "id": "mem_011",
+   "name": "Ethan Brooks",
+   "email": "ethan.brooks@itdesk.io",
+   "role": "Technical Writer",
+   "subGroup": "Reliability",
+   "seat": "A-7",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-05-24",
+   "hue": 11,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0053",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0327"
+    },
+    {
+     "id": "dev_0054",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0205"
+    },
+    {
+     "id": "dev_0055",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0206"
+    },
+    {
+     "id": "dev_0056",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0286"
+    },
+    {
+     "id": "dev_0057",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0420"
+    },
+    {
+     "id": "dev_0058",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0306"
+    },
+    {
+     "id": "dev_0059",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0200"
+    }
+   ]
+  },
+  {
+   "id": "mem_009",
+   "name": "Farhan Ali",
+   "email": "farhan.ali@itdesk.io",
+   "role": "Product Engineer",
+   "subGroup": "Core API",
+   "seat": "D-4",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-03-02",
+   "hue": 219,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0044",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0319"
+    },
+    {
+     "id": "dev_0045",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0188"
+    },
+    {
+     "id": "dev_0046",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0196"
+    },
+    {
+     "id": "dev_0047",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0275"
+    },
+    {
+     "id": "dev_0048",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0416"
+    },
+    {
+     "id": "dev_0049",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0299"
+    }
+   ]
+  },
+  {
+   "id": "mem_007",
+   "name": "Fatima Zahra",
+   "email": "fatima.zahra@itdesk.io",
+   "role": "Staff Engineer",
+   "subGroup": "Reliability",
+   "seat": "C-5",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-03-26",
+   "hue": 247,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0031",
+     "kind": "laptop",
+     "model": "MacBook Pro 16\" M4 Pro",
+     "assetTag": "IT-LP-0305"
+    },
+    {
+     "id": "dev_0032",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0181"
+    },
+    {
+     "id": "dev_0033",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0264"
+    },
+    {
+     "id": "dev_0034",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0405"
+    },
+    {
+     "id": "dev_0035",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0289"
+    },
+    {
+     "id": "dev_0036",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0294"
+    }
+   ]
+  },
+  {
+   "id": "mem_033",
+   "name": "Gabriel Silva",
+   "email": "gabriel.silva@itdesk.io",
+   "role": "DevOps Engineer",
+   "subGroup": "Reliability",
+   "seat": "A-1",
+   "teamId": "compliance-crew",
+   "status": "active",
+   "joinedAt": "2025-11-15",
+   "hue": 13,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0169",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0437"
+    },
+    {
+     "id": "dev_0170",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0360"
+    },
+    {
+     "id": "dev_0171",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0381"
+    },
+    {
+     "id": "dev_0172",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0500"
+    },
+    {
+     "id": "dev_0173",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0380"
+    }
+   ]
+  },
+  {
+   "id": "mem_019",
+   "name": "Grace Liu",
+   "email": "grace.liu@itdesk.io",
+   "role": "Frontend Engineer",
+   "subGroup": "Reliability",
+   "seat": "C-4",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-09-15",
+   "hue": 63,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0097",
+     "kind": "laptop",
+     "model": "MacBook Pro 16\" M4 Pro",
+     "assetTag": "IT-LP-0372"
+    },
+    {
+     "id": "dev_0098",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0266"
+    },
+    {
+     "id": "dev_0099",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0274"
+    },
+    {
+     "id": "dev_0100",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0331"
+    },
+    {
+     "id": "dev_0101",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0449"
+    },
+    {
+     "id": "dev_0102",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0333"
+    },
+    {
+     "id": "dev_0103",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0305"
+    }
+   ]
+  },
+  {
+   "id": "mem_023",
+   "name": "Hannah Schmidt",
+   "email": "hannah.schmidt@itdesk.io",
+   "role": "Technical Writer",
+   "subGroup": "Reliability",
+   "seat": "E-7",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-07-27",
+   "hue": 217,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0121",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0393"
+    },
+    {
+     "id": "dev_0122",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0297"
+    },
+    {
+     "id": "dev_0123",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0352"
+    },
+    {
+     "id": "dev_0124",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0321"
+    }
+   ]
+  },
+  {
+   "id": "mem_031",
+   "name": "Hiro Tanaka",
+   "email": "hiro.tanaka@itdesk.io",
+   "role": "Staff Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "A-8",
+   "teamId": "success-sharks",
+   "status": "active",
+   "joinedAt": "2023-12-27",
+   "hue": 334,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0158",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0429"
+    },
+    {
+     "id": "dev_0159",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0347"
+    },
+    {
+     "id": "dev_0160",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0350"
+    },
+    {
+     "id": "dev_0161",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0246"
+    },
+    {
+     "id": "dev_0162",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0338"
+    }
+   ]
+  },
+  {
+   "id": "mem_042",
+   "name": "Isha Karki",
+   "email": "isha.karki@itdesk.io",
+   "role": "Software Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "D-5",
+   "teamId": "success-sharks",
+   "status": "active",
+   "joinedAt": "2025-11-06",
+   "hue": 235,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0219",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0480"
+    },
+    {
+     "id": "dev_0220",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0416"
+    },
+    {
+     "id": "dev_0221",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0425"
+    },
+    {
+     "id": "dev_0222",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0368"
+    }
+   ]
+  },
+  {
+   "id": "mem_012",
+   "name": "Ishaan Verma",
+   "email": "ishaan.verma@itdesk.io",
+   "role": "Software Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "B-3",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-04-06",
+   "hue": 145,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0060",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0335"
+    },
+    {
+     "id": "dev_0061",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0211"
+    },
+    {
+     "id": "dev_0062",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0295"
+    },
+    {
+     "id": "dev_0063",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0427"
+    },
+    {
+     "id": "dev_0064",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0307"
+    },
+    {
+     "id": "dev_0065",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0296"
+    }
+   ]
+  },
+  {
+   "id": "mem_032",
+   "name": "Jonas Berg",
+   "email": "jonas.berg@itdesk.io",
+   "role": "DevOps Engineer",
+   "subGroup": "Core API",
+   "seat": "B-4",
+   "teamId": "success-sharks",
+   "status": "active",
+   "joinedAt": "2023-01-15",
+   "hue": 246,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0163",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0431"
+    },
+    {
+     "id": "dev_0164",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0354"
+    },
+    {
+     "id": "dev_0165",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0379"
+    },
+    {
+     "id": "dev_0166",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0492"
+    },
+    {
+     "id": "dev_0167",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0379"
+    },
+    {
+     "id": "dev_0168",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0341"
+    }
+   ]
+  },
+  {
+   "id": "mem_022",
+   "name": "Kavya Nair",
+   "email": "kavya.nair@itdesk.io",
+   "role": "Site Reliability Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "B-8",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2026-01-05",
+   "hue": 135,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0117",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0387"
+    },
+    {
+     "id": "dev_0118",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0290"
+    },
+    {
+     "id": "dev_0119",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0348"
+    },
+    {
+     "id": "dev_0120",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0317"
+    }
+   ]
+  },
+  {
+   "id": "mem_029",
+   "name": "Kiran Tamang",
+   "email": "kiran.tamang@itdesk.io",
+   "role": "DevOps Engineer",
+   "subGroup": "Core API",
+   "seat": null,
+   "teamId": "elite-closers",
+   "status": "unknown",
+   "joinedAt": "2024-08-05",
+   "hue": 92,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0148",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0426"
+    },
+    {
+     "id": "dev_0149",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0330"
+    },
+    {
+     "id": "dev_0150",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0335"
+    },
+    {
+     "id": "dev_0151",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0371"
+    },
+    {
+     "id": "dev_0152",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0333"
+    }
+   ]
+  },
+  {
+   "id": "mem_041",
+   "name": "Liam O'Connor",
+   "email": "liam.oconnor@itdesk.io",
+   "role": "Site Reliability Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "C-8",
+   "teamId": "compliance-crew",
+   "status": "active",
+   "joinedAt": "2025-11-22",
+   "hue": 82,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0212",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0473"
+    },
+    {
+     "id": "dev_0213",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0401"
+    },
+    {
+     "id": "dev_0214",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0409"
+    },
+    {
+     "id": "dev_0215",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0525"
+    },
+    {
+     "id": "dev_0216",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0411"
+    },
+    {
+     "id": "dev_0217",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0262"
+    },
+    {
+     "id": "dev_0218",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0360"
+    }
+   ]
+  },
+  {
+   "id": "mem_013",
+   "name": "Lucas Moreau",
+   "email": "lucas.moreau@itdesk.io",
+   "role": "DevOps Engineer",
+   "subGroup": "Core API",
+   "seat": "D-1",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2023-01-09",
+   "hue": 273,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0066",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0340"
+    },
+    {
+     "id": "dev_0067",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0216"
+    },
+    {
+     "id": "dev_0068",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0298"
+    },
+    {
+     "id": "dev_0069",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0430"
+    },
+    {
+     "id": "dev_0070",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0316"
+    },
+    {
+     "id": "dev_0071",
+     "kind": "phone",
+     "model": "Poly CCX 400",
+     "assetTag": "IT-PH-0207"
+    }
+   ]
+  },
+  {
+   "id": "mem_036",
+   "name": "Maya Gurung",
+   "email": "maya.gurung@itdesk.io",
+   "role": "Frontend Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "A-2",
+   "teamId": "trend-setters",
+   "status": "active",
+   "joinedAt": "2026-03-05",
+   "hue": 150,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0183",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0462"
+    },
+    {
+     "id": "dev_0184",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0374"
+    },
+    {
+     "id": "dev_0185",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0385"
+    },
+    {
+     "id": "dev_0186",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0504"
+    },
+    {
+     "id": "dev_0187",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0394"
+    },
+    {
+     "id": "dev_0188",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0351"
+    }
+   ]
+  },
+  {
+   "id": "mem_027",
+   "name": "Mina Park",
+   "email": "mina.park@itdesk.io",
+   "role": "Senior Software Engineer",
+   "subGroup": "Reliability",
+   "seat": null,
+   "teamId": "elite-closers",
+   "status": "resigned",
+   "joinedAt": "2026-03-26",
+   "hue": 59,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0138",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0414"
+    },
+    {
+     "id": "dev_0139",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0325"
+    },
+    {
+     "id": "dev_0140",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0364"
+    },
+    {
+     "id": "dev_0141",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0475"
+    },
+    {
+     "id": "dev_0142",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0360"
+    }
+   ]
+  },
+  {
+   "id": "mem_024",
+   "name": "Nabin Shrestha",
+   "email": "nabin.shrestha@itdesk.io",
+   "role": "Software Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "E-3",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-07-11",
+   "hue": 221,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0125",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0399"
+    },
+    {
+     "id": "dev_0126",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0303"
+    },
+    {
+     "id": "dev_0127",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0310"
+    },
+    {
+     "id": "dev_0128",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0355"
+    },
+    {
+     "id": "dev_0129",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0469"
+    },
+    {
+     "id": "dev_0130",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0353"
+    }
+   ]
+  },
+  {
+   "id": "mem_002",
+   "name": "Olivia Chen",
+   "email": "olivia.chen@itdesk.io",
+   "role": "QA Automation Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "A-3",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-02-21",
+   "hue": 157,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0009",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0275"
+    },
+    {
+     "id": "dev_0010",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0161"
+    },
+    {
+     "id": "dev_0011",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0249"
+    },
+    {
+     "id": "dev_0012",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0283"
+    }
+   ]
+  },
+  {
+   "id": "mem_015",
+   "name": "Oscar Lindqvist",
+   "email": "oscar.lindqvist@itdesk.io",
+   "role": "Software Engineer",
+   "subGroup": "Reliability",
+   "seat": "E-4",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2026-02-16",
+   "hue": 26,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0077",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0355"
+    },
+    {
+     "id": "dev_0078",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0230"
+    },
+    {
+     "id": "dev_0079",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0236"
+    },
+    {
+     "id": "dev_0080",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0303"
+    },
+    {
+     "id": "dev_0081",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0221"
+    }
+   ]
+  },
+  {
+   "id": "mem_017",
+   "name": "Pooja Rana",
+   "email": "pooja.rana@itdesk.io",
+   "role": "Product Engineer",
+   "subGroup": "Core API",
+   "seat": "A-6",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2023-07-27",
+   "hue": 171,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0085",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0369"
+    },
+    {
+     "id": "dev_0086",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0248"
+    },
+    {
+     "id": "dev_0087",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0255"
+    },
+    {
+     "id": "dev_0088",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0314"
+    }
+   ]
+  },
+  {
+   "id": "mem_026",
+   "name": "Prakash Adhikari",
+   "email": "prakash.adhikari@itdesk.io",
+   "role": "Software Engineer",
+   "subGroup": "Developer Experience",
+   "seat": null,
+   "teamId": "elite-closers",
+   "status": "resigned",
+   "joinedAt": "2023-02-26",
+   "hue": 292,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0134",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0411"
+    },
+    {
+     "id": "dev_0135",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0314"
+    },
+    {
+     "id": "dev_0136",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0319"
+    },
+    {
+     "id": "dev_0137",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0330"
+    }
+   ]
+  },
+  {
+   "id": "mem_040",
+   "name": "Rafael Mendes",
+   "email": "rafael.mendes@itdesk.io",
+   "role": "Staff Engineer",
+   "subGroup": "Core API",
+   "seat": "B-2",
+   "teamId": "compliance-crew",
+   "status": "active",
+   "joinedAt": "2023-11-02",
+   "hue": 76,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0208",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0472"
+    },
+    {
+     "id": "dev_0209",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0397"
+    },
+    {
+     "id": "dev_0210",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0406"
+    },
+    {
+     "id": "dev_0211",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0256"
+    }
+   ]
+  },
+  {
+   "id": "mem_016",
+   "name": "Riya Joshi",
+   "email": "riya.joshi@itdesk.io",
+   "role": "Staff Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "C-8",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-12-25",
+   "hue": 22,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0082",
+     "kind": "laptop",
+     "model": "MacBook Pro 16\" M4 Pro",
+     "assetTag": "IT-LP-0363"
+    },
+    {
+     "id": "dev_0083",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0241"
+    },
+    {
+     "id": "dev_0084",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0306"
+    }
+   ]
+  },
+  {
+   "id": "mem_005",
+   "name": "Sakura Ito",
+   "email": "sakura.ito@itdesk.io",
+   "role": "Product Engineer",
+   "subGroup": "Core API",
+   "seat": "D-6",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-05-31",
+   "hue": 59,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0021",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0297"
+    },
+    {
+     "id": "dev_0022",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0175"
+    },
+    {
+     "id": "dev_0023",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0256"
+    },
+    {
+     "id": "dev_0024",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0397"
+    },
+    {
+     "id": "dev_0025",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0285"
+    }
+   ]
+  },
+  {
+   "id": "mem_037",
+   "name": "Samuel Okafor",
+   "email": "samuel.okafor@itdesk.io",
+   "role": "Backend Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "C-7",
+   "teamId": "compliance-crew",
+   "status": "active",
+   "joinedAt": "2026-01-15",
+   "hue": 183,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0189",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0465"
+    },
+    {
+     "id": "dev_0190",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0380"
+    },
+    {
+     "id": "dev_0191",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0392"
+    },
+    {
+     "id": "dev_0192",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0509"
+    },
+    {
+     "id": "dev_0193",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0396"
+    },
+    {
+     "id": "dev_0194",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0354"
+    }
+   ]
+  },
+  {
+   "id": "mem_010",
+   "name": "Tara Basnet",
+   "email": "tara.basnet@itdesk.io",
+   "role": "Frontend Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "C-7",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-01-19",
+   "hue": 41,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0050",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0326"
+    },
+    {
+     "id": "dev_0051",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0197"
+    },
+    {
+     "id": "dev_0052",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0279"
+    }
+   ]
+  },
+  {
+   "id": "mem_021",
+   "name": "Tenzing Sherpa",
+   "email": "tenzing.sherpa@itdesk.io",
+   "role": "Software Engineer",
+   "subGroup": "Core API",
+   "seat": "E-8",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-08-14",
+   "hue": 299,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0111",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0380"
+    },
+    {
+     "id": "dev_0112",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0287"
+    },
+    {
+     "id": "dev_0113",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0340"
+    },
+    {
+     "id": "dev_0114",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0464"
+    },
+    {
+     "id": "dev_0115",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0346"
+    },
+    {
+     "id": "dev_0116",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0240"
+    }
+   ]
+  },
+  {
+   "id": "mem_018",
+   "name": "Ulrich Bauer",
+   "email": "ulrich.bauer@itdesk.io",
+   "role": "QA Automation Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "B-2",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2025-04-08",
+   "hue": 160,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0089",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0370"
+    },
+    {
+     "id": "dev_0090",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0259"
+    },
+    {
+     "id": "dev_0091",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0263"
+    },
+    {
+     "id": "dev_0092",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0323"
+    },
+    {
+     "id": "dev_0093",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0440"
+    },
+    {
+     "id": "dev_0094",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0325"
+    },
+    {
+     "id": "dev_0095",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0228"
+    },
+    {
+     "id": "dev_0096",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0299"
+    }
+   ]
+  },
+  {
+   "id": "mem_039",
+   "name": "Uma Krishnan",
+   "email": "uma.krishnan@itdesk.io",
+   "role": "Senior Software Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "E-7",
+   "teamId": "compliance-crew",
+   "status": "active",
+   "joinedAt": "2025-06-02",
+   "hue": 154,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0201",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0468"
+    },
+    {
+     "id": "dev_0202",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0388"
+    },
+    {
+     "id": "dev_0203",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0396"
+    },
+    {
+     "id": "dev_0204",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0405"
+    },
+    {
+     "id": "dev_0205",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0524"
+    },
+    {
+     "id": "dev_0206",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0410"
+    },
+    {
+     "id": "dev_0207",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0359"
+    }
+   ]
+  },
+  {
+   "id": "mem_030",
+   "name": "Vera Ivanova",
+   "email": "vera.ivanova@itdesk.io",
+   "role": "Frontend Engineer",
+   "subGroup": "Developer Experience",
+   "seat": null,
+   "teamId": "elite-closers",
+   "status": "unknown",
+   "joinedAt": "2023-04-22",
+   "hue": 150,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0153",
+     "kind": "laptop",
+     "model": "MacBook Pro 16\" M4 Pro",
+     "assetTag": "IT-LP-0427"
+    },
+    {
+     "id": "dev_0154",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0344"
+    },
+    {
+     "id": "dev_0155",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0378"
+    },
+    {
+     "id": "dev_0156",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0487"
+    },
+    {
+     "id": "dev_0157",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0371"
+    }
+   ]
+  },
+  {
+   "id": "mem_004",
+   "name": "Victor Lima",
+   "email": "victor.lima@itdesk.io",
+   "role": "Senior Software Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "D-5",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2026-02-25",
+   "hue": 355,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0016",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0290"
+    },
+    {
+     "id": "dev_0017",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0169"
+    },
+    {
+     "id": "dev_0018",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0252"
+    },
+    {
+     "id": "dev_0019",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0391"
+    },
+    {
+     "id": "dev_0020",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0278"
+    }
+   ]
+  },
+  {
+   "id": "mem_043",
+   "name": "Wen Zhao",
+   "email": "wen.zhao@itdesk.io",
+   "role": "Site Reliability Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "A-1",
+   "teamId": "trend-setters",
+   "status": "active",
+   "joinedAt": "2023-05-17",
+   "hue": 38,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0223",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0485"
+    },
+    {
+     "id": "dev_0224",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0430"
+    },
+    {
+     "id": "dev_0225",
+     "kind": "dock",
+     "model": "Dell WD22TB4",
+     "assetTag": "IT-DK-0412"
+    },
+    {
+     "id": "dev_0226",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0534"
+    },
+    {
+     "id": "dev_0227",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0417"
+    },
+    {
+     "id": "dev_0228",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0375"
+    }
+   ]
+  },
+  {
+   "id": "mem_028",
+   "name": "Willa Grant",
+   "email": "willa.grant@itdesk.io",
+   "role": "Backend Engineer",
+   "subGroup": "Payments Platform",
+   "seat": null,
+   "teamId": "elite-closers",
+   "status": "resigned",
+   "joinedAt": "2024-10-09",
+   "hue": 321,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0143",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0417"
+    },
+    {
+     "id": "dev_0144",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0326"
+    },
+    {
+     "id": "dev_0145",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0365"
+    },
+    {
+     "id": "dev_0146",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0481"
+    },
+    {
+     "id": "dev_0147",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0364"
+    }
+   ]
+  },
+  {
+   "id": "mem_014",
+   "name": "Ximena Torres",
+   "email": "ximena.torres@itdesk.io",
+   "role": "QA Automation Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "A-1",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2024-01-14",
+   "hue": 40,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0072",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0349"
+    },
+    {
+     "id": "dev_0073",
+     "kind": "monitor",
+     "model": "LG UltraFine 27\" 5K",
+     "assetTag": "IT-MN-0221"
+    },
+    {
+     "id": "dev_0074",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0432"
+    },
+    {
+     "id": "dev_0075",
+     "kind": "mouse",
+     "model": "Logitech MX Master 3S",
+     "assetTag": "IT-MS-0317"
+    },
+    {
+     "id": "dev_0076",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0212"
+    }
+   ]
+  },
+  {
+   "id": "mem_034",
+   "name": "Yash Malhotra",
+   "email": "yash.malhotra@itdesk.io",
+   "role": "DevOps Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "B-8",
+   "teamId": "compliance-crew",
+   "status": "active",
+   "joinedAt": "2025-01-12",
+   "hue": 44,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0174",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0445"
+    },
+    {
+     "id": "dev_0175",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0366"
+    },
+    {
+     "id": "dev_0176",
+     "kind": "keyboard",
+     "model": "Logitech MX Keys S",
+     "assetTag": "IT-KB-0502"
+    },
+    {
+     "id": "dev_0177",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0387"
+    },
+    {
+     "id": "dev_0178",
+     "kind": "phone",
+     "model": "Cisco 8845 desk phone",
+     "assetTag": "IT-PH-0254"
+    },
+    {
+     "id": "dev_0179",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0349"
+    }
+   ]
+  },
+  {
+   "id": "mem_020",
+   "name": "Yusuf Demir",
+   "email": "yusuf.demir@itdesk.io",
+   "role": "Frontend Engineer",
+   "subGroup": "Payments Platform",
+   "seat": "B-6",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2023-09-30",
+   "hue": 305,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0104",
+     "kind": "laptop",
+     "model": "Dell XPS 15",
+     "assetTag": "IT-LP-0377"
+    },
+    {
+     "id": "dev_0105",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 32\" U3225QE",
+     "assetTag": "IT-MN-0282"
+    },
+    {
+     "id": "dev_0106",
+     "kind": "dock",
+     "model": "CalDigit TS4",
+     "assetTag": "IT-DK-0339"
+    },
+    {
+     "id": "dev_0107",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0455"
+    },
+    {
+     "id": "dev_0108",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0338"
+    },
+    {
+     "id": "dev_0109",
+     "kind": "phone",
+     "model": "Poly CCX 400",
+     "assetTag": "IT-PH-0233"
+    },
+    {
+     "id": "dev_0110",
+     "kind": "headset",
+     "model": "Sony WH-1000XM5",
+     "assetTag": "IT-HS-0308"
+    }
+   ]
+  },
+  {
+   "id": "mem_025",
+   "name": "Zara Ahmed",
+   "email": "zara.ahmed@itdesk.io",
+   "role": "Site Reliability Engineer",
+   "subGroup": "Core API",
+   "seat": "B-4",
+   "teamId": "elite-closers",
+   "status": "active",
+   "joinedAt": "2023-10-12",
+   "hue": 75,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0131",
+     "kind": "laptop",
+     "model": "MacBook Pro 14\" M4",
+     "assetTag": "IT-LP-0404"
+    },
+    {
+     "id": "dev_0132",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0313"
+    },
+    {
+     "id": "dev_0133",
+     "kind": "phone",
+     "model": "Poly CCX 400",
+     "assetTag": "IT-PH-0245"
+    }
+   ]
+  },
+  {
+   "id": "mem_038",
+   "name": "Zoe Bennett",
+   "email": "zoe.bennett@itdesk.io",
+   "role": "DevOps Engineer",
+   "subGroup": "Developer Experience",
+   "seat": "E-3",
+   "teamId": "kpi-krushers",
+   "status": "active",
+   "joinedAt": "2025-11-07",
+   "hue": 35,
+   "version": 0,
+   "devices": [
+    {
+     "id": "dev_0195",
+     "kind": "laptop",
+     "model": "ThinkPad X1 Carbon Gen 13",
+     "assetTag": "IT-LP-0467"
+    },
+    {
+     "id": "dev_0196",
+     "kind": "monitor",
+     "model": "Dell UltraSharp 27\" U2724D",
+     "assetTag": "IT-MN-0382"
+    },
+    {
+     "id": "dev_0197",
+     "kind": "dock",
+     "model": "Anker 778 Thunderbolt",
+     "assetTag": "IT-DK-0396"
+    },
+    {
+     "id": "dev_0198",
+     "kind": "keyboard",
+     "model": "Apple Magic Keyboard",
+     "assetTag": "IT-KB-0518"
+    },
+    {
+     "id": "dev_0199",
+     "kind": "mouse",
+     "model": "Apple Magic Trackpad",
+     "assetTag": "IT-MS-0401"
+    },
+    {
+     "id": "dev_0200",
+     "kind": "headset",
+     "model": "Jabra Evolve2 65",
+     "assetTag": "IT-HS-0358"
+    }
+   ]
+  }
+ ],
+ "transfers": [
+  {
+   "id": "trf_024",
+   "ticket": "IT-4261",
+   "direction": "in",
+   "fromTeamId": "magic-makers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_010",
+     "memberName": "Tara Basnet",
+     "fromSeat": "E-7",
+     "toSeat": "C-7",
+     "devices": [
+      {
+       "id": "dev_0050",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0326"
+      },
+      {
+       "id": "dev_0051",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0197"
+      },
+      {
+       "id": "dev_0052",
+       "kind": "dock",
+       "model": "CalDigit TS4",
+       "assetTag": "IT-DK-0279"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-10-26",
+   "createdAt": "2026-10-23T03:19:00.000Z",
+   "initiatedBy": "Aarati Shrestha",
+   "note": "Joining the observability initiative",
+   "itStatus": "requested",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-10-23T03:19:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_023",
+   "ticket": "IT-4254",
+   "direction": "in",
+   "fromTeamId": "kpi-krushers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_014",
+     "memberName": "Ximena Torres",
+     "fromSeat": "B-2",
+     "toSeat": "A-1",
+     "devices": [
+      {
+       "id": "dev_0072",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0349"
+      },
+      {
+       "id": "dev_0073",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0221"
+      },
+      {
+       "id": "dev_0074",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0432"
+      },
+      {
+       "id": "dev_0075",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0317"
+      },
+      {
+       "id": "dev_0076",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0212"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-10-25",
+   "createdAt": "2026-10-22T07:41:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Q3 headcount rebalancing",
+   "itStatus": "requested",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-10-22T07:41:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_022",
+   "ticket": "IT-4247",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "compliance-crew",
+   "moves": [
+    {
+     "memberId": "mem_039",
+     "memberName": "Uma Krishnan",
+     "fromSeat": "C-6",
+     "toSeat": "E-7",
+     "devices": [
+      {
+       "id": "dev_0201",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0468"
+      },
+      {
+       "id": "dev_0202",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0388"
+      },
+      {
+       "id": "dev_0203",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0396"
+      },
+      {
+       "id": "dev_0204",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0405"
+      },
+      {
+       "id": "dev_0205",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0524"
+      },
+      {
+       "id": "dev_0206",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0410"
+      },
+      {
+       "id": "dev_0207",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0359"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_040",
+     "memberName": "Rafael Mendes",
+     "fromSeat": "C-1",
+     "toSeat": "B-2",
+     "devices": [
+      {
+       "id": "dev_0208",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0472"
+      },
+      {
+       "id": "dev_0209",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0397"
+      },
+      {
+       "id": "dev_0210",
+       "kind": "dock",
+       "model": "CalDigit TS4",
+       "assetTag": "IT-DK-0406"
+      },
+      {
+       "id": "dev_0211",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0256"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_041",
+     "memberName": "Liam O'Connor",
+     "fromSeat": "D-2",
+     "toSeat": "C-8",
+     "devices": [
+      {
+       "id": "dev_0212",
+       "kind": "laptop",
+       "model": "Dell XPS 15",
+       "assetTag": "IT-LP-0473"
+      },
+      {
+       "id": "dev_0213",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0401"
+      },
+      {
+       "id": "dev_0214",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0409"
+      },
+      {
+       "id": "dev_0215",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0525"
+      },
+      {
+       "id": "dev_0216",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0411"
+      },
+      {
+       "id": "dev_0217",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0262"
+      },
+      {
+       "id": "dev_0218",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0360"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-10-23",
+   "createdAt": "2026-10-20T03:48:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Joining the new data platform squad",
+   "itStatus": "scheduled",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-10-20T03:48:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-10-20T23:00:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_021",
+   "ticket": "IT-4240",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "kpi-krushers",
+   "moves": [
+    {
+     "memberId": "mem_038",
+     "memberName": "Zoe Bennett",
+     "fromSeat": "C-1",
+     "toSeat": "E-3",
+     "devices": [
+      {
+       "id": "dev_0195",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0467"
+      },
+      {
+       "id": "dev_0196",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0382"
+      },
+      {
+       "id": "dev_0197",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0396"
+      },
+      {
+       "id": "dev_0198",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0518"
+      },
+      {
+       "id": "dev_0199",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0401"
+      },
+      {
+       "id": "dev_0200",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0358"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-10-21",
+   "createdAt": "2026-10-18T08:05:00.000Z",
+   "initiatedBy": "Priya Nair (People Ops)",
+   "note": "Mobile release needs backend support",
+   "itStatus": "scheduled",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-10-18T08:05:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-10-19T03:17:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_020",
+   "ticket": "IT-4233",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "success-sharks",
+   "moves": [
+    {
+     "memberId": "mem_031",
+     "memberName": "Hiro Tanaka",
+     "fromSeat": "D-2",
+     "toSeat": "A-8",
+     "devices": [
+      {
+       "id": "dev_0158",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0429"
+      },
+      {
+       "id": "dev_0159",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0347"
+      },
+      {
+       "id": "dev_0160",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0350"
+      },
+      {
+       "id": "dev_0161",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0246"
+      },
+      {
+       "id": "dev_0162",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0338"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_032",
+     "memberName": "Jonas Berg",
+     "fromSeat": "C-1",
+     "toSeat": "B-4",
+     "devices": [
+      {
+       "id": "dev_0163",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0431"
+      },
+      {
+       "id": "dev_0164",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0354"
+      },
+      {
+       "id": "dev_0165",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0379"
+      },
+      {
+       "id": "dev_0166",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0492"
+      },
+      {
+       "id": "dev_0167",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0379"
+      },
+      {
+       "id": "dev_0168",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0341"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-10-18",
+   "createdAt": "2026-10-15T05:37:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Moving into security engineering",
+   "itStatus": "moved",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-10-15T05:37:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-10-16T00:49:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-10-17T10:25:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_019",
+   "ticket": "IT-4226",
+   "direction": "in",
+   "fromTeamId": "compliance-crew",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_005",
+     "memberName": "Sakura Ito",
+     "fromSeat": "B-4",
+     "toSeat": "D-6",
+     "devices": [
+      {
+       "id": "dev_0021",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0297"
+      },
+      {
+       "id": "dev_0022",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0175"
+      },
+      {
+       "id": "dev_0023",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0256"
+      },
+      {
+       "id": "dev_0024",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0397"
+      },
+      {
+       "id": "dev_0025",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0285"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-10-14",
+   "createdAt": "2026-10-11T05:46:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Q3 headcount rebalancing",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-10-11T05:46:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-10-12T00:58:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-10-13T10:34:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-10-14T08:10:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_018",
+   "ticket": "IT-4219",
+   "direction": "in",
+   "fromTeamId": "veritas-engines",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_002",
+     "memberName": "Olivia Chen",
+     "fromSeat": "C-6",
+     "toSeat": "A-3",
+     "devices": [
+      {
+       "id": "dev_0009",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0275"
+      },
+      {
+       "id": "dev_0010",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0161"
+      },
+      {
+       "id": "dev_0011",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0249"
+      },
+      {
+       "id": "dev_0012",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0283"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_003",
+     "memberName": "Caleb Wright",
+     "fromSeat": "E-2",
+     "toSeat": "D-7",
+     "devices": [
+      {
+       "id": "dev_0013",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0281"
+      },
+      {
+       "id": "dev_0014",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0166"
+      },
+      {
+       "id": "dev_0015",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0287"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_004",
+     "memberName": "Victor Lima",
+     "fromSeat": "C-6",
+     "toSeat": "D-5",
+     "devices": [
+      {
+       "id": "dev_0016",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0290"
+      },
+      {
+       "id": "dev_0017",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0169"
+      },
+      {
+       "id": "dev_0018",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0252"
+      },
+      {
+       "id": "dev_0019",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0391"
+      },
+      {
+       "id": "dev_0020",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0278"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-08-28",
+   "createdAt": "2026-08-27T06:07:00.000Z",
+   "initiatedBy": "Daniel Kim",
+   "note": "Re-org: payments services moved under Elite Closers",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-08-27T06:07:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-08-28T01:19:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-08-29T10:55:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-08-30T08:31:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_016",
+   "ticket": "IT-4205",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_022",
+     "memberName": "Kavya Nair",
+     "fromSeat": "C-1",
+     "toSeat": "B-8",
+     "devices": [
+      {
+       "id": "dev_0117",
+       "kind": "laptop",
+       "model": "Dell XPS 15",
+       "assetTag": "IT-LP-0387"
+      },
+      {
+       "id": "dev_0118",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0290"
+      },
+      {
+       "id": "dev_0119",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0348"
+      },
+      {
+       "id": "dev_0120",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0317"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-08-17",
+   "createdAt": "2026-08-16T08:35:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Pairing closer with DX tooling owners",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-08-16T08:35:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-08-17T03:47:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-08-18T13:23:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-08-19T10:59:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_017",
+   "ticket": "IT-4212",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "success-sharks",
+   "moves": [
+    {
+     "memberId": "mem_042",
+     "memberName": "Isha Karki",
+     "fromSeat": "A-2",
+     "toSeat": "D-5",
+     "devices": [
+      {
+       "id": "dev_0219",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0480"
+      },
+      {
+       "id": "dev_0220",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0416"
+      },
+      {
+       "id": "dev_0221",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0425"
+      },
+      {
+       "id": "dev_0222",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0368"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-08-17",
+   "createdAt": "2026-08-16T06:18:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Moving into security engineering",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-08-16T06:18:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-08-17T01:30:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-08-18T11:06:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-08-19T08:42:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_015",
+   "ticket": "IT-4198",
+   "direction": "in",
+   "fromTeamId": "compliance-crew",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_001",
+     "memberName": "Dev Patel",
+     "fromSeat": "A-8",
+     "toSeat": "C-2",
+     "devices": [
+      {
+       "id": "dev_0001",
+       "kind": "laptop",
+       "model": "MacBook Pro 16\" M4 Pro",
+       "assetTag": "IT-LP-0268"
+      },
+      {
+       "id": "dev_0002",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0147"
+      },
+      {
+       "id": "dev_0003",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0152"
+      },
+      {
+       "id": "dev_0004",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0244"
+      },
+      {
+       "id": "dev_0005",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0387"
+      },
+      {
+       "id": "dev_0006",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0277"
+      },
+      {
+       "id": "dev_0007",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0183"
+      },
+      {
+       "id": "dev_0008",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0282"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-08-10",
+   "createdAt": "2026-08-09T06:29:00.000Z",
+   "initiatedBy": "Lukas Weber",
+   "note": "Q3 headcount rebalancing",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-08-09T06:29:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-08-10T01:41:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-08-11T11:17:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-08-12T08:53:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_014",
+   "ticket": "IT-4191",
+   "direction": "in",
+   "fromTeamId": "compliance-crew",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_008",
+     "memberName": "Diya Menon",
+     "fromSeat": "D-6",
+     "toSeat": "E-6",
+     "devices": [
+      {
+       "id": "dev_0037",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0311"
+      },
+      {
+       "id": "dev_0038",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0187"
+      },
+      {
+       "id": "dev_0039",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0270"
+      },
+      {
+       "id": "dev_0040",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0411"
+      },
+      {
+       "id": "dev_0041",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0297"
+      },
+      {
+       "id": "dev_0042",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0196"
+      },
+      {
+       "id": "dev_0043",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0295"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_009",
+     "memberName": "Farhan Ali",
+     "fromSeat": "C-2",
+     "toSeat": "D-4",
+     "devices": [
+      {
+       "id": "dev_0044",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0319"
+      },
+      {
+       "id": "dev_0045",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0188"
+      },
+      {
+       "id": "dev_0046",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0196"
+      },
+      {
+       "id": "dev_0047",
+       "kind": "dock",
+       "model": "CalDigit TS4",
+       "assetTag": "IT-DK-0275"
+      },
+      {
+       "id": "dev_0048",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0416"
+      },
+      {
+       "id": "dev_0049",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0299"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-08-03",
+   "createdAt": "2026-08-02T07:28:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Joining the observability initiative",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-08-02T07:28:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-08-03T02:40:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-08-04T12:16:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-08-05T09:52:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_013",
+   "ticket": "IT-4184",
+   "direction": "in",
+   "fromTeamId": "compliance-crew",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_011",
+     "memberName": "Ethan Brooks",
+     "fromSeat": "E-3",
+     "toSeat": "A-7",
+     "devices": [
+      {
+       "id": "dev_0053",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0327"
+      },
+      {
+       "id": "dev_0054",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0205"
+      },
+      {
+       "id": "dev_0055",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0206"
+      },
+      {
+       "id": "dev_0056",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0286"
+      },
+      {
+       "id": "dev_0057",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0420"
+      },
+      {
+       "id": "dev_0058",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0306"
+      },
+      {
+       "id": "dev_0059",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0200"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_012",
+     "memberName": "Ishaan Verma",
+     "fromSeat": "A-6",
+     "toSeat": "B-3",
+     "devices": [
+      {
+       "id": "dev_0060",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0335"
+      },
+      {
+       "id": "dev_0061",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0211"
+      },
+      {
+       "id": "dev_0062",
+       "kind": "dock",
+       "model": "CalDigit TS4",
+       "assetTag": "IT-DK-0295"
+      },
+      {
+       "id": "dev_0063",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0427"
+      },
+      {
+       "id": "dev_0064",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0307"
+      },
+      {
+       "id": "dev_0065",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0296"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_013",
+     "memberName": "Lucas Moreau",
+     "fromSeat": "B-6",
+     "toSeat": "D-1",
+     "devices": [
+      {
+       "id": "dev_0066",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0340"
+      },
+      {
+       "id": "dev_0067",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0216"
+      },
+      {
+       "id": "dev_0068",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0298"
+      },
+      {
+       "id": "dev_0069",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0430"
+      },
+      {
+       "id": "dev_0070",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0316"
+      },
+      {
+       "id": "dev_0071",
+       "kind": "phone",
+       "model": "Poly CCX 400",
+       "assetTag": "IT-PH-0207"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-08-02",
+   "createdAt": "2026-08-01T05:36:00.000Z",
+   "initiatedBy": "Lukas Weber",
+   "note": "Backfilling the Core API on-call rotation",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-08-01T05:36:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-08-02T00:48:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-08-03T10:24:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-08-04T08:00:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_012",
+   "ticket": "IT-4177",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "trend-setters",
+   "moves": [
+    {
+     "memberId": "mem_035",
+     "memberName": "Chloe Martin",
+     "fromSeat": "A-5",
+     "toSeat": "C-3",
+     "devices": [
+      {
+       "id": "dev_0180",
+       "kind": "laptop",
+       "model": "MacBook Pro 16\" M4 Pro",
+       "assetTag": "IT-LP-0453"
+      },
+      {
+       "id": "dev_0181",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0372"
+      },
+      {
+       "id": "dev_0182",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0384"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_036",
+     "memberName": "Maya Gurung",
+     "fromSeat": "E-5",
+     "toSeat": "A-2",
+     "devices": [
+      {
+       "id": "dev_0183",
+       "kind": "laptop",
+       "model": "Dell XPS 15",
+       "assetTag": "IT-LP-0462"
+      },
+      {
+       "id": "dev_0184",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0374"
+      },
+      {
+       "id": "dev_0185",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0385"
+      },
+      {
+       "id": "dev_0186",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0504"
+      },
+      {
+       "id": "dev_0187",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0394"
+      },
+      {
+       "id": "dev_0188",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0351"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-07-03",
+   "createdAt": "2026-07-02T08:19:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Mobile release needs backend support",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-07-02T08:19:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-07-03T03:31:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-07-04T13:07:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-07-05T10:43:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_011",
+   "ticket": "IT-4170",
+   "direction": "in",
+   "fromTeamId": "kpi-krushers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_006",
+     "memberName": "Arjun Bhattarai",
+     "fromSeat": "E-4",
+     "toSeat": "D-3",
+     "devices": [
+      {
+       "id": "dev_0026",
+       "kind": "laptop",
+       "model": "MacBook Pro 16\" M4 Pro",
+       "assetTag": "IT-LP-0303"
+      },
+      {
+       "id": "dev_0027",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0176"
+      },
+      {
+       "id": "dev_0028",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0179"
+      },
+      {
+       "id": "dev_0029",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0259"
+      },
+      {
+       "id": "dev_0030",
+       "kind": "phone",
+       "model": "Poly CCX 400",
+       "assetTag": "IT-PH-0187"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_007",
+     "memberName": "Fatima Zahra",
+     "fromSeat": "D-3",
+     "toSeat": "C-5",
+     "devices": [
+      {
+       "id": "dev_0031",
+       "kind": "laptop",
+       "model": "MacBook Pro 16\" M4 Pro",
+       "assetTag": "IT-LP-0305"
+      },
+      {
+       "id": "dev_0032",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0181"
+      },
+      {
+       "id": "dev_0033",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0264"
+      },
+      {
+       "id": "dev_0034",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0405"
+      },
+      {
+       "id": "dev_0035",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0289"
+      },
+      {
+       "id": "dev_0036",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0294"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-07-03",
+   "createdAt": "2026-07-02T05:33:00.000Z",
+   "initiatedBy": "Rohan Mehta",
+   "note": "Q3 headcount rebalancing",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-07-02T05:33:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-07-03T00:45:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-07-04T10:21:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-07-05T07:57:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_010",
+   "ticket": "IT-4163",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_018",
+     "memberName": "Ulrich Bauer",
+     "fromSeat": "B-5",
+     "toSeat": "B-2",
+     "devices": [
+      {
+       "id": "dev_0089",
+       "kind": "laptop",
+       "model": "Dell XPS 15",
+       "assetTag": "IT-LP-0370"
+      },
+      {
+       "id": "dev_0090",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0259"
+      },
+      {
+       "id": "dev_0091",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0263"
+      },
+      {
+       "id": "dev_0092",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0323"
+      },
+      {
+       "id": "dev_0093",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0440"
+      },
+      {
+       "id": "dev_0094",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0325"
+      },
+      {
+       "id": "dev_0095",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0228"
+      },
+      {
+       "id": "dev_0096",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0299"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_019",
+     "memberName": "Grace Liu",
+     "fromSeat": "A-5",
+     "toSeat": "C-4",
+     "devices": [
+      {
+       "id": "dev_0097",
+       "kind": "laptop",
+       "model": "MacBook Pro 16\" M4 Pro",
+       "assetTag": "IT-LP-0372"
+      },
+      {
+       "id": "dev_0098",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0266"
+      },
+      {
+       "id": "dev_0099",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0274"
+      },
+      {
+       "id": "dev_0100",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0331"
+      },
+      {
+       "id": "dev_0101",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0449"
+      },
+      {
+       "id": "dev_0102",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0333"
+      },
+      {
+       "id": "dev_0103",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0305"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-07-01",
+   "createdAt": "2026-06-30T06:00:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Payments checkout rewrite squad",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-06-30T06:00:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-07-01T01:12:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-07-02T10:48:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-07-03T08:24:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_009",
+   "ticket": "IT-4156",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_020",
+     "memberName": "Yusuf Demir",
+     "fromSeat": "B-5",
+     "toSeat": "B-6",
+     "devices": [
+      {
+       "id": "dev_0104",
+       "kind": "laptop",
+       "model": "Dell XPS 15",
+       "assetTag": "IT-LP-0377"
+      },
+      {
+       "id": "dev_0105",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0282"
+      },
+      {
+       "id": "dev_0106",
+       "kind": "dock",
+       "model": "CalDigit TS4",
+       "assetTag": "IT-DK-0339"
+      },
+      {
+       "id": "dev_0107",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0455"
+      },
+      {
+       "id": "dev_0108",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0338"
+      },
+      {
+       "id": "dev_0109",
+       "kind": "phone",
+       "model": "Poly CCX 400",
+       "assetTag": "IT-PH-0233"
+      },
+      {
+       "id": "dev_0110",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0308"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-06-25",
+   "createdAt": "2026-06-24T04:44:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Sit with the Reliability pod",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-06-24T04:44:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-06-24T23:56:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-06-26T09:32:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-06-27T07:08:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_008",
+   "ticket": "IT-4149",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_023",
+     "memberName": "Hannah Schmidt",
+     "fromSeat": "A-5",
+     "toSeat": "E-7",
+     "devices": [
+      {
+       "id": "dev_0121",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0393"
+      },
+      {
+       "id": "dev_0122",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0297"
+      },
+      {
+       "id": "dev_0123",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0352"
+      },
+      {
+       "id": "dev_0124",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0321"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-06-23",
+   "createdAt": "2026-06-22T03:54:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Floor 4 seating refresh",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-06-22T03:54:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-06-22T23:06:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-06-24T08:42:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-06-25T06:18:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_007",
+   "ticket": "IT-4142",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_024",
+     "memberName": "Nabin Shrestha",
+     "fromSeat": "A-5",
+     "toSeat": "E-3",
+     "devices": [
+      {
+       "id": "dev_0125",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0399"
+      },
+      {
+       "id": "dev_0126",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0303"
+      },
+      {
+       "id": "dev_0127",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0310"
+      },
+      {
+       "id": "dev_0128",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0355"
+      },
+      {
+       "id": "dev_0129",
+       "kind": "keyboard",
+       "model": "Apple Magic Keyboard",
+       "assetTag": "IT-KB-0469"
+      },
+      {
+       "id": "dev_0130",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0353"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_025",
+     "memberName": "Zara Ahmed",
+     "fromSeat": "C-6",
+     "toSeat": "B-4",
+     "devices": [
+      {
+       "id": "dev_0131",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0404"
+      },
+      {
+       "id": "dev_0132",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0313"
+      },
+      {
+       "id": "dev_0133",
+       "kind": "phone",
+       "model": "Poly CCX 400",
+       "assetTag": "IT-PH-0245"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-06-18",
+   "createdAt": "2026-06-17T04:30:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Floor 4 seating refresh",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-06-17T04:30:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-06-17T23:42:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-06-19T09:18:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-06-20T06:54:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_006",
+   "ticket": "IT-4135",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "trend-setters",
+   "moves": [
+    {
+     "memberId": "mem_043",
+     "memberName": "Wen Zhao",
+     "fromSeat": "D-8",
+     "toSeat": "A-1",
+     "devices": [
+      {
+       "id": "dev_0223",
+       "kind": "laptop",
+       "model": "Dell XPS 15",
+       "assetTag": "IT-LP-0485"
+      },
+      {
+       "id": "dev_0224",
+       "kind": "monitor",
+       "model": "LG UltraFine 27\" 5K",
+       "assetTag": "IT-MN-0430"
+      },
+      {
+       "id": "dev_0225",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0412"
+      },
+      {
+       "id": "dev_0226",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0534"
+      },
+      {
+       "id": "dev_0227",
+       "kind": "mouse",
+       "model": "Logitech MX Master 3S",
+       "assetTag": "IT-MS-0417"
+      },
+      {
+       "id": "dev_0228",
+       "kind": "headset",
+       "model": "Sony WH-1000XM5",
+       "assetTag": "IT-HS-0375"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-06-07",
+   "createdAt": "2026-06-06T07:48:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Mobile release needs backend support",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-06-06T07:48:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-06-07T03:00:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-06-08T12:36:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-06-09T10:12:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_005",
+   "ticket": "IT-4128",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "compliance-crew",
+   "moves": [
+    {
+     "memberId": "mem_033",
+     "memberName": "Gabriel Silva",
+     "fromSeat": "D-8",
+     "toSeat": "A-1",
+     "devices": [
+      {
+       "id": "dev_0169",
+       "kind": "laptop",
+       "model": "Dell XPS 15",
+       "assetTag": "IT-LP-0437"
+      },
+      {
+       "id": "dev_0170",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0360"
+      },
+      {
+       "id": "dev_0171",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0381"
+      },
+      {
+       "id": "dev_0172",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0500"
+      },
+      {
+       "id": "dev_0173",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0380"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_034",
+     "memberName": "Yash Malhotra",
+     "fromSeat": "C-6",
+     "toSeat": "B-8",
+     "devices": [
+      {
+       "id": "dev_0174",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0445"
+      },
+      {
+       "id": "dev_0175",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0366"
+      },
+      {
+       "id": "dev_0176",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0502"
+      },
+      {
+       "id": "dev_0177",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0387"
+      },
+      {
+       "id": "dev_0178",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0254"
+      },
+      {
+       "id": "dev_0179",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0349"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-06-05",
+   "createdAt": "2026-06-04T05:58:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Mobile release needs backend support",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-06-04T05:58:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-06-05T01:10:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-06-06T10:46:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-06-07T08:22:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_004",
+   "ticket": "IT-4121",
+   "direction": "out",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "compliance-crew",
+   "moves": [
+    {
+     "memberId": "mem_037",
+     "memberName": "Samuel Okafor",
+     "fromSeat": "E-5",
+     "toSeat": "C-7",
+     "devices": [
+      {
+       "id": "dev_0189",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0465"
+      },
+      {
+       "id": "dev_0190",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0380"
+      },
+      {
+       "id": "dev_0191",
+       "kind": "dock",
+       "model": "CalDigit TS4",
+       "assetTag": "IT-DK-0392"
+      },
+      {
+       "id": "dev_0192",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0509"
+      },
+      {
+       "id": "dev_0193",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0396"
+      },
+      {
+       "id": "dev_0194",
+       "kind": "headset",
+       "model": "Jabra Evolve2 65",
+       "assetTag": "IT-HS-0354"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-06-03",
+   "createdAt": "2026-06-02T03:54:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Joining the new data platform squad",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-06-02T03:54:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-06-02T23:06:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-06-04T08:42:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-06-05T06:18:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_003",
+   "ticket": "IT-4114",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_016",
+     "memberName": "Riya Joshi",
+     "fromSeat": "A-2",
+     "toSeat": "C-8",
+     "devices": [
+      {
+       "id": "dev_0082",
+       "kind": "laptop",
+       "model": "MacBook Pro 16\" M4 Pro",
+       "assetTag": "IT-LP-0363"
+      },
+      {
+       "id": "dev_0083",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0241"
+      },
+      {
+       "id": "dev_0084",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0306"
+      }
+     ]
+    },
+    {
+     "memberId": "mem_017",
+     "memberName": "Pooja Rana",
+     "fromSeat": "B-5",
+     "toSeat": "A-6",
+     "devices": [
+      {
+       "id": "dev_0085",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0369"
+      },
+      {
+       "id": "dev_0086",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0248"
+      },
+      {
+       "id": "dev_0087",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 27\" U2724D",
+       "assetTag": "IT-MN-0255"
+      },
+      {
+       "id": "dev_0088",
+       "kind": "dock",
+       "model": "Dell WD22TB4",
+       "assetTag": "IT-DK-0314"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-05-29",
+   "createdAt": "2026-05-28T05:45:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Pairing closer with DX tooling owners",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-05-28T05:45:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-05-29T00:57:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-05-30T10:33:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-05-31T08:09:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_002",
+   "ticket": "IT-4107",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_021",
+     "memberName": "Tenzing Sherpa",
+     "fromSeat": "E-5",
+     "toSeat": "E-8",
+     "devices": [
+      {
+       "id": "dev_0111",
+       "kind": "laptop",
+       "model": "ThinkPad X1 Carbon Gen 13",
+       "assetTag": "IT-LP-0380"
+      },
+      {
+       "id": "dev_0112",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0287"
+      },
+      {
+       "id": "dev_0113",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0340"
+      },
+      {
+       "id": "dev_0114",
+       "kind": "keyboard",
+       "model": "Logitech MX Keys S",
+       "assetTag": "IT-KB-0464"
+      },
+      {
+       "id": "dev_0115",
+       "kind": "mouse",
+       "model": "Apple Magic Trackpad",
+       "assetTag": "IT-MS-0346"
+      },
+      {
+       "id": "dev_0116",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0240"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-05-26",
+   "createdAt": "2026-05-25T08:01:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Pairing closer with DX tooling owners",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-05-25T08:01:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-05-26T03:13:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-05-27T12:49:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-05-28T10:25:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "trf_001",
+   "ticket": "IT-4100",
+   "direction": "internal",
+   "fromTeamId": "elite-closers",
+   "toTeamId": "elite-closers",
+   "moves": [
+    {
+     "memberId": "mem_015",
+     "memberName": "Oscar Lindqvist",
+     "fromSeat": "E-5",
+     "toSeat": "E-4",
+     "devices": [
+      {
+       "id": "dev_0077",
+       "kind": "laptop",
+       "model": "MacBook Pro 14\" M4",
+       "assetTag": "IT-LP-0355"
+      },
+      {
+       "id": "dev_0078",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0230"
+      },
+      {
+       "id": "dev_0079",
+       "kind": "monitor",
+       "model": "Dell UltraSharp 32\" U3225QE",
+       "assetTag": "IT-MN-0236"
+      },
+      {
+       "id": "dev_0080",
+       "kind": "dock",
+       "model": "Anker 778 Thunderbolt",
+       "assetTag": "IT-DK-0303"
+      },
+      {
+       "id": "dev_0081",
+       "kind": "phone",
+       "model": "Cisco 8845 desk phone",
+       "assetTag": "IT-PH-0221"
+      }
+     ]
+    }
+   ],
+   "effectiveDate": "2026-05-19",
+   "createdAt": "2026-05-18T03:12:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "note": "Payments checkout rewrite squad",
+   "itStatus": "completed",
+   "history": [
+    {
+     "status": "requested",
+     "at": "2026-05-18T03:12:00.000Z"
+    },
+    {
+     "status": "scheduled",
+     "at": "2026-05-18T22:24:00.000Z"
+    },
+    {
+     "status": "moved",
+     "at": "2026-05-20T08:00:00.000Z"
+    },
+    {
+     "status": "completed",
+     "at": "2026-05-21T05:36:00.000Z"
+    }
+   ]
+  }
+ ],
+ "exits": [
+  {
+   "id": "exit_1",
+   "memberId": "mem_026",
+   "memberName": "Prakash Adhikari",
+   "status": "resigned",
+   "seat": "E-1",
+   "effectiveDate": "2026-07-26",
+   "createdAt": "2026-07-25T09:00:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "reason": "Accepted an offer elsewhere"
+  },
+  {
+   "id": "exit_2",
+   "memberId": "mem_027",
+   "memberName": "Mina Park",
+   "status": "resigned",
+   "seat": "B-1",
+   "effectiveDate": "2026-07-04",
+   "createdAt": "2026-07-03T09:00:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "reason": "Accepted an offer elsewhere"
+  },
+  {
+   "id": "exit_3",
+   "memberId": "mem_028",
+   "memberName": "Willa Grant",
+   "status": "resigned",
+   "seat": "A-4",
+   "effectiveDate": "2026-09-19",
+   "createdAt": "2026-09-18T09:00:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "reason": "Starting a master's degree"
+  },
+  {
+   "id": "exit_4",
+   "memberId": "mem_029",
+   "memberName": "Kiran Tamang",
+   "status": "unknown",
+   "seat": "B-7",
+   "effectiveDate": "2026-07-18",
+   "createdAt": "2026-07-17T09:00:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "reason": "No response for 3+ weeks; escalated to People Ops"
+  },
+  {
+   "id": "exit_5",
+   "memberId": "mem_030",
+   "memberName": "Vera Ivanova",
+   "status": "unknown",
+   "seat": "E-2",
+   "effectiveDate": "2026-09-25",
+   "createdAt": "2026-09-24T09:00:00.000Z",
+   "initiatedBy": "Pawan Ojha",
+   "reason": "No response for 3+ weeks; escalated to People Ops"
+  }
+ ],
+ "reservedSeats": {
+  "elite-closers": [],
+  "magic-makers": [
+   "A-5",
+   "D-6",
+   "A-8",
+   "E-5",
+   "B-4",
+   "A-4",
+   "B-6",
+   "C-5",
+   "D-1",
+   "E-7",
+   "B-3",
+   "E-1",
+   "E-6",
+   "A-7",
+   "E-4",
+   "C-7",
+   "C-1",
+   "C-6",
+   "C-3",
+   "D-5",
+   "B-7",
+   "D-3",
+   "B-5",
+   "D-2",
+   "B-2",
+   "B-8",
+   "B-1",
+   "A-6",
+   "A-2",
+   "D-4"
+  ],
+  "kpi-krushers": [
+   "E-6",
+   "D-7",
+   "D-1",
+   "E-2",
+   "E-4",
+   "E-5",
+   "A-2",
+   "A-8",
+   "A-3",
+   "D-3",
+   "B-2",
+   "B-5",
+   "E-8",
+   "D-8",
+   "C-8",
+   "B-3",
+   "B-4",
+   "C-3",
+   "D-6",
+   "D-2",
+   "E-7",
+   "B-1",
+   "A-4",
+   "B-7",
+   "C-5",
+   "C-1",
+   "D-4",
+   "E-1",
+   "A-7",
+   "A-6"
+  ],
+  "trend-setters": [
+   "D-6",
+   "B-6",
+   "A-5",
+   "D-8",
+   "C-6",
+   "B-5",
+   "B-2",
+   "D-4",
+   "A-6",
+   "A-3",
+   "A-8",
+   "E-2",
+   "E-7",
+   "E-5",
+   "B-4",
+   "D-3",
+   "A-7",
+   "C-5",
+   "D-7",
+   "B-8",
+   "E-8",
+   "A-4",
+   "E-4",
+   "D-5",
+   "B-7",
+   "C-4",
+   "E-3",
+   "E-6",
+   "D-2"
+  ],
+  "veritas-engines": [
+   "C-5",
+   "A-7",
+   "D-2",
+   "A-1",
+   "C-6",
+   "E-6",
+   "E-8",
+   "C-4",
+   "C-3",
+   "A-4",
+   "A-8",
+   "D-8",
+   "B-1",
+   "D-1",
+   "C-7",
+   "D-6",
+   "B-4",
+   "E-4",
+   "B-5",
+   "B-7",
+   "B-2",
+   "E-3",
+   "D-3",
+   "E-2",
+   "E-1",
+   "B-8"
+  ],
+  "success-sharks": [
+   "C-8",
+   "E-7",
+   "D-1",
+   "A-3",
+   "E-2",
+   "A-4",
+   "E-5",
+   "D-7",
+   "E-1",
+   "C-7",
+   "B-6",
+   "A-2",
+   "C-4",
+   "B-7",
+   "D-2",
+   "B-5",
+   "E-4",
+   "C-3",
+   "D-6",
+   "B-3",
+   "C-2",
+   "D-4",
+   "D-3"
+  ],
+  "compliance-crew": [
+   "E-6",
+   "D-5",
+   "E-3",
+   "D-6",
+   "A-8",
+   "C-6",
+   "D-3",
+   "C-5",
+   "B-6",
+   "B-4",
+   "C-1",
+   "A-6",
+   "E-8",
+   "E-2",
+   "A-7",
+   "C-2",
+   "A-3",
+   "D-7"
+  ]
+ }
+}

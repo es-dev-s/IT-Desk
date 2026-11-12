@@ -1,0 +1,644 @@
+{
+ "name": "Level 4",
+ "level": 4,
+ "sortOrder": 70,
+ "seatPrefix": "",
+ "cols": 17,
+ "rows": 5,
+ "notes": "Imported from the seating sheet \"Level-4\" dated 2026-08-10.",
+ "source": {
+  "image": "1-level4.png",
+  "sheetDate": "2026-08-10",
+  "title": "Level-4"
+ },
+ "elements": [
+  {
+   "id": "l4-seat-A01",
+   "kind": "seat",
+   "x": 0,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "1"
+  },
+  {
+   "id": "l4-seat-A02",
+   "kind": "seat",
+   "x": 1,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "2",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-A03",
+   "kind": "seat",
+   "x": 2,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "3",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-A04",
+   "kind": "seat",
+   "x": 3,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "4",
+   "team": "Power Players",
+   "leadSeat": true
+  },
+  {
+   "id": "l4-seat-A05",
+   "kind": "seat",
+   "x": 4,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "5",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-A06",
+   "kind": "seat",
+   "x": 5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "6",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-A07",
+   "kind": "seat",
+   "x": 6,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "7",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-A08",
+   "kind": "seat",
+   "x": 7,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "8",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-A09",
+   "kind": "seat",
+   "x": 8,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "9",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-A10",
+   "kind": "seat",
+   "x": 9,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "10",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-A11",
+   "kind": "seat",
+   "x": 10,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "11",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-A12",
+   "kind": "seat",
+   "x": 11,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "12",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-A13",
+   "kind": "seat",
+   "x": 12,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "13",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-A14",
+   "kind": "seat",
+   "x": 13,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "14",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-A15",
+   "kind": "seat",
+   "x": 14,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "15",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-A16",
+   "kind": "seat",
+   "x": 15,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "16",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-A17",
+   "kind": "seat",
+   "x": 16,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "code": "17",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-B01",
+   "kind": "seat",
+   "x": 2,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "18",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-B02",
+   "kind": "seat",
+   "x": 3,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "19",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-B03",
+   "kind": "seat",
+   "x": 4,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "20",
+   "team": "Power Players"
+  },
+  {
+   "id": "l4-seat-B04",
+   "kind": "seat",
+   "x": 5,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "21",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-B05",
+   "kind": "seat",
+   "x": 6,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "22",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-B06",
+   "kind": "seat",
+   "x": 7,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "23",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-B07",
+   "kind": "seat",
+   "x": 8,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "24",
+   "team": "Alpha Winners",
+   "leadSeat": true
+  },
+  {
+   "id": "l4-seat-B08",
+   "kind": "seat",
+   "x": 9,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "25",
+   "team": "Alpha Winners"
+  },
+  {
+   "id": "l4-seat-B09",
+   "kind": "seat",
+   "x": 10,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "26",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-B10",
+   "kind": "seat",
+   "x": 11,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "27",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-B11",
+   "kind": "seat",
+   "x": 12,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "28",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-B12",
+   "kind": "seat",
+   "x": 13,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "29",
+   "team": "Success Sharks",
+   "leadSeat": true
+  },
+  {
+   "id": "l4-seat-B13",
+   "kind": "seat",
+   "x": 14,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "30",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-B14",
+   "kind": "seat",
+   "x": 15,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "31",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-seat-B15",
+   "kind": "seat",
+   "x": 16,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "code": "32",
+   "team": "Success Sharks"
+  },
+  {
+   "id": "l4-block-1",
+   "kind": "block",
+   "x": 0,
+   "y": 1,
+   "w": 17,
+   "h": 2
+  },
+  {
+   "id": "l4-block-2",
+   "kind": "block",
+   "x": 0,
+   "y": 3,
+   "w": 2,
+   "h": 1
+  },
+  {
+   "id": "l4-door-1",
+   "kind": "door",
+   "x": 0,
+   "y": 4,
+   "w": 2,
+   "h": 1,
+   "label": "Door"
+  }
+ ],
+ "people": [
+  {
+   "seat_code": "L4-A02",
+   "team": "Power Players",
+   "person_name": "Swastika Pokharel",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Swastika Pokharel"
+  },
+  {
+   "seat_code": "L4-A03",
+   "team": "Power Players",
+   "person_name": "Shubekshya Maharjan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Shubekshya Maharjan"
+  },
+  {
+   "seat_code": "L4-A04",
+   "team": "Power Players",
+   "person_name": "Jamuna Upadhyaya",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Jamuna Upadhyaya"
+  },
+  {
+   "seat_code": "L4-A05",
+   "team": "Power Players",
+   "person_name": "Bipana Magar",
+   "is_lead": "no",
+   "handover_to": "Nalina Shrestha",
+   "handover_until": "2026-08-09",
+   "notes": "Bipana Magar - Nalina Shrestha Till Aug-9"
+  },
+  {
+   "seat_code": "L4-A06",
+   "team": "Power Players",
+   "person_name": "Rashmi Bhade",
+   "is_lead": "no",
+   "handover_to": "Bipana Magar",
+   "handover_until": "2026-08-09",
+   "notes": "Rashmi Bhade-Bipana Magar Till Aug-9"
+  },
+  {
+   "seat_code": "L4-A07",
+   "team": "Power Players",
+   "person_name": "Suvekcha Thapa",
+   "is_lead": "no",
+   "handover_to": "Rashmi Bhadel",
+   "handover_until": "2026-08-09",
+   "notes": "Suvekcha Thapa-Rashmi Bhadel Till Aug-9"
+  },
+  {
+   "seat_code": "L4-A08",
+   "team": "Alpha Winners",
+   "person_name": "Aaniya Shah",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Aaniya Shah"
+  },
+  {
+   "seat_code": "L4-A09",
+   "team": "Alpha Winners",
+   "person_name": "Sandhya Subedi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "2026-07-20",
+   "notes": "-Sandhya Subedi Till Jul-20"
+  },
+  {
+   "seat_code": "L4-A10",
+   "team": "Alpha Winners",
+   "person_name": "Lilen Nakarmi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Lilen Nakarmi"
+  },
+  {
+   "seat_code": "L4-A11",
+   "team": "Alpha Winners",
+   "person_name": "Komal Shah",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Komal Shah"
+  },
+  {
+   "seat_code": "L4-A12",
+   "team": "Alpha Winners",
+   "person_name": "Smriti Purkuti",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Smriti Purkuti"
+  },
+  {
+   "seat_code": "L4-A13",
+   "team": "Success Sharks",
+   "person_name": "Manita Tamang",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Manita Tamang"
+  },
+  {
+   "seat_code": "L4-A14",
+   "team": "Success Sharks",
+   "person_name": "Aarti Thapa",
+   "is_lead": "no",
+   "handover_to": "Samma Maharjan",
+   "handover_until": "2026-08-04",
+   "notes": "Aarti Thapa-Samma Maharjan Till Aug-4"
+  },
+  {
+   "seat_code": "L4-A15",
+   "team": "Success Sharks",
+   "person_name": "Saloni Pandit",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Saloni Pandit"
+  },
+  {
+   "seat_code": "L4-A16",
+   "team": "Success Sharks",
+   "person_name": "Elyza Acharya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Elyza Acharya"
+  },
+  {
+   "seat_code": "L4-A17",
+   "team": "Success Sharks",
+   "person_name": "Kushum Ranabhat",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Kushum Ranabhat"
+  },
+  {
+   "seat_code": "L4-B01",
+   "team": "Power Players",
+   "person_name": "Puja Sapkota",
+   "is_lead": "no",
+   "handover_to": "Suvekcha Thapa",
+   "handover_until": "2026-08-09",
+   "notes": "Puja Sapkota-Suvekcha Thapa Till Aug-9"
+  },
+  {
+   "seat_code": "L4-B02",
+   "team": "Power Players",
+   "person_name": "Rabina Bhatta",
+   "is_lead": "no",
+   "handover_to": "Puja Sapkota",
+   "handover_until": "2026-08-04",
+   "notes": "Rabina Bhatta-Puja Sapkota Till Aug-4"
+  },
+  {
+   "seat_code": "L4-B03",
+   "team": "Power Players",
+   "person_name": "Nalina Shrestha",
+   "is_lead": "no",
+   "handover_to": "Puja Sapkota",
+   "handover_until": "2026-08-09",
+   "notes": "Nalina Shrestha-Puja Sapkota Till Aug-9"
+  },
+  {
+   "seat_code": "L4-B04",
+   "team": "Alpha Winners",
+   "person_name": "Sara Shrestha",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sara Shrestha"
+  },
+  {
+   "seat_code": "L4-B05",
+   "team": "Alpha Winners",
+   "person_name": "Shreeya Shakya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Shreeya Shakya"
+  },
+  {
+   "seat_code": "L4-B06",
+   "team": "Alpha Winners",
+   "person_name": "Mallika Manandhar",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Mallika Manandhar"
+  },
+  {
+   "seat_code": "L4-B07",
+   "team": "Alpha Winners",
+   "person_name": "Puja Tamang",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Puja Tamang"
+  },
+  {
+   "seat_code": "L4-B08",
+   "team": "Alpha Winners",
+   "person_name": "Binita Gurung",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Binita Gurung"
+  },
+  {
+   "seat_code": "L4-B09",
+   "team": "Success Sharks",
+   "person_name": "Rina Maharjan",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Rina Maharjan"
+  },
+  {
+   "seat_code": "L4-B10",
+   "team": "Success Sharks",
+   "person_name": "Phurbi Lamu Sherpa",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Phurbi Lamu Sherpa"
+  },
+  {
+   "seat_code": "L4-B11",
+   "team": "Success Sharks",
+   "person_name": "Alina Pandey",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Alina Pandey"
+  },
+  {
+   "seat_code": "L4-B12",
+   "team": "Success Sharks",
+   "person_name": "Prerana Bhusal",
+   "is_lead": "yes",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Prerana Bhusal"
+  },
+  {
+   "seat_code": "L4-B13",
+   "team": "Success Sharks",
+   "person_name": "Sonali Regmi",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Sonali Regmi"
+  },
+  {
+   "seat_code": "L4-B14",
+   "team": "Success Sharks",
+   "person_name": "Aruna Gurung",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Aruna Gurung"
+  },
+  {
+   "seat_code": "L4-B15",
+   "team": "Success Sharks",
+   "person_name": "Paristha Acharya",
+   "is_lead": "no",
+   "handover_to": "",
+   "handover_until": "",
+   "notes": "Paristha Acharya"
+  }
+ ]
+}
