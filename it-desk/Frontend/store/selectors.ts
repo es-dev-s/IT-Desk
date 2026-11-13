@@ -6,7 +6,9 @@ import { computeOverview } from "@/lib/analytics";
 import { nowMs } from "@/lib/clock";
 import { compareSeats } from "@/lib/constants";
 import { occupancy, seatIndex } from "@/lib/floors";
-import type { Member, Transfer } from "@/lib/schemas";
+import type { ExitRecord, Member, Transfer } from "@/lib/schemas";
+import type { ITRequest } from "@/lib/requests";
+import { useRequests } from "./requests-store";
 import { teamColorMap } from "@/lib/team-colors";
 import { useWorkspace } from "./workspace-provider";
 
@@ -37,8 +39,37 @@ export function useActiveMembers(): Member[] {
   );
 }
 
+/**
+ * Transfers of the team in focus. Admin and IT receive the whole organisation from the API,
+ * so a selected team is applied here; "All teams" ("") and leads (already scoped) see everything they got.
+ */
 export function useTransfers(): Transfer[] {
-  return useWorkspace(useShallow((s) => s.transferIds.map((id) => s.transfers[id])));
+  return useWorkspace(
+    useShallow((s) => {
+      const all = s.transferIds.map((id) => s.transfers[id]);
+      const team = s.currentTeamId;
+      return team ? all.filter((t) => t.fromTeamId === team || t.toTeamId === team) : all;
+    }),
+  );
+}
+
+/** Exit records of people on the team in focus (the whole organisation in "All teams"). */
+export function useExits(): ExitRecord[] {
+  return useWorkspace(
+    useShallow((s) => {
+      const all = s.exitIds.map((id) => s.exits[id]);
+      const team = s.currentTeamId;
+      return team ? all.filter((e) => s.members[e.memberId]?.teamId === team) : all;
+    }),
+  );
+}
+
+/** IT requests of the team in focus; null until loaded. Leads are already scoped by the API. */
+export function useFocusedRequests(): ITRequest[] | null {
+  const items = useRequests((s) => s.items);
+  const team = useWorkspace((s) => s.currentTeamId);
+  const role = useWorkspace((s) => s.user.role);
+  return useMemo(() => (items && team && role !== "team_lead" ? items.filter((r) => r.teamId === team) : items), [items, team, role]);
 }
 
 export function useOverview() {

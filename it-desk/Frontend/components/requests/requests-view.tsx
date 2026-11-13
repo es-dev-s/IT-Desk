@@ -16,6 +16,7 @@ import {
 } from "@/lib/requests";
 import { cn, pluralize } from "@/lib/utils";
 import { useTeams } from "@/store/selectors";
+import { useWorkspace } from "@/store/workspace-provider";
 import { useRequests } from "@/store/requests-store";
 import { useSession } from "@/components/auth/session-provider";
 import { Avatar } from "@/components/ui/avatar";
@@ -62,7 +63,16 @@ export function RequestsView() {
   const [view, setView] = useState<View>("active");
   const [query, setQuery] = useState("");
   const [assignee, setAssignee] = useState<"any" | "mine" | "unassigned">("any");
-  const [team, setTeam] = useState("all");
+  const focus = useWorkspace((s) => s.currentTeamId);
+  const [team, setTeam] = useState(focus || "all");
+  // The sidebar's team in focus drives the Team filter (adjusted during render, not in an effect).
+  const [seenFocus, setSeenFocus] = useState(focus);
+  if (seenFocus !== focus) {
+    setSeenFocus(focus);
+    setTeam(focus || "all");
+  }
+  // IT has no Team filter of its own, so it follows the sidebar directly.
+  const teamFilter = isAdmin ? team : session.user.role === "team_lead" ? "all" : focus || "all";
   const [type, setType] = useState<"all" | RequestType>("all");
   const [sort, setSort] = useState<"newest" | "priority">(isIt ? "priority" : "newest");
 
@@ -72,11 +82,11 @@ export function RequestsView() {
       all.filter((r) => {
         if (isIt && assignee === "mine" && r.assigneeId !== session.user.id) return false;
         if (isIt && assignee === "unassigned" && r.assigneeId) return false;
-        if (isAdmin && team !== "all" && (team === ORG ? r.teamId !== null : r.teamId !== team)) return false;
+        if (teamFilter !== "all" && (teamFilter === ORG ? r.teamId !== null : r.teamId !== teamFilter)) return false;
         if (type !== "all" && r.type !== type) return false;
         return true;
       }),
-    [all, isIt, isAdmin, assignee, team, type, session.user.id],
+    [all, isIt, assignee, teamFilter, type, session.user.id],
   );
   const counts = useMemo(() => {
     const c: Record<View, number> = { active: 0, open: 0, in_progress: 0, resolved: 0, closed: 0, all: 0 };

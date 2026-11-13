@@ -2,12 +2,10 @@
 
 import { ArrowLeftRight, Inbox } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useShallow } from "zustand/react/shallow";
 import { ACTIVITY_PAGE_SIZE } from "@/lib/constants";
 import { formatShortDate } from "@/lib/format";
 import type { Direction } from "@/lib/schemas";
-import { useTransfers } from "@/store/selectors";
-import { useWorkspace } from "@/store/workspace-provider";
+import { useExits, useTransfers } from "@/store/selectors";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -36,7 +34,7 @@ const statusOptions = [
 
 export function TransfersView() {
   const transfers = useTransfers();
-  const exits = useWorkspace(useShallow((s) => s.exitIds.map((id) => s.exits[id])));
+  const exits = useExits();
   const [direction, setDirection] = useState<"all" | Direction>("all");
   const [status, setStatus] = useState("all");
   const [query, setQuery] = useState("");

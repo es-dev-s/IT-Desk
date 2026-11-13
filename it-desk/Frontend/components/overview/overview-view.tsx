@@ -6,7 +6,7 @@ import { computeOverview, deviceCount, periodBounds, type ChartGrain, type Kpi, 
 import { formatRelative, formatShortDate, signed } from "@/lib/format";
 import { cn, pluralize } from "@/lib/utils";
 import { nowMs } from "@/lib/clock";
-import { useCurrentTeam, useTeamMembers, useTransfers } from "@/store/selectors";
+import { useCurrentTeam, useFocusedRequests, useTeamMembers, useTransfers } from "@/store/selectors";
 import { useWorkspace } from "@/store/workspace-provider";
 import { useUI } from "@/store/ui-store";
 import { buttonClass } from "@/components/ui/button";
@@ -76,14 +76,8 @@ function anchorFromInput(kind: RangeKind, value: string) {
 }
 
 export function OverviewView() {
-  const allTransfers = useTransfers();
+  const transfers = useTransfers();
   const teamId = useWorkspace((s) => s.currentTeamId);
-  const role = useWorkspace((s) => s.user.role);
-  // Admin/IT get organisation-wide data from the API; narrow it to the team in focus ("" = All teams).
-  const transfers = useMemo(
-    () => (teamId ? allTransfers.filter((t) => t.fromTeamId === teamId || t.toTeamId === teamId) : allTransfers),
-    [allTransfers, teamId],
-  );
   const syncedAt = useWorkspace((s) => s.lastSyncedAt);
   const [kind, setKind] = useState<RangeKind>("month");
   const [anchor, setAnchor] = useState(() => new Date());
@@ -101,12 +95,8 @@ export function OverviewView() {
   const roster = useTeamMembers();
   // Admins receive organisation-wide transfers, so only count moves touching the team in focus.
   // IT requests (Request IT) are the bulk of the work IT carries; transfers alone left these cards at 0.
-  const requests = useRequests((s) => s.items);
-  const rangedRequests = useMemo(
-    // Leads are already scoped by the API; for admin/IT narrow to the team in focus.
-    () => (requests ?? []).filter((r) => inPeriod(r.createdAt) && (!teamId || role === "team_lead" || r.teamId === teamId)),
-    [requests, inPeriod, teamId, role],
-  );
+  const requests = useFocusedRequests();
+  const rangedRequests = useMemo(() => (requests ?? []).filter((r) => inPeriod(r.createdAt)), [requests, inPeriod]);
   const openRequests = useMemo(() => rangedRequests.filter((r) => !isClosed(r.status)), [rangedRequests]);
   const reqOpen = rangedRequests.filter((r) => r.status === "open").length;
   const reqActive = rangedRequests.filter((r) => r.status === "in_progress").length;
