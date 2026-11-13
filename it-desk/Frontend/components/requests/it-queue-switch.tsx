@@ -3,8 +3,7 @@
 import { ArrowLeftRight, LifeBuoy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import { useTransfers } from "@/store/selectors";
-import { useRequests } from "@/store/requests-store";
+import { useFocusedRequests, useTransfers } from "@/store/selectors";
 import { Segmented } from "@/components/ui/segmented";
 
 type Lane = "transfers" | "requests";
@@ -13,7 +12,8 @@ type Lane = "transfers" | "requests";
 export function ItQueueSwitch({ value }: { value: Lane }) {
   const router = useRouter();
   const transfers = useTransfers();
-  const counts = useRequests((s) => s.counts);
+  const requests = useFocusedRequests();
+  const openRequests = useMemo(() => requests?.filter((r) => r.status === "open" || r.status === "in_progress").length, [requests]);
   const openTransfers = useMemo(() => transfers.filter((t) => t.itStatus !== "completed").length, [transfers]);
   return (
     <Segmented
@@ -24,7 +24,7 @@ export function ItQueueSwitch({ value }: { value: Lane }) {
       onChange={(v) => router.push(v === "transfers" ? "/queue" : "/requests")}
       options={[
         { value: "transfers", label: "Transfers", icon: ArrowLeftRight, count: openTransfers },
-        { value: "requests", label: "Requests", icon: LifeBuoy, count: counts ? counts.open + counts.inProgress : undefined },
+        { value: "requests", label: "Requests", icon: LifeBuoy, count: openRequests },
       ]}
     />
   );
