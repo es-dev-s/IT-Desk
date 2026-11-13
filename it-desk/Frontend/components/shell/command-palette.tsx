@@ -58,7 +58,9 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
   const items = useMemo<Item[]>(() => {
     const q = query.trim().toLowerCase();
     const match = (...fields: string[]) => !q || fields.some((f) => f.toLowerCase().includes(q));
+    // A group (Reports) is listed as its sub-pages.
     const pages: Item[] = navFor(session.permissions)
+      .flatMap((n) => (n.children?.length ? n.children.map((c) => ({ ...n, href: c.href, label: c.label })) : [n]))
       .filter((n) => match(n.label)).map((n) => ({
       id: `page:${n.href}`,
       group: "Go to",

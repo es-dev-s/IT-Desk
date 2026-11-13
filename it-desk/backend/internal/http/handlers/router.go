@@ -68,6 +68,7 @@ func (s *Server) Handler() http.Handler {
 	write("PUT /api/v1/settings", auth.PermSelf, s.putSettings)
 	read("GET /api/v1/teams", auth.PermViewTeams, s.getTeams)
 	s.floorRoutes(read, write)
+	s.reportRoutes(read)
 	read("GET /api/v1/members", auth.PermViewMembers, s.getMembers)
 	read("GET /api/v1/members/{id}", auth.PermViewMembers, s.getMember)
 	read("GET /api/v1/members/{id}/detail", auth.PermViewMembers, s.getMemberDetail)

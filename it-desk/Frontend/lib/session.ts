@@ -35,6 +35,7 @@ export const PERMISSIONS = [
   "requests.cancel",
   "requests.comment",
   "requests.fulfil",
+  "reports.view",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
