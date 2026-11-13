@@ -505,7 +505,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
             {named ? (
               <>
                 <span
-                  className={cn("tnum block whitespace-nowrap font-medium leading-none", e.leadSeat && "pr-3", cs >= 56 ? "text-[10.5px]" : "text-[9.5px]")}
+                  className={cn("tnum block truncate font-medium leading-none", lead && (cs >= 44 ? "pr-3.5" : "pr-2.5"), cs >= 56 ? "text-[10.5px]" : "text-[9.5px]")}
                   style={{ color: numberColor }}
                   data-seat-number
                 >
@@ -899,8 +899,8 @@ function HoverCard({
         transform: below ? undefined : "translateY(-100%)",
       }}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-[13px] font-semibold text-neutral-900">
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="shrink-0 whitespace-nowrap text-[13px] font-semibold text-neutral-900">
           {seat.code ? (
             <>
               <span className="mr-1 text-[11px] font-medium uppercase tracking-wide text-neutral-400">Seat</span>
@@ -911,11 +911,11 @@ function HoverCard({
           )}
         </span>
         {seat.leadSeat ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 text-[10px] font-medium text-amber-700 ring-1 ring-amber-200">
-            <Crown className="size-2.5" aria-hidden /> Lead desk
+          <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-amber-50 px-1.5 py-px text-[10px] font-medium leading-4 text-amber-700 ring-1 ring-amber-200">
+            <Crown className="size-2.5 shrink-0" aria-hidden /> Lead desk
           </span>
         ) : null}
-        <span className="ml-auto inline-flex items-center gap-1.5 truncate text-[11px] text-neutral-500">
+        <span className="ml-auto inline-flex min-w-0 items-center gap-1.5 text-[11px] text-neutral-500">
           <span
             className="size-2 shrink-0 rounded-full"
             style={{
@@ -923,7 +923,7 @@ function HoverCard({
               boxShadow: zone ? undefined : "inset 0 0 0 1px rgb(0 0 0/0.25)",
             }}
           />
-          {zone ? teamName(zone) : "No zone"}
+          <span className="truncate">{zone ? teamName(zone) : "No zone"}</span>
         </span>
       </div>
       <div className="mt-2.5 border-t border-line pt-2.5">
@@ -947,10 +947,10 @@ function HoverCard({
                 )}
               </div>
             </div>
-            <div className="mt-2 flex items-center gap-2 text-[11px] text-neutral-500">
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-neutral-500">
               {occ.isLead ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 font-medium text-amber-700 ring-1 ring-amber-200">
-                  <Crown className="size-3" aria-hidden /> Team lead
+                  <Crown className="size-3 shrink-0" aria-hidden /> Team lead
                 </span>
               ) : null}
               {!occ.redacted && occ.memberId ? <span className="tnum">{pluralize(occ.devices, "device")}</span> : null}
