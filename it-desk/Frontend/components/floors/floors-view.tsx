@@ -45,6 +45,7 @@ export function FloorsView() {
   const teams = useTeamsById();
   const colors = useTeamColors();
   const teamName = useCallback((id: string) => teams[id]?.name ?? "Another team", [teams]);
+  const leadName = useCallback((id: string) => teams[id]?.leadName || undefined, [teams]);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -84,6 +85,8 @@ export function FloorsView() {
   const [numberFor, setNumberFor] = useState<string | null>(null);
   const [moving, setMoving] = useState<MoveState | null>(null);
   const [editing, setEditing] = useState(false);
+  // A lead sees seats by who sits there: green own team, red other teams, white free.
+  const byTeam = isLead && Boolean(myTeam) && !editing;
   const [sel, setSel] = useState<Set<string>>(() => new Set());
   const [marquee, setMarquee] = useState<Marquee | null>(null);
   const canvas = useRef<FloorCanvasHandle>(null);
@@ -340,7 +343,7 @@ export function FloorsView() {
         <LegendPopover color={(() => {
           const z = floor ? seatsOf(floor).find((e) => e.teamId && colors[e.teamId]) : undefined;
           return z?.teamId ? colors[z.teamId] : undefined;
-        })()} moving={Boolean(moving)} />
+        })()} moving={Boolean(moving)} byTeam={byTeam} />
       </div>
 
       {q ? (
@@ -418,6 +421,8 @@ export function FloorsView() {
           selected={editing ? sel : undefined}
           highlight={highlight}
           focusTeamId={!editing && !moving && !q ? focusTeam : null}
+          ownTeamId={byTeam ? myTeam : null}
+          leadName={byTeam ? leadName : undefined}
           tone={tone}
           mode={editing ? "edit" : "view"}
           onSeatClick={onSeatClick}
@@ -534,7 +539,7 @@ export function FloorsView() {
 }
 
 /** Key to the plan, tucked into a small popover. */
-function LegendPopover({ color, moving }: { color?: TeamColor; moving: boolean }) {
+function LegendPopover({ color, moving, byTeam = false }: { color?: TeamColor; moving: boolean; byTeam?: boolean }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -563,8 +568,20 @@ function LegendPopover({ color, moving }: { color?: TeamColor; moving: boolean }
           aria-label="Legend"
         >
           <ul className="space-y-2">
-            {(
-              [
+            {(byTeam
+              ? ([
+                  { key: "own", label: "Your team", occupied: true, relation: "own", byTeam },
+                  { key: "taken", label: "Other team", occupied: true, relation: "other", byTeam },
+                  { key: "free", label: "Available", byTeam },
+                  { key: "lead", label: "Team lead", zoned: false, lead: true, byTeam },
+                  ...(moving
+                    ? [
+                        { key: "current", label: "Current desk", tone: "current" as const, now: true, byTeam },
+                        { key: "unavailable", label: "Not available for this move", tone: "disabled" as const, byTeam },
+                      ]
+                    : [{ key: "chosen", label: "Selected", tone: "target" as const, byTeam }]),
+                ] satisfies SeatLegendItem[])
+              : [
                 { key: "taken", label: "Occupied", color, zoned: true, occupied: true },
                 { key: "free", label: "Available", color, zoned: true },
                 { key: "lead", label: "Team lead desk", zoned: false, lead: true },
