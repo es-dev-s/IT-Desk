@@ -1,7 +1,9 @@
-import { ArrowLeftRight, Building2, LayoutGrid, Map as MapIcon, LifeBuoy, MessagesSquare, Settings, ShieldCheck, Users, Wrench, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, Building2, FileSpreadsheet, LayoutGrid, Map as MapIcon, LifeBuoy, MessagesSquare, Settings, ShieldCheck, Users, Wrench, type LucideIcon } from "lucide-react";
 import type { Permission, Role } from "./session";
 
-export type NavItem = { href: string; label: string; icon: LucideIcon; permission: Permission; description: string };
+export type NavChild = { href: string; label: string };
+/** `children` turns the entry into a group in the sidebar: it opens to list them instead of linking anywhere itself. */
+export type NavItem = { href: string; label: string; icon: LucideIcon; permission: Permission; description: string; children?: readonly NavChild[] };
 
 /** Every page, with the permission that unlocks it. The nav only lists what the role can open. */
 export const NAV_ITEMS = [
@@ -12,6 +14,17 @@ export const NAV_ITEMS = [
   { href: "/transfers", label: "Transfers", icon: ArrowLeftRight, permission: "transfers.view", description: "Moves and their IT status" },
   { href: "/requests", label: "Requests", icon: LifeBuoy, permission: "requests.view", description: "Equipment and support asks to IT" },
   { href: "/messages", label: "Messages", icon: MessagesSquare, permission: "requests.comment", description: "Chat with IT about a request" },
+  {
+    href: "/reports",
+    label: "Reports",
+    icon: FileSpreadsheet,
+    permission: "reports.view",
+    description: "Seats, devices and IT tasks",
+    children: [
+      { href: "/reports/members", label: "Member & device report" },
+      { href: "/reports/it-tasks", label: "IT task report" },
+    ],
+  },
   { href: "/teams", label: "Teams", icon: Building2, permission: "users.manage", description: "Teams and their leads" },
   { href: "/users", label: "Users", icon: ShieldCheck, permission: "users.manage", description: "Accounts and access" },
   { href: "/settings", label: "Settings", icon: Settings, permission: "self", description: "Profile and notifications" },
@@ -50,6 +63,10 @@ export function getBreadcrumbs(pathname: string, ctx: { role: Role; teamName?: s
 
 /** Crumbs below a nav page (floor management and the layout builder). */
 function subPages(pathname: string, href: string): Crumb[] {
+  const child = NAV_ITEMS.find((i): i is (typeof NAV_ITEMS)[number] & { children: readonly NavChild[] } => i.href === href && "children" in i)?.children.find((c) =>
+    isActivePath(pathname, c.href),
+  );
+  if (child) return [{ label: child.label }];
   if (href !== "/floors" || pathname === "/floors") return [];
   if (pathname === "/floors/manage") return [{ label: "Manage" }];
   if (/^\/floors\/[^/]+\/edit$/.test(pathname)) return [{ label: "Manage", href: "/floors/manage" }, { label: "Edit layout" }];

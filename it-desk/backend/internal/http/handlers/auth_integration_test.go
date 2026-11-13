@@ -226,6 +226,8 @@ func TestPolicyMatrixOverHTTP(t *testing.T) {
 		{"POST", "/api/v1/it-requests/nope/status", map[string]string{"status": "in_progress"}, []string{"it"}},
 		{"POST", "/api/v1/it-requests/nope/reject", map[string]string{"reason": "nope"}, []string{"it"}},
 		{"POST", "/api/v1/it-requests/nope/comments", map[string]string{"body": "hi"}, all},
+		{"GET", "/api/v1/reports/members", nil, all},
+		{"GET", "/api/v1/reports/it-tasks", nil, all},
 	}
 	for _, c := range calls {
 		for role, cl := range clients {

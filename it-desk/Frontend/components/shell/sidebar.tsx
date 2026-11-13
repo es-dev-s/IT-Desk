@@ -1,9 +1,11 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { homeFor } from "@/lib/session";
-import { isActivePath, navFor } from "@/lib/nav";
+import { isActivePath, navFor, type NavItem } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import { useCurrentTeam, useSeatStats, useTransfers, useUser } from "@/store/selectors";
 import { useWorkspace } from "@/store/workspace-provider";
@@ -15,6 +17,56 @@ import { RoleBadge } from "@/components/auth/role-badge";
 import { TeamSwitcher } from "@/components/auth/team-switcher";
 import { Avatar } from "@/components/ui/avatar";
 import { Logo } from "./logo";
+
+/** A nav entry with sub-pages: a button that opens to list them. Open while one of them is the current page. */
+function NavGroup({ item, pathname, onNavigate }: { item: NavItem; pathname: string; onNavigate: () => void }) {
+  const active = isActivePath(pathname, item.href);
+  const [toggled, setToggled] = useState<boolean | null>(null);
+  const open = toggled ?? active;
+  const Icon = item.icon;
+  const listId = `nav-group-${item.href.replace(/\W+/g, "")}`;
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => setToggled(!open)}
+        aria-expanded={open}
+        aria-controls={listId}
+        data-testid={`nav-group-${item.label.toLowerCase()}`}
+        className={cn(
+          "flex h-8 w-full items-center gap-3 rounded-lg px-2 text-left text-[13px] font-medium outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-accent/35",
+          active ? "text-accent-ink" : "text-neutral-600 hover:bg-neutral-900/[0.035] hover:text-neutral-900",
+        )}
+      >
+        <Icon className={cn("size-4", active ? "text-accent" : "text-neutral-400")} aria-hidden />
+        {item.label}
+        <ChevronDown className={cn("ml-auto size-4 text-neutral-400 transition-transform duration-150", open && "rotate-180")} aria-hidden />
+      </button>
+      {open ? (
+        <ul id={listId} className="mb-1 ml-4 mt-0.5 space-y-0.5 border-l border-line pl-3">
+          {item.children!.map((child) => {
+            const current = isActivePath(pathname, child.href);
+            return (
+              <li key={child.href}>
+                <Link
+                  href={child.href}
+                  onClick={onNavigate}
+                  aria-current={current ? "page" : undefined}
+                  className={cn(
+                    "flex h-8 items-center rounded-lg px-2 text-[13px] outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-accent/35",
+                    current ? "bg-accent-soft font-medium text-accent-ink" : "text-neutral-600 hover:bg-neutral-900/[0.035] hover:text-neutral-900",
+                  )}
+                >
+                  {child.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </li>
+  );
+}
 
 export function SidebarContent() {
   const pathname = usePathname();
@@ -63,7 +115,7 @@ export function SidebarContent() {
         )}
       </div>
 
-      <nav aria-label="Main" className="flex-1 px-3">
+      <nav aria-label="Main" className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-3">
         <ul className="space-y-0.5">
           {items.map((item) => {
             const active = isActivePath(pathname, item.href);
@@ -71,6 +123,7 @@ export function SidebarContent() {
             const isRequests = item.href === "/requests";
             const isMessages = item.href === "/messages";
             const badge = isRequests ? requestBadge : isMessages ? chatUnread : (item.href === "/transfers" && role !== "it") || item.href === "/queue" ? pending : 0;
+            if (item.children?.length) return <NavGroup key={item.href} item={item} pathname={pathname} onNavigate={() => closeMobile(false)} />;
             return (
               <li key={item.href}>
                 <Link

@@ -54,6 +54,8 @@ const (
 	PermCancelRequest  Permission = "requests.cancel"  // withdraw own request while open
 	PermCommentRequest Permission = "requests.comment" // add to the timeline
 	PermFulfilRequest  Permission = "requests.fulfil"  // IT: claim/assign, start, resolve, reject
+	// Reports: member & device allocation and IT tasks (scoped per role in the store).
+	PermViewReports Permission = "reports.view"
 )
 
 // Matrix is the single source of truth for who can do what. Row-level scoping
@@ -62,19 +64,19 @@ const (
 var Matrix = map[Role]map[Permission]bool{
 	RoleAdmin: set(PermSelf, PermViewWorkspace, PermViewTeams, PermViewMembers, PermViewFloor, PermManageFloors, PermAssignSeat, PermViewTransfers,
 		PermViewExits, PermViewOverview, PermViewActivity, PermManageUsers, PermManageMembers,
-		PermViewRequests, PermCreateRequest, PermCancelRequest, PermCommentRequest),
+		PermViewRequests, PermCreateRequest, PermCancelRequest, PermCommentRequest, PermViewReports),
 	RoleTeamLead: set(PermSelf, PermViewWorkspace, PermViewTeams, PermViewMembers, PermViewFloor, PermAssignSeat, PermViewTransfers,
 		PermCreateTransfer, PermUndoTransfer, PermViewExits, PermMarkExit, PermUndoExit, PermViewOverview, PermManageMembers,
-		PermViewRequests, PermCreateRequest, PermCancelRequest, PermCommentRequest),
+		PermViewRequests, PermCreateRequest, PermCancelRequest, PermCommentRequest, PermViewReports),
 	RoleIT: set(PermSelf, PermViewWorkspace, PermViewTeams, PermViewMembers, PermViewFloor, PermViewTransfers, PermAdvanceTransfer,
-		PermViewRequests, PermCommentRequest, PermFulfilRequest),
+		PermViewRequests, PermCommentRequest, PermFulfilRequest, PermViewReports),
 }
 
 // AllPermissions lists every permission (for tests and the /auth/me payload).
 var AllPermissions = []Permission{PermSelf, PermViewWorkspace, PermViewTeams, PermViewMembers, PermViewFloor, PermManageFloors, PermAssignSeat,
 	PermViewTransfers, PermCreateTransfer, PermUndoTransfer, PermAdvanceTransfer, PermViewExits, PermMarkExit,
 	PermUndoExit, PermViewOverview, PermViewActivity, PermManageUsers, PermManageMembers,
-	PermViewRequests, PermCreateRequest, PermCancelRequest, PermCommentRequest, PermFulfilRequest}
+	PermViewRequests, PermCreateRequest, PermCancelRequest, PermCommentRequest, PermFulfilRequest, PermViewReports}
 
 func set(ps ...Permission) map[Permission]bool {
 	m := make(map[Permission]bool, len(ps))
