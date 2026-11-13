@@ -112,9 +112,16 @@ func SeedUsers(ctx context.Context, pool *pgxpool.Pool) ([]Credential, error) {
 			if exists && hasPassword {
 				continue
 			}
-			pw, err := auth.GeneratePassword(16)
-			if err != nil {
-				return err
+			// SEED_PASSWORD (local dev only) gives every demo account the same
+			// fixed password instead of a random one. Refused in production.
+			pw := os.Getenv("SEED_PASSWORD")
+			if pw != "" && strings.EqualFold(os.Getenv("APP_ENV"), "production") {
+				return fmt.Errorf("SEED_PASSWORD is not allowed when APP_ENV=production")
+			}
+			if pw == "" {
+				if pw, err = auth.GeneratePassword(16); err != nil {
+					return err
+				}
 			}
 			hash, err := auth.HashPassword(pw)
 			if err != nil {
