@@ -83,10 +83,11 @@ func TestRowLevelScoping(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Floors are visible to everyone, but other teams' people are anonymised.
+	// Floors are visible to everyone; other teams' people show a name and team
+	// but not their id or device count.
 	for seat, o := range f.Occupants {
-		if o.TeamID != "t2" && !o.IsLead && (o.Name != "" || o.MemberID != "" || !o.Redacted) {
-			t.Fatalf("lead2 sees who sits at %s", seat)
+		if o.TeamID != "t2" && !o.IsLead && (o.Name == "" || o.MemberID != "" || o.Devices != 0 || o.Redacted) {
+			t.Fatalf("lead2 sees the wrong detail for %s", seat)
 		}
 		if o.TeamID == "t2" && o.Name == "" {
 			t.Fatalf("lead2 can't see their own person at %s", seat)

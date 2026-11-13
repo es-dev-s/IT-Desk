@@ -1,7 +1,7 @@
 "use client";
 
 import { Crown } from "lucide-react";
-import { NOW_MARK_CLASS, seatLook, type SeatTone } from "@/components/floors/floor-canvas";
+import { NOW_MARK_CLASS, seatLook, type SeatRelation, type SeatTone } from "@/components/floors/floor-canvas";
 import { NO_TEAM_COLOR, type TeamColor } from "@/lib/team-colors";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,7 @@ export type SeatLegendItem = {
   lead?: boolean;
   tone?: SeatTone;
   outOfFocus?: boolean;
+  relation?: SeatRelation;
   /** Draw the "now" mark (current desk). */
   now?: boolean;
 };
@@ -29,6 +30,7 @@ export function SeatSwatch({ item }: { item: SeatLegendItem }) {
     lead: item.lead,
     tone: item.tone,
     outOfFocus: item.outOfFocus,
+    relation: item.relation,
   });
   return (
     <span

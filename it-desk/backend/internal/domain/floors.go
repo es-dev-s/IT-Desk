@@ -55,8 +55,8 @@ type FloorElement struct {
 }
 
 // SeatOccupant is who sits on a published seat. For a team lead looking at
-// another team's seat the person is redacted (name and id empty) unless the
-// occupant is a team lead (lead names are public in the team directory).
+// another team's seat the name and team are shown, but the member id and
+// device count are withheld. Redacted is set only when the name itself is hidden.
 type SeatOccupant struct {
 	MemberID string `json:"memberId,omitempty"`
 	Name     string `json:"name,omitempty"`

@@ -360,6 +360,7 @@ function MemberForm({ editing, onDone }: { editing: Member | null; onDone: () =>
               destId={teamId}
               anyZone={isAdmin}
               claimNoZone={!isAdmin}
+              colorByTeam
               internal
               movers={[draft]}
               seats={seat ? { [draftId]: seat } : {}}

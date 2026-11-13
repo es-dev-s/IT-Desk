@@ -31,6 +31,7 @@ export function SeatPicker({
   activeId,
   onPick,
   height = "min(46dvh, 420px)",
+  colorByTeam = false,
 }: {
   rules: RulesState;
   destId: string;
@@ -45,6 +46,8 @@ export function SeatPicker({
   activeId: string | null;
   onPick: (seatId: string) => void;
   height?: string;
+  /** Add-member picker: occupied seats are green for destId's team and red for other teams. */
+  colorByTeam?: boolean;
 }) {
   const colors = useTeamColors();
   const teamName = (id: string) => (rules.teams[id] as { name?: string } | undefined)?.name ?? "Another team";
@@ -135,13 +138,16 @@ export function SeatPicker({
       if (t === "target") add({ key: "chosen", label: "Selected", color, zoned, occupied: Boolean(o), tone: t });
       if (t === "target" && active?.seatId === e.id) add({ key: "current", label: "Current desk", color, zoned, occupied: Boolean(o), tone: t, now: true });
       else if (t === "current") add({ key: "current", label: "Current desk", color, zoned, occupied: Boolean(o), tone: t, now: true });
-      else if (o) add({ key: "taken", label: "Occupied", color, zoned, occupied: true, tone: t, outOfFocus }, e.teamId === destId);
+      else if (o && colorByTeam && destId) {
+        const own = o.teamId === destId;
+        add({ key: own ? "own" : "taken", label: own ? "Occupied · your team" : "Occupied · other team", color, zoned, occupied: true, tone: t, outOfFocus, relation: own ? "own" : "other" });
+      } else if (o) add({ key: "taken", label: "Occupied", color, zoned, occupied: true, tone: t, outOfFocus }, e.teamId === destId);
       else if (t === "default") add({ key: "free", label: "Available", color, zoned, tone: t, outOfFocus }, e.teamId === destId);
       else if (outOfFocus) add(zoned ? { key: "other", label: "Other team", color, zoned, tone: t, outOfFocus } : { key: "unavailable", label: "Not available", zoned, tone: t, outOfFocus });
       else add({ key: "unavailable", label: "Not available", color, zoned, tone: t, outOfFocus });
       if (Boolean(o?.isLead) || e.leadSeat) add({ key: "lead", label: "Team lead desk", zoned: false, lead: true });
     }
-    const order = ["free", "chosen", "current", "taken", "other", "unavailable", "lead"];
+    const order = ["free", "chosen", "current", "own", "taken", "other", "unavailable", "lead"];
     return order.flatMap((k) => (found.has(k) ? [found.get(k)!] : []));
   };
 
@@ -177,6 +183,7 @@ export function SeatPicker({
         occupant={holder}
         selected={selected}
         focusTeamId={anyZone ? null : destId}
+        ownTeamId={colorByTeam ? destId || null : null}
         tone={tone}
         nowSeatId={active?.seatId || undefined}
         mode="pick"

@@ -145,8 +145,9 @@ func loadCells(ctx context.Context, q querier, floorIDs []string) (map[string][]
 	return out, rows.Err()
 }
 
-// loadOccupants returns seat id -> occupant for floors, redacted for a team
-// lead looking at another team's people (lead occupants stay visible).
+// loadOccupants returns seat id -> occupant for floors. A team lead looking at
+// another team's people sees their name and team (so seat pickers can say who
+// holds a desk) but not their id or device count.
 func loadOccupants(ctx context.Context, q querier, actor Actor, floorIDs []string) (map[string]map[string]domain.SeatOccupant, error) {
 	out := map[string]map[string]domain.SeatOccupant{}
 	if len(floorIDs) == 0 {
@@ -168,7 +169,7 @@ func loadOccupants(ctx context.Context, q querier, actor Actor, floorIDs []strin
 			return nil, err
 		}
 		if scope != "" && o.TeamID != scope && !o.IsLead {
-			o.MemberID, o.Name, o.Devices, o.Redacted = "", "", 0, true
+			o.MemberID, o.Devices = "", 0
 		}
 		if out[fid] == nil {
 			out[fid] = map[string]domain.SeatOccupant{}
