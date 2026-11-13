@@ -4,7 +4,7 @@ import { MessagesSquare, Plus, SearchX } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
-import { CHAT_POLL_MS, chatApi, chatHref, counterpart, type ChatFilter, type ChatList, type ChatScope, type ChatThread, type ChatUnread } from "@/lib/chat";
+import { CHAT_POLL_MS, chatApi, chatHref, counterpart, threadHas, type ChatFilter, type ChatList, type ChatScope, type ChatThread, type ChatUnread } from "@/lib/chat";
 import { isClosed, requestSummary } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import { useChat } from "@/store/chat-store";
@@ -100,14 +100,14 @@ export function MessagesView() {
 
   const select = (id: string | null) => router.replace(id ? chatHref(id) : pathname, { scroll: false });
 
-  const seed = useMemo(() => list?.items.find((t) => t.request.id === selectedId) ?? null, [list, selectedId]);
+  const seed = useMemo(() => list?.items.find((t) => threadHas(t, selectedId)) ?? null, [list, selectedId]);
 
   // The thread pane read or wrote: reflect it in the list and the nav badge at once.
   const onThread = useCallback(
     (t: ChatThread, unread?: ChatUnread) => {
       setList((cur) => {
         if (!cur) return cur;
-        const i = cur.items.findIndex((x) => x.request.id === t.request.id);
+        const i = cur.items.findIndex((x) => threadHas(x, t.request.id));
         if (i < 0) return cur;
         const items = [...cur.items];
         const moved = items[i].lastMessage?.id !== t.lastMessage?.id;
@@ -190,7 +190,7 @@ export function MessagesView() {
                       : scope === "mine" && hasStaff
                         ? "Requests routed to you show up here. Switch to All IT to see unassigned ones."
                         : canCreate
-                        ? "Every request you send to IT gets its own conversation with the person handling it."
+                        ? "All your requests to IT show up in one conversation with the people handling them."
                         : "Conversations appear here as soon as a request comes in."
                   }
                   action={
@@ -206,8 +206,8 @@ export function MessagesView() {
             ) : (
               <ul className="p-2" aria-label="Conversations">
                 {list?.items.map((t) => (
-                  <li key={t.request.id}>
-                    <ConversationRow thread={t} active={t.request.id === selectedId} onSelect={() => select(t.request.id)} />
+                  <li key={t.request.requesterId ?? t.request.id}>
+                    <ConversationRow thread={t} active={threadHas(t, selectedId)} onSelect={() => select(t.request.id)} />
                   </li>
                 ))}
               </ul>
@@ -238,7 +238,8 @@ function ConversationRow({ thread: t, active, onSelect }: { thread: ChatThread; 
   const c = counterpart(t);
   const last = t.lastMessage;
   const unread = t.unread > 0;
-  const closed = isClosed(r.status);
+  const closed = t.requests.every((x) => isClosed(x.status));
+  const multi = t.requests.length > 1;
   const preview = last
     ? `${last.side === t.side ? (last.mine ? "You: " : `${last.side === "it" ? last.senderName : last.authorName}: `) : ""}${(last.body || (last.attachments?.length ? "Photo" : "")).replace(/\s+/g, " ")}`
     : "No messages yet — say hello";
@@ -262,9 +263,9 @@ function ConversationRow({ thread: t, active, onSelect }: { thread: ChatThread; 
           <span className={cn("tnum ml-auto shrink-0 text-[11px]", unread ? "font-medium text-accent-ink" : "text-neutral-400")}>{listTime(t.lastActivityAt)}</span>
         </span>
         <span className="mt-0.5 flex items-center gap-1.5 text-xs text-neutral-500">
-          <span className="tnum shrink-0 font-mono text-[11px] font-medium text-neutral-600">{r.ticket}</span>
+          <span className="tnum shrink-0 font-mono text-[11px] font-medium text-neutral-600">{multi ? `${t.requests.length} requests` : r.ticket}</span>
           <span aria-hidden className="text-neutral-300">·</span>
-          <span className="truncate">{requestSummary(r)}</span>
+          <span className="truncate">{multi ? t.requests.map((x) => x.ticket).join(", ") : requestSummary(r)}</span>
           {closed ? <span className="ml-auto shrink-0 rounded-full bg-neutral-100 px-1.5 py-px text-[10.5px] font-medium text-neutral-500">Closed</span> : null}
         </span>
         <span className="mt-1 flex items-center gap-2">

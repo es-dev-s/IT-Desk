@@ -154,3 +154,74 @@ func TestRequestChatScopingUnreadAndStaff(t *testing.T) {
 		t.Errorf("audited %d messages, want 6", audits)
 	}
 }
+
+// One lead raising several requests has a single conversation holding all of
+// them, each message tagged with its own REQ id; another lead stays separate.
+func TestChatConsolidatesRequestsPerLead(t *testing.T) {
+	st, lead := setup(t)
+	ctx := context.Background()
+	lead2, admin := as(leadT2), as(adminU)
+	clock := time.Date(2026, 3, 1, 9, 0, 0, 0, time.UTC)
+	st.Now = func() time.Time { clock = clock.Add(time.Second); return clock }
+	item := []domain.ITRequestItem{{Kind: "mouse", Quantity: 1}}
+	var ids []string
+	for i := 0; i < 3; i++ {
+		r, err := st.CreateITRequest(ctx, lead, domain.ITRequestInput{Items: item, Notes: "Another mouse please", Priority: "normal"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		ids = append(ids, r.ID)
+		if _, err := st.PostChatMessage(ctx, lead, r.ID, "about "+r.Ticket, "", nil); err != nil {
+			t.Fatal(err)
+		}
+	}
+	other, err := st.CreateITRequest(ctx, lead2, domain.ITRequestInput{Items: item, Notes: "Different team request", Priority: "normal"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	list, err := st.Chats(ctx, admin, ChatFilter{})
+	if err != nil || len(list.Items) != 2 || list.UnreadChats != 1 || list.Unread != 3 {
+		t.Fatalf("admin list: %+v %v", list, err)
+	}
+	var conv *domain.ChatThread
+	for i := range list.Items {
+		if list.Items[i].Request.ID == other.ID && len(list.Items[i].Requests) != 1 {
+			t.Fatalf("other lead merged: %+v", list.Items[i].Requests)
+		}
+		if len(list.Items[i].Requests) == 3 {
+			conv = &list.Items[i]
+		}
+	}
+	if conv == nil || conv.MessageCount != 3 || conv.Unread != 3 || conv.Request.ID != ids[2] {
+		t.Fatalf("lead conversation: %+v", conv)
+	}
+
+	// Opening through any of the lead's requests shows the same conversation.
+	for _, id := range ids {
+		th, err := st.ChatMessages(ctx, lead, id, "")
+		if err != nil || len(th.Messages) != 3 || len(th.Thread.Requests) != 3 {
+			t.Fatalf("thread via %s: %+v %v", id, th, err)
+		}
+		for i, m := range th.Messages {
+			if m.RequestID != ids[i] || m.Ticket == "" {
+				t.Fatalf("message %d not tagged with its request: %+v", i, m)
+			}
+		}
+	}
+	// The other lead's request is not part of it, and polling spans requests.
+	if th, _ := st.ChatMessages(ctx, admin, ids[0], ""); len(th.Messages) != 3 {
+		t.Fatalf("admin view: %d", len(th.Messages))
+	}
+	if th, err := st.ChatMessages(ctx, admin, ids[0], ""); err == nil {
+		first := th.Messages[0].ID
+		if p, _ := st.ChatMessages(ctx, admin, ids[1], first); len(p.Messages) != 2 {
+			t.Fatalf("poll after first: %d", len(p.Messages))
+		}
+	}
+
+	// Reading the conversation clears every request in it.
+	if u, err := st.MarkChatRead(ctx, admin, ids[1]); err != nil || u.Unread != 0 || u.UnreadChats != 0 {
+		t.Fatalf("after read: %+v %v", u, err)
+	}
+}

@@ -3,7 +3,7 @@
 import { AlertCircle, ArrowDown, ArrowLeft, CheckCheck, Download, ExternalLink, ImagePlus, Info, Loader2, RotateCw, Send, UserPlus, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ApiError, newIdempotencyKey } from "@/lib/api";
-import { attachmentSrc, CHAT_LIMITS, CHAT_POLL_MS, chatApi, counterpart, type ChatMessage, type ChatSide, type ChatThread, type ChatUnread } from "@/lib/chat";
+import { attachmentSrc, CHAT_LIMITS, CHAT_POLL_MS, chatApi, counterpart, defaultTarget, type ChatMessage, type ChatSide, type ChatThread, type ChatUnread } from "@/lib/chat";
 import { dayKey, formatDate, formatDateTime, formatTime } from "@/lib/format";
 import { nowMs } from "@/lib/clock";
 import { isClosed, requestSummary, STATUS_LABEL } from "@/lib/requests";
@@ -18,7 +18,7 @@ import { CounterpartAvatar } from "./chat-ui";
 
 /** A message the viewer is sending: shown at once, confirmed or marked failed. */
 type PendingFile = { name: string; data: string; preview: string };
-type Pending = { key: string; body: string; files: PendingFile[]; as: ChatSide; createdAt: string; status: "sending" | "failed"; error?: string };
+type Pending = { key: string; requestId: string; body: string; files: PendingFile[]; as: ChatSide; createdAt: string; status: "sending" | "failed"; error?: string };
 
 const GROUP_GAP_MS = 5 * 60_000;
 const NEAR_BOTTOM_PX = 120;
@@ -42,6 +42,8 @@ export function ThreadPane({
   const [pending, setPending] = useState<Pending[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [as, setAs] = useState<ChatSide | null>(null);
+  // Which of the lead's requests a new message is about (null = the latest open one).
+  const [target, setTarget] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [files, setFiles] = useState<PendingFile[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -157,11 +159,13 @@ export function ThreadPane({
 
   const side: ChatSide = as ?? thread?.side ?? "requester";
   const canChoose = (thread?.canPostAs.length ?? 0) > 1;
+  const targetId = thread ? (target && thread.requests.some((x) => x.id === target) ? target : defaultTarget(thread)) : id;
+  const multi = (thread?.requests.length ?? 0) > 1;
 
   const deliver = async (p: Pending) => {
     setPending((cur) => cur.map((x) => (x.key === p.key ? { ...x, status: "sending", error: undefined } : x)));
     try {
-      const m = await chatApi.send(id, { body: p.body, images: p.files.map((f) => ({ name: f.name, data: f.data })), ...(canChoose ? { as: p.as } : {}) }, p.key);
+      const m = await chatApi.send(p.requestId, { body: p.body, images: p.files.map((f) => ({ name: f.name, data: f.data })), ...(canChoose ? { as: p.as } : {}) }, p.key);
       setPending((cur) => cur.filter((x) => x.key !== p.key));
       forceScroll.current = true;
       merge([m]);
@@ -208,7 +212,7 @@ export function ThreadPane({
   const send = () => {
     const body = draft.trim();
     if ((!body && files.length === 0) || body.length > CHAT_LIMITS.maxBody || !thread) return;
-    const p: Pending = { key: newIdempotencyKey(), body, files, as: side, createdAt: new Date(nowMs()).toISOString(), status: "sending" };
+    const p: Pending = { key: newIdempotencyKey(), requestId: targetId, body, files, as: side, createdAt: new Date(nowMs()).toISOString(), status: "sending" };
     setPending((cur) => [...cur, p]);
     setDraft("");
     setFiles([]);
@@ -241,7 +245,8 @@ export function ThreadPane({
   }
 
   const c = thread ? counterpart(thread) : null;
-  const r = thread?.request;
+  // The request the header, banner and composer talk about: the one picked, else the latest open.
+  const r = thread ? (thread.requests.find((x) => x.id === targetId) ?? thread.request) : undefined;
   const routedStaff = r?.staffName ?? null;
   const placeholder = !thread
     ? "Message"
@@ -301,6 +306,28 @@ export function ThreadPane({
             </span>
             <span className="ml-auto shrink-0 lg:hidden">{STATUS_LABEL[r.status]}</span>
           </div>
+          {multi ? (
+            <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Requests in this conversation" data-testid="chat-requests">
+              {thread.requests.map((x) => (
+                <li key={x.id}>
+                  <button
+                    type="button"
+                    onClick={() => setTarget(x.id)}
+                    aria-pressed={x.id === r.id}
+                    title={`${requestSummary(x)} · ${STATUS_LABEL[x.status]}`}
+                    className={cn(
+                      "tnum inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[11px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent/35",
+                      x.id === r.id ? "border-accent bg-accent-soft text-accent-ink" : "border-line-strong bg-white text-neutral-600 hover:bg-neutral-50",
+                      isClosed(x.status) && "opacity-60",
+                    )}
+                  >
+                    {x.ticket}
+                    <span className="font-sans font-normal text-neutral-500">{STATUS_LABEL[x.status]}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
           {!r.staffId && !isClosed(r.status) ? (
             <div className="mt-2 flex items-center gap-2.5 rounded-lg bg-amber-50 px-3 py-2 text-amber-900 ring-1 ring-inset ring-amber-200/70" data-testid="chat-unassigned">
               <Info className="size-4 shrink-0 text-amber-600" aria-hidden />
@@ -360,6 +387,7 @@ export function ThreadPane({
                     first={row.first}
                     last={row.last}
                     showVia={isStaffSide}
+                    ticket={multi ? row.m.ticket : null}
                     seen={row.index === lastMineIndex && seenAt !== null && seenAt >= row.m.createdAt}
                   />
                 ),
@@ -390,6 +418,11 @@ export function ThreadPane({
           send();
         }}
       >
+        {multi && thread && r ? (
+          <p className="mb-2 text-xs text-neutral-500" data-testid="chat-regarding">
+            About <span className="tnum font-mono font-medium text-neutral-700">{r.ticket}</span> — pick another request above to change it.
+          </p>
+        ) : null}
         {canChoose && thread ? (
           <div className="mb-2 flex items-center gap-2 text-xs text-neutral-500">
             <span id="chat-as-label">Send as</span>
@@ -523,7 +556,7 @@ function buildRows(messages: ChatMessage[], viewerSide: ChatSide): Row[] {
     const prev = messages[i - 1];
     const next = messages[i + 1];
     const same = (a?: ChatMessage) =>
-      a && a.side === m.side && a.senderName === m.senderName && a.authorId === m.authorId && dayKey(new Date(a.createdAt).getTime()) === day;
+      a && a.requestId === m.requestId && a.side === m.side && a.senderName === m.senderName && a.authorId === m.authorId && dayKey(new Date(a.createdAt).getTime()) === day;
     const first = !same(prev) || t - new Date(prev!.createdAt).getTime() > GROUP_GAP_MS;
     const last = !same(next) || new Date(next!.createdAt).getTime() - t > GROUP_GAP_MS;
     out.push({ kind: "msg", m, own: m.side === viewerSide, first, last, index: i });
@@ -531,7 +564,7 @@ function buildRows(messages: ChatMessage[], viewerSide: ChatSide): Row[] {
   return out;
 }
 
-function Bubble({ m, own, first, last, showVia, seen }: { m: ChatMessage; own: boolean; first: boolean; last: boolean; showVia: boolean; seen: boolean }) {
+function Bubble({ m, own, first, last, showVia, seen, ticket }: { m: ChatMessage; own: boolean; first: boolean; last: boolean; showVia: boolean; seen: boolean; ticket: string | null }) {
   // Your own IT-side messages: say who the requester sees them from.
   const name = m.mine ? (m.side === "it" && m.onBehalf ? `You · as ${m.senderName}` : "You") : m.senderName;
   return (
@@ -539,6 +572,11 @@ function Bubble({ m, own, first, last, showVia, seen }: { m: ChatMessage; own: b
       {first ? (
         <span className={cn("mb-1 flex items-baseline gap-1.5 px-1 text-[11px]", own && "flex-row-reverse")}>
           <span className="font-semibold text-neutral-700">{name}</span>
+          {ticket ? (
+            <span className="tnum rounded bg-neutral-100 px-1 font-mono text-[10.5px] font-medium text-neutral-600" data-testid="chat-message-ticket">
+              {ticket}
+            </span>
+          ) : null}
           {m.side === "it" && showVia && m.onBehalf && !m.mine ? <span className="text-neutral-400">via {m.authorName}</span> : null}
           <time className="tnum text-neutral-400" dateTime={m.createdAt} title={formatDateTime(m.createdAt)}>
             {formatTime(m.createdAt)}

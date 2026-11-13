@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { API_BASE_URL, newIdempotencyKey, request } from "./api";
-import { itRequestSchema } from "./requests";
+import { isClosed, itRequestSchema } from "./requests";
 
 /* ----------------------------------------------------------------------------
- * Request chat: one conversation per IT request, between the requester's side
+ * Request chat: one conversation per requester (lead) holding all of their IT
+ * requests, each message tagged with its REQ id, between the requester's side
  * (the lead / their team) and IT. IT staff have no logins yet, so IT-side
  * messages are written by an IT or admin account and shown as the staff
  * member the request is routed to ("IT team" when nobody is).
@@ -30,6 +31,8 @@ export type ChatAttachment = z.infer<typeof chatAttachmentSchema>;
 export const chatMessageSchema = z.object({
   id: z.string().min(1),
   requestId: z.string().min(1),
+  /** REQ id of the request this message is about. */
+  ticket: z.string().catch(""),
   side: z.enum(CHAT_SIDES),
   senderName: z.string(),
   staffId: z.string().nullable(),
@@ -46,7 +49,10 @@ export const chatMessageSchema = z.object({
 export type ChatMessage = z.infer<typeof chatMessageSchema>;
 
 export const chatThreadSchema = z.object({
+  /** The request with the latest activity. */
   request: itRequestSchema,
+  /** Every request in this conversation (one per requester), latest activity first. */
+  requests: z.array(itRequestSchema).min(1),
   side: z.enum(CHAT_SIDES),
   canPostAs: z.array(z.enum(CHAT_SIDES)).catch([]),
   messageCount: z.number().int().min(0),
@@ -109,17 +115,29 @@ export const chatApi = {
 export function counterpart(t: ChatThread): { name: string; subtitle: string; staff: boolean; unassigned: boolean } {
   const r = t.request;
   if (t.side === "requester") {
-    return r.staffName
-      ? { name: r.staffName, subtitle: r.staffTitle || "IT", staff: true, unassigned: false }
-      : { name: "IT team", subtitle: "Unassigned", staff: false, unassigned: true };
+    // One conversation can span requests routed to different IT members.
+    const open = t.requests.filter((x) => !isClosed(x.status));
+    const relevant = open.length ? open : t.requests;
+    const staff = new Map<string, { name: string; title: string | null }>();
+    for (const x of relevant) if (x.staffId && x.staffName) staff.set(x.staffId, { name: x.staffName, title: x.staffTitle ?? null });
+    const all = [...staff.values()];
+    if (all.length === 1 && relevant.every((x) => x.staffId)) return { name: all[0].name, subtitle: all[0].title || "IT", staff: true, unassigned: false };
+    if (all.length > 0) return { name: "IT team", subtitle: `Handled by ${all.map((s) => s.name).join(", ")}`, staff: false, unassigned: false };
+    return { name: "IT team", subtitle: "Unassigned", staff: false, unassigned: true };
   }
   return {
     name: r.requesterName,
     subtitle: r.teamName ? `${r.teamName} · ${r.requesterRole === "admin" ? "Admin" : "Team lead"}` : r.requesterRole === "admin" ? "Admin" : "Team lead",
     staff: false,
-    unassigned: !r.staffId,
+    unassigned: t.requests.every((x) => !x.staffId),
   };
 }
+
+/** The request new messages are about by default: the latest one still open. */
+export const defaultTarget = (t: ChatThread) => (t.requests.find((x) => !isClosed(x.status)) ?? t.request).id;
+
+/** Whether a conversation holds this request (the URL may name any of them). */
+export const threadHas = (t: ChatThread, requestId: string | null) => requestId !== null && t.requests.some((x) => x.id === requestId);
 
 export const chatHref = (requestId: string) => `/messages?r=${encodeURIComponent(requestId)}`;
 

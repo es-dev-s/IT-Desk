@@ -127,6 +127,9 @@ func cleanImageName(name, ct string) string {
 type RequestMessage struct {
 	ID         string  `json:"id"`
 	RequestID  string  `json:"requestId"`
+	// Ticket is the REQ id of the request this message belongs to: one
+	// conversation spans all of a requester's requests.
+	Ticket     string  `json:"ticket"`
 	Side       string  `json:"side"`
 	SenderName string  `json:"senderName"`
 	StaffID    *string `json:"staffId"`
@@ -159,8 +162,13 @@ type ChatFileIn struct {
 }
 
 // ChatThread is one conversation in GET /chats and the header of a thread.
+//
+// A conversation is per requester (lead): Request is the one with the latest
+// activity (where new messages go by default) and Requests lists all of them,
+// newest activity first. Counts, last message and unread span all of them.
 type ChatThread struct {
-	Request ITRequest `json:"request"`
+	Request  ITRequest   `json:"request"`
+	Requests []ITRequest `json:"requests"`
 	// Side is the caller's side on this request (what "unread" is measured for).
 	Side         string          `json:"side"`
 	CanPostAs    []string        `json:"canPostAs"`

@@ -18,6 +18,7 @@ type chatMsg struct {
 
 type chatThread struct {
 	Request      reqView  `json:"request"`
+	Requests     []reqView `json:"requests"`
 	Side         string   `json:"side"`
 	CanPostAs    []string `json:"canPostAs"`
 	MessageCount int      `json:"messageCount"`
@@ -104,7 +105,7 @@ func TestRequestChatHTTP(t *testing.T) {
 		Unread int         `json:"unread"`
 	}
 	_ = json.Unmarshal(r.Data, &list)
-	if r.Status != 200 || len(list.Items) != 1 || list.Items[0].Request.ID != mine.ID || list.Items[0].Unread != 1 ||
+	if r.Status != 200 || len(list.Items) != 1 || !hasReq(list.Items[0].Requests, mine.ID) || list.Items[0].Unread != 1 ||
 		list.Items[0].LastMessage == nil || list.Items[0].LastMessage.ID != m2.ID || list.Unread != 1 ||
 		list.Items[0].Side != "requester" || len(list.Items[0].CanPostAs) != 1 {
 		t.Fatalf("lead chats: %d %+v", r.Status, list)
@@ -175,7 +176,7 @@ func TestStaffLoginLinkHTTP(t *testing.T) {
 		MyStaffID *string      `json:"myStaffId"`
 	}
 	_ = json.Unmarshal(r.Data, &list)
-	if r.Status != 200 || len(list.Items) != 1 || list.Items[0].Request.ID != mine.ID || list.MyStaffID == nil || *list.MyStaffID != "its_ujjal_dahal" {
+	if r.Status != 200 || len(list.Items) != 1 || !hasReq(list.Items[0].Requests, mine.ID) || list.MyStaffID == nil || *list.MyStaffID != "its_ujjal_dahal" {
 		t.Fatalf("assigned to me: %d %+v", r.Status, list)
 	}
 
@@ -196,4 +197,13 @@ func TestStaffLoginLinkHTTP(t *testing.T) {
 	if n, _ := chatUnread(t, lead); n != 1 {
 		t.Errorf("lead unread = %d, want 1", n)
 	}
+}
+
+func hasReq(rs []reqView, id string) bool {
+	for _, r := range rs {
+		if r.ID == id {
+			return true
+		}
+	}
+	return false
 }
