@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, ArrowDown, ArrowLeft, CheckCheck, Download, ExternalLink, ImagePlus, Info, Loader2, RotateCw, Send, UserPlus, X } from "lucide-react";
+import { AlertCircle, ArrowDown, ArrowLeft, CheckCheck, Download, ExternalLink, Eye, ImagePlus, Info, Loader2, RotateCw, Send, UserPlus, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ApiError, newIdempotencyKey } from "@/lib/api";
 import { attachmentSrc, CHAT_LIMITS, CHAT_POLL_MS, chatApi, counterpart, defaultTarget, type ChatMessage, type ChatSide, type ChatThread, type ChatUnread } from "@/lib/chat";
@@ -11,14 +11,13 @@ import { cn } from "@/lib/utils";
 import { useRequests } from "@/store/requests-store";
 import { useSession } from "@/components/auth/session-provider";
 import { Button } from "@/components/ui/button";
-import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PriorityLabel, RequestStatusPill } from "@/components/requests/request-ui";
 import { CounterpartAvatar } from "./chat-ui";
 
 /** A message the viewer is sending: shown at once, confirmed or marked failed. */
 type PendingFile = { name: string; data: string; preview: string };
-type Pending = { key: string; requestId: string; body: string; files: PendingFile[]; as: ChatSide; createdAt: string; status: "sending" | "failed"; error?: string };
+type Pending = { key: string; requestId: string; body: string; files: PendingFile[]; createdAt: string; status: "sending" | "failed"; error?: string };
 
 const GROUP_GAP_MS = 5 * 60_000;
 const NEAR_BOTTOM_PX = 120;
@@ -41,7 +40,6 @@ export function ThreadPane({
   const [messages, setMessages] = useState<ChatMessage[] | null>(null);
   const [pending, setPending] = useState<Pending[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [as, setAs] = useState<ChatSide | null>(null);
   // Which of the lead's requests a new message is about (null = the latest open one).
   const [target, setTarget] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
@@ -157,15 +155,17 @@ export function ThreadPane({
     setUnseenBelow(0);
   };
 
-  const side: ChatSide = as ?? thread?.side ?? "requester";
-  const canChoose = (thread?.canPostAs.length ?? 0) > 1;
+  // Everyone writes as themselves. An admin looking at a conversation between a
+  // lead and IT can't write in it at all (the server refuses it too).
+  const side: ChatSide = thread?.side ?? "requester";
+  const viewOnly = thread !== null && thread.canPostAs.length === 0;
   const targetId = thread ? (target && thread.requests.some((x) => x.id === target) ? target : defaultTarget(thread)) : id;
   const multi = (thread?.requests.length ?? 0) > 1;
 
   const deliver = async (p: Pending) => {
     setPending((cur) => cur.map((x) => (x.key === p.key ? { ...x, status: "sending", error: undefined } : x)));
     try {
-      const m = await chatApi.send(p.requestId, { body: p.body, images: p.files.map((f) => ({ name: f.name, data: f.data })), ...(canChoose ? { as: p.as } : {}) }, p.key);
+      const m = await chatApi.send(p.requestId, { body: p.body, images: p.files.map((f) => ({ name: f.name, data: f.data })) }, p.key);
       setPending((cur) => cur.filter((x) => x.key !== p.key));
       forceScroll.current = true;
       merge([m]);
@@ -211,8 +211,8 @@ export function ThreadPane({
 
   const send = () => {
     const body = draft.trim();
-    if ((!body && files.length === 0) || body.length > CHAT_LIMITS.maxBody || !thread) return;
-    const p: Pending = { key: newIdempotencyKey(), requestId: targetId, body, files, as: side, createdAt: new Date(nowMs()).toISOString(), status: "sending" };
+    if ((!body && files.length === 0) || body.length > CHAT_LIMITS.maxBody || !thread || viewOnly) return;
+    const p: Pending = { key: newIdempotencyKey(), requestId: targetId, body, files, createdAt: new Date(nowMs()).toISOString(), status: "sending" };
     setPending((cur) => [...cur, p]);
     setDraft("");
     setFiles([]);
@@ -332,8 +332,10 @@ export function ThreadPane({
             <div className="mt-2 flex items-center gap-2.5 rounded-lg bg-amber-50 px-3 py-2 text-amber-900 ring-1 ring-inset ring-amber-200/70" data-testid="chat-unassigned">
               <Info className="size-4 shrink-0 text-amber-600" aria-hidden />
               <span className="min-w-0 flex-1 leading-4">
-                {isStaffSide
-                  ? "No one in IT is assigned yet. Replies go out as the IT team until you assign someone."
+                {viewOnly
+                  ? "No one in IT is assigned yet."
+                  : isStaffSide
+                    ? "No one in IT is assigned yet. Replies go out as the IT team until you assign someone."
                   : "No one in IT is assigned yet — your messages reach the whole IT team."}
               </span>
               {isStaffSide ? (
@@ -411,6 +413,15 @@ export function ThreadPane({
       </div>
 
       {/* Composer */}
+      {viewOnly ? (
+        <p
+          className="flex shrink-0 items-center gap-2 border-t border-line bg-neutral-50 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 text-[13px] text-neutral-600 sm:px-5"
+          data-testid="chat-view-only"
+        >
+          <Eye className="size-4 shrink-0 text-neutral-400" aria-hidden />
+          View only. Admins can read conversations between team leads and IT but can’t reply in them.
+        </p>
+      ) : (
       <form
         className="shrink-0 border-t border-line bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:px-5"
         onSubmit={(e) => {
@@ -422,20 +433,6 @@ export function ThreadPane({
           <p className="mb-2 text-xs text-neutral-500" data-testid="chat-regarding">
             About <span className="tnum font-mono font-medium text-neutral-700">{r.ticket}</span> — pick another request above to change it.
           </p>
-        ) : null}
-        {canChoose && thread ? (
-          <div className="mb-2 flex items-center gap-2 text-xs text-neutral-500">
-            <span id="chat-as-label">Send as</span>
-            <Segmented
-              label="Send as"
-              value={side}
-              onChange={setAs}
-              options={[
-                { value: "it", label: routedStaff ? `IT · ${routedStaff}` : "IT team" },
-                { value: "requester", label: `Requester side` },
-              ]}
-            />
-          </div>
         ) : null}
         {files.length ? (
           <ul className="mb-2 flex flex-wrap gap-2">
@@ -532,6 +529,7 @@ export function ThreadPane({
           ) : null}
         </p>
       </form>
+      )}
     </div>
   );
 }

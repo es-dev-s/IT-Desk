@@ -20,6 +20,9 @@ import (
 
 var errChatSide = domain.Forbidden("chat_side", "You can’t send messages for that side of this conversation.")
 
+// errChatViewOnly: an admin trying to write in a conversation between a lead and IT.
+var errChatViewOnly = domain.Forbidden("chat_view_only", "Admins can read this conversation but can’t reply in it.")
+
 // ChatFilter narrows GET /chats.
 type ChatFilter struct {
 	Status string // "", "active" (open + in progress) or "closed"
@@ -32,9 +35,11 @@ type ChatFilter struct {
 // viewerSideSQL is domain.ChatSideFor in SQL; $1 = role, $2 = user id.
 const viewerSideSQL = `CASE WHEN $1 = 'it' THEN 'it' WHEN $1 = 'team_lead' THEN 'requester' WHEN r.requester_id = $2 THEN 'requester' ELSE 'it' END`
 
-// unreadSQL counts what the other side sent after vs.side last read.
-const unreadSQL = `(SELECT count(*) FROM it_request_messages um WHERE um.request_id = r.id AND um.side <> vs.side
-	AND um.created_at > COALESCE((SELECT cr.read_at FROM it_request_chat_reads cr WHERE cr.request_id = r.id AND cr.side = vs.side), '-infinity'))`
+// unreadSQL counts what the other side sent after vs.side last read. An admin
+// watching someone else's conversation (domain.IsChatObserver) has no unread.
+const unreadSQL = `(CASE WHEN $1 = 'admin' AND r.requester_id IS DISTINCT FROM $2 THEN 0 ELSE
+	(SELECT count(*) FROM it_request_messages um WHERE um.request_id = r.id AND um.side <> vs.side
+	AND um.created_at > COALESCE((SELECT cr.read_at FROM it_request_chat_reads cr WHERE cr.request_id = r.id AND cr.side = vs.side), '-infinity')) END)`
 
 const messageSelect = `SELECT m.id, m.request_id, m.side, m.staff_id, m.staff_name, m.author_id, m.author_name, m.author_role,
 	(m.side = 'it' AND m.staff_id IS NOT NULL AND st.user_id IS DISTINCT FROM m.author_id), m.body, m.created_at, mr.ticket
@@ -73,10 +78,10 @@ func scanMessages(rows pgx.Rows, actor Actor) ([]domain.RequestMessage, error) {
 	return out, rows.Err()
 }
 
-func postSides(role string) []string {
-	var out []string
+func postSides(actor Actor, requesterID *string) []string {
+	out := []string{}
 	for _, s := range []string{domain.ChatSideRequester, domain.ChatSideIT} {
-		if domain.CanPostAs(role, s) {
+		if domain.CanPostAs(actor.User.Role, actor.User.ID, requesterID, s) {
 			out = append(out, s)
 		}
 	}
@@ -164,14 +169,13 @@ func threadsFor(ctx context.Context, q querier, actor Actor, ids []string) ([]do
 			last[m.RequestID] = m
 		}
 	}
-	sides := postSides(actor.User.Role)
 	for _, id := range ids {
 		r, ok := reqs[id]
 		st, ok2 := stats[id]
 		if !ok || !ok2 {
 			continue
 		}
-		t := domain.ChatThread{Request: r, Side: st.side, CanPostAs: sides, MessageCount: st.count, Unread: st.unread,
+		t := domain.ChatThread{Request: r, Side: st.side, CanPostAs: postSides(actor, r.RequesterID), MessageCount: st.count, Unread: st.unread,
 			LastActivityAt: domain.NewTime(st.last)}
 		if m, ok := last[id]; ok {
 			t.LastMessage = &m
@@ -474,10 +478,11 @@ func (s *Store) ChatMessages(ctx context.Context, actor Actor, id, after string)
 	return out, err
 }
 
-// PostChatMessage sends a message on a request in scope. as picks the side
-// ("" = the caller's own side); only admins may speak for either. IT-side
-// messages carry the staff member shown: the caller's own directory entry
-// once staff have logins, else the one the request is routed to.
+// PostChatMessage sends a message on a request in scope. as names the side
+// ("" = the caller's own side) and must be the caller's own: nobody speaks for
+// the other side, and an admin can only write on requests they raised (others
+// are view only). IT-side messages carry the staff member shown: the caller's
+// own directory entry, else the one the request is routed to.
 func (s *Store) PostChatMessage(ctx context.Context, actor Actor, id, body, as string, files []domain.ChatFileIn) (domain.RequestMessage, error) {
 	var out domain.RequestMessage
 	body = strings.TrimSpace(body)
@@ -507,7 +512,10 @@ func (s *Store) PostChatMessage(ctx context.Context, actor Actor, id, body, as s
 		if side == "" {
 			side = domain.ChatSideFor(actor.User.Role, actor.User.ID, r.requesterID)
 		}
-		if !domain.CanPostAs(actor.User.Role, side) {
+		if domain.IsChatObserver(actor.User.Role, actor.User.ID, r.requesterID) {
+			return errChatViewOnly
+		}
+		if !domain.CanPostAs(actor.User.Role, actor.User.ID, r.requesterID, side) {
 			return errChatSide
 		}
 		var staffID, staffName *string
@@ -567,7 +575,8 @@ func markRead(ctx context.Context, q querier, id, side string, at time.Time) err
 }
 
 // MarkChatRead marks the conversation read for the caller's side and returns
-// the caller's remaining unread totals.
+// the caller's remaining unread totals. It does nothing for an admin watching
+// a conversation they are not part of.
 func (s *Store) MarkChatRead(ctx context.Context, actor Actor, id string) (domain.ChatUnread, error) {
 	var out domain.ChatUnread
 	err := s.withTx(ctx, writeTx, func(tx pgx.Tx) error {
@@ -583,6 +592,10 @@ func (s *Store) MarkChatRead(ctx context.Context, actor Actor, id string) (domai
 			var requester *string
 			if err := tx.QueryRow(ctx, `SELECT requester_id FROM it_requests WHERE id = $1`, rid).Scan(&requester); err != nil {
 				return err
+			}
+			// An admin looking in is not IT reading it: the lead must not see "Seen".
+			if domain.IsChatObserver(actor.User.Role, actor.User.ID, requester) {
+				continue
 			}
 			if err := markRead(ctx, tx, rid, domain.ChatSideFor(actor.User.Role, actor.User.ID, requester), now); err != nil {
 				return err
