@@ -140,10 +140,9 @@ export function SeatPicker({
         if (t === "target") add({ key: "chosen", label: "Selected", occupied: Boolean(o), relation, tone: t, byTeam });
         else if (o) add(relation === "own" ? { key: "own", label: "Your team", occupied: true, relation, tone: t, byTeam } : { key: "taken", label: "Other team", occupied: true, relation, tone: t, byTeam });
         else if (t === "default") add({ key: "free", label: "Available", tone: t, byTeam });
-        else add({ key: "unavailable", label: "Free · not yours to assign", tone: "disabled", byTeam });
         if (Boolean(o?.isLead) || e.leadSeat) add({ key: "lead", label: "Team lead", zoned: false, lead: true, byTeam });
       }
-      return ["free", "own", "taken", "chosen", "unavailable", "lead"].flatMap((k) => (found.has(k) ? [found.get(k)!] : []));
+      return ["free", "own", "taken", "chosen", "lead"].flatMap((k) => (found.has(k) ? [found.get(k)!] : []));
     }
     for (const e of floor.elements) {
       if (e.kind !== "seat") continue;
