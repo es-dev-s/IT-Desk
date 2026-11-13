@@ -1,6 +1,7 @@
 package store
 
-// Request chat: one conversation per IT request (migration 0012). Scoping is
+// Request chat: messages belong to a request (migration 0012) but a
+// conversation spans all of one requester's requests. Scoping is
 // the request's: a team lead only ever sees conversations on their own team's
 // requests (others are 404). Read state is kept per side.
 
@@ -8,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -35,14 +37,14 @@ const unreadSQL = `(SELECT count(*) FROM it_request_messages um WHERE um.request
 	AND um.created_at > COALESCE((SELECT cr.read_at FROM it_request_chat_reads cr WHERE cr.request_id = r.id AND cr.side = vs.side), '-infinity'))`
 
 const messageSelect = `SELECT m.id, m.request_id, m.side, m.staff_id, m.staff_name, m.author_id, m.author_name, m.author_role,
-	(m.side = 'it' AND m.staff_id IS NOT NULL AND st.user_id IS DISTINCT FROM m.author_id), m.body, m.created_at
-	FROM it_request_messages m LEFT JOIN it_staff st ON st.id = m.staff_id`
+	(m.side = 'it' AND m.staff_id IS NOT NULL AND st.user_id IS DISTINCT FROM m.author_id), m.body, m.created_at, mr.ticket
+	FROM it_request_messages m JOIN it_requests mr ON mr.id = m.request_id LEFT JOIN it_staff st ON st.id = m.staff_id`
 
 func scanMessage(row pgx.Row, actor Actor) (domain.RequestMessage, error) {
 	var m domain.RequestMessage
 	var at time.Time
 	if err := row.Scan(&m.ID, &m.RequestID, &m.Side, &m.StaffID, &m.StaffName, &m.AuthorID, &m.AuthorName, &m.AuthorRole,
-		&m.OnBehalf, &m.Body, &at); err != nil {
+		&m.OnBehalf, &m.Body, &at, &m.Ticket); err != nil {
 		return m, err
 	}
 	m.CreatedAt = domain.NewTime(at)
@@ -183,6 +185,57 @@ func threadsFor(ctx context.Context, q querier, actor Actor, ids []string) ([]do
 	return out, nil
 }
 
+// mergeThreads folds the per-request summaries of one requester (newest
+// activity first) into a single conversation.
+func mergeThreads(ts []domain.ChatThread) domain.ChatThread {
+	out := ts[0]
+	out.Requests = make([]domain.ITRequest, 0, len(ts))
+	for i, t := range ts {
+		out.Requests = append(out.Requests, t.Request)
+		if i == 0 {
+			continue
+		}
+		out.MessageCount += t.MessageCount
+		out.Unread += t.Unread
+		if t.LastMessage != nil && (out.LastMessage == nil || t.LastMessage.CreatedAt.After(out.LastMessage.CreatedAt.Time)) {
+			out.LastMessage = t.LastMessage
+		}
+		if t.LastActivityAt.After(out.LastActivityAt.Time) {
+			out.LastActivityAt = t.LastActivityAt
+		}
+		if t.OtherReadAt != nil && (out.OtherReadAt == nil || t.OtherReadAt.After(out.OtherReadAt.Time)) {
+			out.OtherReadAt = t.OtherReadAt
+		}
+	}
+	return out
+}
+
+// conversationIDs returns every in-scope request of the same requester as id
+// (id included), newest activity first. Empty when id is out of scope.
+func conversationIDs(ctx context.Context, q querier, actor Actor, id string) ([]string, error) {
+	scope, args := chatScope(actor, []any{id})
+	return queryIDs(ctx, q, `SELECT r.id FROM it_requests r
+		WHERE COALESCE(r.requester_id, r.id) = (SELECT COALESCE(b.requester_id, b.id) FROM it_requests b WHERE b.id = $1) AND `+scope+`
+		ORDER BY GREATEST(r.created_at, COALESCE((SELECT max(m.created_at) FROM it_request_messages m WHERE m.request_id = r.id), r.created_at)) DESC, r.id`, args...)
+}
+
+func queryIDs(ctx context.Context, q querier, sql string, args ...any) ([]string, error) {
+	rows, err := q.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var ids []string
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
+}
+
 // scopeWhere returns the team-scope condition (args start at $3: $1/$2 are
 // reserved for the viewer-side expression).
 func chatScope(actor Actor, args []any) (string, []any) {
@@ -208,8 +261,8 @@ func chatUnread(ctx context.Context, q querier, actor Actor) (domain.ChatUnread,
 		}
 	}
 	err := q.QueryRow(ctx, `SELECT COALESCE(sum(u), 0), count(*) FILTER (WHERE u > 0) FROM (
-			SELECT `+unreadSQL+` AS u FROM it_requests r CROSS JOIN LATERAL (SELECT `+viewerSideSQL+` AS side) vs
-			WHERE `+scope+` AND EXISTS (SELECT 1 FROM it_request_messages em WHERE em.request_id = r.id)) t`, args...).
+			SELECT sum(u) AS u FROM (SELECT COALESCE(r.requester_id, r.id) AS conv, `+unreadSQL+` AS u FROM it_requests r CROSS JOIN LATERAL (SELECT `+viewerSideSQL+` AS side) vs
+			WHERE `+scope+` AND EXISTS (SELECT 1 FROM it_request_messages em WHERE em.request_id = r.id)) x GROUP BY conv) t`, args...).
 		Scan(&out.Unread, &out.UnreadChats)
 	return out, err
 }
@@ -286,20 +339,21 @@ func (s *Store) Chats(ctx context.Context, actor Actor, f ChatFilter) (domain.Ch
 		if err != nil {
 			return err
 		}
-		var ids []string
+		var matched []string
 		for rows.Next() {
 			var id string
 			if err := rows.Scan(&id); err != nil {
 				rows.Close()
 				return err
 			}
-			ids = append(ids, id)
+			matched = append(matched, id)
 		}
 		rows.Close()
 		if err := rows.Err(); err != nil {
 			return err
 		}
-		if out.Items, err = threadsFor(ctx, tx, actor, ids); err != nil {
+		out.Items, err = conversationsFor(ctx, tx, actor, matched)
+		if err != nil {
 			return err
 		}
 		u, err := chatUnread(ctx, tx, actor)
@@ -307,6 +361,50 @@ func (s *Store) Chats(ctx context.Context, actor Actor, f ChatFilter) (domain.Ch
 		return err
 	})
 	return out, err
+}
+
+// conversationsFor builds one conversation per requester for the matched
+// requests, ordered by the first match. Each spans all of that requester's
+// in-scope requests, not only the matching ones.
+func conversationsFor(ctx context.Context, q querier, actor Actor, matched []string) ([]domain.ChatThread, error) {
+	out := []domain.ChatThread{}
+	if len(matched) == 0 {
+		return out, nil
+	}
+	scope, args := chatScope(actor, []any{matched})
+	all, err := queryIDs(ctx, q, `SELECT r.id FROM it_requests r
+		WHERE COALESCE(r.requester_id, r.id) IN (SELECT COALESCE(b.requester_id, b.id) FROM it_requests b WHERE b.id = ANY($1)) AND `+scope, args...)
+	if err != nil {
+		return nil, err
+	}
+	threads, err := threadsFor(ctx, q, actor, all)
+	if err != nil {
+		return nil, err
+	}
+	conv := map[string]string{} // request id -> requester key
+	for _, t := range threads {
+		k := t.Request.ID
+		if t.Request.RequesterID != nil {
+			k = *t.Request.RequesterID
+		}
+		conv[t.Request.ID] = k
+	}
+	groups := map[string][]domain.ChatThread{}
+	for _, t := range threads {
+		groups[conv[t.Request.ID]] = append(groups[conv[t.Request.ID]], t)
+	}
+	done := map[string]bool{}
+	for _, id := range matched {
+		k, ok := conv[id]
+		if !ok || done[k] {
+			continue
+		}
+		done[k] = true
+		g := groups[k]
+		sort.SliceStable(g, func(i, j int) bool { return g[i].LastActivityAt.After(g[j].LastActivityAt.Time) })
+		out = append(out, mergeThreads(g))
+	}
+	return out, nil
 }
 
 // chatRequestInScope returns the id if the request exists in the caller's scope.
@@ -337,7 +435,11 @@ func (s *Store) ChatMessages(ctx context.Context, actor Actor, id, after string)
 		if err := chatRequestInScope(ctx, tx, actor, id); err != nil {
 			return err
 		}
-		threads, err := threadsFor(ctx, tx, actor, []string{id})
+		ids, err := conversationIDs(ctx, tx, actor, id)
+		if err != nil {
+			return err
+		}
+		threads, err := conversationsFor(ctx, tx, actor, ids[:min(1, len(ids))])
 		if err != nil {
 			return err
 		}
@@ -347,12 +449,12 @@ func (s *Store) ChatMessages(ctx context.Context, actor Actor, id, after string)
 		out.Thread = threads[0]
 		var rows pgx.Rows
 		if after = strings.TrimSpace(after); after != "" {
-			rows, err = tx.Query(ctx, messageSelect+` WHERE m.request_id = $1 AND (m.created_at, m.id) >
-				(SELECT a.created_at, a.id FROM it_request_messages a WHERE a.id = $2 AND a.request_id = $1)
-				ORDER BY m.created_at, m.id LIMIT $3`, id, after, domain.MaxThreadMessages)
+			rows, err = tx.Query(ctx, messageSelect+` WHERE m.request_id = ANY($1) AND (m.created_at, m.id) >
+				(SELECT a.created_at, a.id FROM it_request_messages a WHERE a.id = $2 AND a.request_id = ANY($1))
+				ORDER BY m.created_at, m.id LIMIT $3`, ids, after, domain.MaxThreadMessages)
 		} else {
-			rows, err = tx.Query(ctx, `SELECT * FROM (`+messageSelect+` WHERE m.request_id = $1 ORDER BY m.created_at DESC, m.id DESC LIMIT $2) x
-				ORDER BY 11, 1`, id, domain.MaxThreadMessages+1)
+			rows, err = tx.Query(ctx, `SELECT * FROM (`+messageSelect+` WHERE m.request_id = ANY($1) ORDER BY m.created_at DESC, m.id DESC LIMIT $2) x
+				ORDER BY 11, 1`, ids, domain.MaxThreadMessages+1)
 		}
 		if err != nil {
 			return err
@@ -469,19 +571,22 @@ func markRead(ctx context.Context, q querier, id, side string, at time.Time) err
 func (s *Store) MarkChatRead(ctx context.Context, actor Actor, id string) (domain.ChatUnread, error) {
 	var out domain.ChatUnread
 	err := s.withTx(ctx, writeTx, func(tx pgx.Tx) error {
-		var team, requester *string
-		err := tx.QueryRow(ctx, `SELECT team_id, requester_id FROM it_requests WHERE id = $1`, id).Scan(&team, &requester)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return errRequestNotFound
+		if err := chatRequestInScope(ctx, tx, actor, id); err != nil {
+			return err
 		}
+		ids, err := conversationIDs(ctx, tx, actor, id)
 		if err != nil {
 			return err
 		}
-		if scope := actor.TeamScope(); scope != "" && (team == nil || *team != scope) {
-			return errRequestNotFound
-		}
-		if err := markRead(ctx, tx, id, domain.ChatSideFor(actor.User.Role, actor.User.ID, requester), s.Now()); err != nil {
-			return err
+		now := s.Now()
+		for _, rid := range ids {
+			var requester *string
+			if err := tx.QueryRow(ctx, `SELECT requester_id FROM it_requests WHERE id = $1`, rid).Scan(&requester); err != nil {
+				return err
+			}
+			if err := markRead(ctx, tx, rid, domain.ChatSideFor(actor.User.Role, actor.User.ID, requester), now); err != nil {
+				return err
+			}
 		}
 		out, err = chatUnread(ctx, tx, actor)
 		return err

@@ -62,13 +62,13 @@ func TestITStaffLoginLinkAndAssignedChats(t *testing.T) {
 
 	// "Assigned to me".
 	list, err := st.Chats(ctx, it, ChatFilter{Assigned: "me"})
-	if err != nil || len(list.Items) != 1 || list.Items[0].Request.ID != rMine.ID || list.MyStaffID == nil || *list.MyStaffID != mine {
+	if err != nil || len(list.Items) != 1 || len(list.Items[0].Requests) != 3 || list.MyStaffID == nil || *list.MyStaffID != mine {
 		t.Fatalf("assigned to me: %+v %v", list, err)
 	}
-	if all, _ := st.Chats(ctx, it, ChatFilter{}); len(all.Items) != 3 {
-		t.Fatalf("linked IT still sees every IT conversation: %d", len(all.Items))
+	if all, _ := st.Chats(ctx, it, ChatFilter{}); len(all.Items) != 1 {
+		t.Fatalf("one lead, one conversation, linked IT still sees all of it: %d", len(all.Items))
 	}
-	if none, _ := st.Chats(ctx, it, ChatFilter{Assigned: "none"}); len(none.Items) != 1 || none.Items[0].Request.ID != rNone.ID {
+	if none, _ := st.Chats(ctx, it, ChatFilter{Assigned: "none"}); len(none.Items) != 1 || none.Items[0].Unread != 3 {
 		t.Fatalf("unassigned filter: %+v", none.Items)
 	}
 	if adm, _ := st.Chats(ctx, admin, ChatFilter{Assigned: "me"}); len(adm.Items) != 0 || adm.MyStaffID != nil {
@@ -79,10 +79,10 @@ func TestITStaffLoginLinkAndAssignedChats(t *testing.T) {
 	}
 
 	// Unread: theirs + unrouted for the linked person; everything for admin.
-	if u, _ := st.ChatUnread(ctx, it); u.UnreadChats != 2 || u.Unread != 2 {
+	if u, _ := st.ChatUnread(ctx, it); u.UnreadChats != 1 || u.Unread != 2 {
 		t.Fatalf("linked IT unread: %+v", u)
 	}
-	if u, _ := st.ChatUnread(ctx, admin); u.UnreadChats != 3 {
+	if u, _ := st.ChatUnread(ctx, admin); u.UnreadChats != 1 || u.Unread != 3 {
 		t.Fatalf("admin unread: %+v", u)
 	}
 
