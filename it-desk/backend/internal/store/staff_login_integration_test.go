@@ -78,11 +78,11 @@ func TestITStaffLoginLinkAndAssignedChats(t *testing.T) {
 		t.Fatal("bad assigned filter accepted")
 	}
 
-	// Unread: theirs + unrouted for the linked person; everything for admin.
+	// Unread: theirs + unrouted for the linked person; nothing for an admin looking on.
 	if u, _ := st.ChatUnread(ctx, it); u.UnreadChats != 1 || u.Unread != 2 {
 		t.Fatalf("linked IT unread: %+v", u)
 	}
-	if u, _ := st.ChatUnread(ctx, admin); u.UnreadChats != 1 || u.Unread != 3 {
+	if u, _ := st.ChatUnread(ctx, admin); u.UnreadChats != 0 || u.Unread != 0 {
 		t.Fatalf("admin unread: %+v", u)
 	}
 
@@ -95,9 +95,9 @@ func TestITStaffLoginLinkAndAssignedChats(t *testing.T) {
 	if got := th.Messages[len(th.Messages)-1]; got.SenderName != "Abash Thapa" || got.OnBehalf || got.Mine {
 		t.Fatalf("requester view: %+v", got)
 	}
-	// Admin replying on Abash's ticket is still "on behalf".
-	if m, err := st.PostChatMessage(ctx, admin, rMine.ID, "Cc admin", "it", nil); err != nil || m.SenderName != "Abash Thapa" || !m.OnBehalf {
-		t.Fatalf("admin on behalf: %+v %v", m, err)
+	// An admin can't reply on Abash's ticket as him (or at all).
+	if _, err := st.PostChatMessage(ctx, admin, rMine.ID, "Cc admin", "it", nil); !errors.Is(err, errChatViewOnly) {
+		t.Fatalf("admin on behalf: %v, want view only", err)
 	}
 
 	// Unlink.

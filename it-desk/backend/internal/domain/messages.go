@@ -23,9 +23,10 @@ const (
 
 func IsChatSide(s string) bool { return s == ChatSideRequester || s == ChatSideIT }
 
-// ChatSideFor is the side an account speaks for (and reads as) on a request:
-// IT accounts are IT, team leads are the requester's side, and an admin is the
-// requester on requests they raised and IT on everything else.
+// ChatSideFor is the side an account reads a request's conversation from: IT
+// accounts are IT, team leads are the requester's side, and an admin is the
+// requester on requests they raised. On everything else an admin only watches
+// (see IsChatObserver); they see it laid out the way IT does.
 func ChatSideFor(role, userID string, requesterID *string) string {
 	switch role {
 	case "it":
@@ -39,13 +40,21 @@ func ChatSideFor(role, userID string, requesterID *string) string {
 	return ChatSideIT
 }
 
-// CanPostAs reports whether a role may speak for side. Admins can act for
-// either side (they raise requests and they stand in for IT staff who have no
-// login yet); everyone else only for their own.
-func CanPostAs(role, side string) bool {
+// IsChatObserver: an admin on a request somebody else raised. They can read
+// the conversation between the lead and IT but never write in it, and reading
+// it does not count as either side having read it.
+func IsChatObserver(role, userID string, requesterID *string) bool {
+	return role == "admin" && (requesterID == nil || *requesterID != userID)
+}
+
+// CanPostAs reports whether an account may send a message as side on a request.
+// Everyone speaks only for themselves: IT accounts as IT, team leads as the
+// requester, and an admin only as the requester on a request they raised.
+// Nobody, admins included, can send as IT without being an IT account.
+func CanPostAs(role, userID string, requesterID *string, side string) bool {
 	switch role {
 	case "admin":
-		return IsChatSide(side)
+		return side == ChatSideRequester && !IsChatObserver(role, userID, requesterID)
 	case "it":
 		return side == ChatSideIT
 	case "team_lead":
@@ -170,7 +179,8 @@ type ChatThread struct {
 	Request  ITRequest   `json:"request"`
 	Requests []ITRequest `json:"requests"`
 	// Side is the caller's side on this request (what "unread" is measured for).
-	Side         string          `json:"side"`
+	Side string `json:"side"`
+	// CanPostAs is empty for an admin watching someone else's conversation (view only).
 	CanPostAs    []string        `json:"canPostAs"`
 	MessageCount int             `json:"messageCount"`
 	Unread       int             `json:"unread"`
@@ -198,7 +208,8 @@ type ChatMessages struct {
 
 // ChatUnread is GET /chats/unread (the nav badge).
 // For IT staff with a login it counts only conversations routed to them or to
-// nobody; other IT accounts and admins count every IT-side conversation.
+// nobody; other IT accounts count every IT-side conversation. Admins count
+// only replies on requests they raised themselves.
 type ChatUnread struct {
 	Unread      int `json:"unread"`
 	UnreadChats int `json:"unreadChats"`

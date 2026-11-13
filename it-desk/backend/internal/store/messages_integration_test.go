@@ -61,7 +61,7 @@ func TestRequestChatScopingUnreadAndStaff(t *testing.T) {
 	for _, c := range []struct {
 		who  Actor
 		want int
-	}{{it, 1}, {admin, 1}, {lead, 0}, {lead2, 0}} {
+	}{{it, 1}, {admin, 0}, {lead, 0}, {lead2, 0}} {
 		u, err := st.ChatUnread(ctx, c.who)
 		if err != nil || u.Unread != c.want {
 			t.Errorf("%s unread = %+v %v, want %d", c.who.User.Email, u, err, c.want)
@@ -100,14 +100,25 @@ func TestRequestChatScopingUnreadAndStaff(t *testing.T) {
 		t.Fatalf("mark read: %+v %v", u, err)
 	}
 
-	// Admin: IT side by default on others' requests, may speak for the requester.
-	m3, err := st.PostChatMessage(ctx, admin, r1.ID, "Adding the dock too.", "requester", nil)
-	if err != nil || m3.Side != "requester" || m3.SenderName != "Ada Admin" {
-		t.Fatalf("admin as requester: %+v %v", m3, err)
+	// Admin: view only on a conversation between a lead and IT, whichever side they name.
+	for _, as := range []string{"", "it", "requester"} {
+		if _, err := st.PostChatMessage(ctx, admin, r1.ID, "Noted.", as, nil); !errors.Is(err, errChatViewOnly) {
+			t.Fatalf("admin post as %q: %v, want view only", as, err)
+		}
 	}
-	m4, err := st.PostChatMessage(ctx, admin, r1.ID, "Noted.", "", nil)
-	if err != nil || m4.Side != "it" || m4.SenderName != "Akash Adhikari" {
-		t.Fatalf("admin default side: %+v %v", m4, err)
+	adminView, err := st.ChatMessages(ctx, admin, r1.ID, "")
+	if err != nil || len(adminView.Messages) != 2 || len(adminView.Thread.CanPostAs) != 0 || adminView.Thread.Unread != 0 {
+		t.Fatalf("admin view: %+v %v", adminView.Thread, err)
+	}
+	// An admin opening it is not IT reading it.
+	if _, err := st.PostChatMessage(ctx, lead, r1.ID, "Thanks!", "", nil); err != nil {
+		t.Fatal(err)
+	}
+	if u, err := st.MarkChatRead(ctx, admin, r1.ID); err != nil || u.Unread != 0 {
+		t.Fatalf("admin mark read: %+v %v", u, err)
+	}
+	if u, _ := st.ChatUnread(ctx, it); u.Unread != 1 {
+		t.Fatalf("IT unread after an admin looked: %+v", u)
 	}
 
 	// Unrouted request: IT replies as "IT team"; once Ivan's account is linked
@@ -150,8 +161,8 @@ func TestRequestChatScopingUnreadAndStaff(t *testing.T) {
 	}
 	var audits int
 	_ = st.db.Pool.QueryRow(ctx, `SELECT count(*) FROM audit_log WHERE action = 'it_request.message'`).Scan(&audits)
-	if audits != 6 {
-		t.Errorf("audited %d messages, want 6", audits)
+	if audits != 5 {
+		t.Errorf("audited %d messages, want 5", audits)
 	}
 }
 
@@ -180,9 +191,13 @@ func TestChatConsolidatesRequestsPerLead(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	list, err := st.Chats(ctx, admin, ChatFilter{})
+	// An admin sees the same conversations but has nothing unread in them.
+	if al, err := st.Chats(ctx, admin, ChatFilter{}); err != nil || len(al.Items) != 2 || al.UnreadChats != 0 || al.Unread != 0 {
+		t.Fatalf("admin list: %+v %v", al, err)
+	}
+	list, err := st.Chats(ctx, as(itU), ChatFilter{})
 	if err != nil || len(list.Items) != 2 || list.UnreadChats != 1 || list.Unread != 3 {
-		t.Fatalf("admin list: %+v %v", list, err)
+		t.Fatalf("IT list: %+v %v", list, err)
 	}
 	var conv *domain.ChatThread
 	for i := range list.Items {
@@ -221,7 +236,7 @@ func TestChatConsolidatesRequestsPerLead(t *testing.T) {
 	}
 
 	// Reading the conversation clears every request in it.
-	if u, err := st.MarkChatRead(ctx, admin, ids[1]); err != nil || u.Unread != 0 || u.UnreadChats != 0 {
+	if u, err := st.MarkChatRead(ctx, as(itU), ids[1]); err != nil || u.Unread != 0 || u.UnreadChats != 0 {
 		t.Fatalf("after read: %+v %v", u, err)
 	}
 }

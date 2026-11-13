@@ -5,8 +5,10 @@ import { isClosed, itRequestSchema } from "./requests";
 /* ----------------------------------------------------------------------------
  * Request chat: one conversation per requester (lead) holding all of their IT
  * requests, each message tagged with its REQ id, between the requester's side
- * (the lead / their team) and IT. IT staff have no logins yet, so IT-side
- * messages are written by an IT or admin account and shown as the staff
+ * (the lead / their team) and IT. Everyone writes as themselves: IT accounts
+ * on the IT side, the requester on theirs. An admin can read every
+ * conversation but only writes on requests they raised (canPostAs is empty on
+ * the rest). IT-side messages show the sender's staff entry, else the staff
  * member the request is routed to ("IT team" when nobody is).
  * ------------------------------------------------------------------------- */
 
@@ -99,7 +101,7 @@ export const chatApi = {
   messages: (id: string, after?: string, signal?: AbortSignal) =>
     request(`/it-requests/${rid(id)}/messages${after ? `?after=${encodeURIComponent(after)}` : ""}`, { schema: chatPageSchema, signal, retries: after ? 0 : 2 }),
   /** The idempotency key is the client's message id, so a retried send never posts twice. */
-  send: (id: string, body: { body: string; as?: ChatSide; images?: { name: string; data: string }[] }, key: string = newIdempotencyKey()) =>
+  send: (id: string, body: { body: string; images?: { name: string; data: string }[] }, key: string = newIdempotencyKey()) =>
     request(`/it-requests/${rid(id)}/messages`, {
       method: "POST",
       body,

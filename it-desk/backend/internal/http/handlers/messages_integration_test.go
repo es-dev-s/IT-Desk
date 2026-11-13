@@ -131,11 +131,35 @@ func TestRequestChatHTTP(t *testing.T) {
 		t.Errorf("lead unread after read = %d", n)
 	}
 
-	// Admin sees both teams and may speak for either side.
+	// Admin sees both teams, but can only write on the request they raised themselves.
 	r = admin.do("GET", "/api/v1/chats", nil)
 	_ = json.Unmarshal(r.Data, &list)
-	if len(list.Items) != 2 || len(list.Items[0].CanPostAs) != 2 {
-		t.Errorf("admin chats: %+v", list.Items)
+	if len(list.Items) != 2 {
+		t.Fatalf("admin chats: %+v", list.Items)
+	}
+	for _, it := range list.Items {
+		want := 0
+		if hasReq(it.Requests, other.ID) {
+			want = 1
+		}
+		if len(it.CanPostAs) != want || (want == 1 && it.CanPostAs[0] != "requester") || (want == 0 && it.Unread != 0) {
+			t.Errorf("admin thread %s: canPostAs=%v unread=%d", it.Requests[0].ID, it.CanPostAs, it.Unread)
+		}
+	}
+	for _, as := range []string{"", "it", "requester"} {
+		body := map[string]any{"body": "Stepping in"}
+		if as != "" {
+			body["as"] = as
+		}
+		if r := admin.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", body); r.Status != 403 || r.Error.Code != "chat_view_only" {
+			t.Errorf("admin post as %q on a lead's request: %d %s, want 403 chat_view_only", as, r.Status, r.Error.Code)
+		}
+	}
+	if r := admin.do("POST", "/api/v1/it-requests/"+other.ID+"/messages", map[string]any{"body": "Any update?"}); r.Status != 201 {
+		t.Errorf("admin post on own request: %d %s", r.Status, r.Error.Code)
+	}
+	if r := admin.do("POST", "/api/v1/it-requests/"+other.ID+"/messages", map[string]any{"body": "x", "as": "it"}); r.Status != 403 || r.Error.Code != "chat_side" {
+		t.Errorf("admin as IT on own request: %d %s, want 403 chat_side", r.Status, r.Error.Code)
 	}
 }
 

@@ -147,16 +147,31 @@ func TestChatSides(t *testing.T) {
 			t.Errorf("ChatSideFor(%s, requester=%v) = %s, want %s", c.role, c.requester, got, c.want)
 		}
 	}
-	allowed := map[string][]string{"admin": {"requester", "it"}, "it": {"it"}, "team_lead": {"requester"}, "": {}}
-	for role, sides := range allowed {
+	// Everyone posts only as themselves; an admin only on a request they raised.
+	for _, c := range []struct {
+		role      string
+		requester *string
+		sides     []string
+	}{
+		{"it", &other, []string{"it"}},
+		{"it", &me, []string{"it"}},
+		{"team_lead", &other, []string{"requester"}},
+		{"admin", &me, []string{"requester"}},
+		{"admin", &other, nil},
+		{"admin", nil, nil},
+		{"", &me, nil},
+	} {
 		for _, side := range []string{"requester", "it", "bogus"} {
 			want := false
-			for _, s := range sides {
+			for _, s := range c.sides {
 				want = want || s == side
 			}
-			if got := CanPostAs(role, side); got != want {
-				t.Errorf("CanPostAs(%q, %q) = %v, want %v", role, side, got, want)
+			if got := CanPostAs(c.role, me, c.requester, side); got != want {
+				t.Errorf("CanPostAs(%q, requester=%v, %q) = %v, want %v", c.role, c.requester, side, got, want)
 			}
+		}
+		if got, want := IsChatObserver(c.role, me, c.requester), c.role == "admin" && c.sides == nil; got != want {
+			t.Errorf("IsChatObserver(%q, requester=%v) = %v, want %v", c.role, c.requester, got, want)
 		}
 	}
 }
