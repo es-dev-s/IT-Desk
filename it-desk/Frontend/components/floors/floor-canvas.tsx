@@ -30,6 +30,8 @@ const FIT_MAX = 64;
 const PAD = 16;
 /** Room kept under the plan for the floating zoom pill, so it never covers the last row. */
 const PILL = 36;
+/** Auto-fit ignores width gains up to this (wider than any scrollbar) when deciding to zoom back in. */
+const SCROLLBAR_SLACK = 24;
 
 export type SeatTone = "default" | "disabled" | "target" | "current";
 
@@ -213,17 +215,21 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
 
   // Fit the whole floor into the visible area (both directions), centred.
   const userZoomed = useRef(false);
+  /** The box the last applied fit was computed for. */
+  const lastFit = useRef<{ w: number; h: number; cell: number } | null>(null);
   const fitCell = useCallback(() => {
     const el = scroller.current;
     if (!el) return null;
     const w = el.clientWidth - PAD * 2;
     const h = (hug && sizer.current ? sizer.current.clientHeight : el.clientHeight) - PAD * 2 - PILL;
     if (w <= 0 || h <= 0) return null;
-    return clamp(Math.floor(Math.min(w / Math.max(cols, 1), h / Math.max(rows, 1))), MIN_CELL, FIT_MAX);
+    return { w, h, cell: clamp(Math.floor(Math.min(w / Math.max(cols, 1), h / Math.max(rows, 1))), MIN_CELL, FIT_MAX) };
   }, [cols, rows, hug]);
   const fit = useCallback(() => {
-    const c = fitCell();
-    if (c === null) return;
+    const f = fitCell();
+    if (f === null) return;
+    const c = f.cell;
+    lastFit.current = f;
     userZoomed.current = false;
     setFitSize(c);
     setCell(c);
@@ -248,11 +254,17 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         if (userZoomed.current || (fitMode === "once" && fitted.current)) return;
-        const c = fitCell();
-        if (c === null) return;
+        const f = fitCell();
+        if (f === null) return;
+        // In a scrolling panel, a bigger plan can make the panel's scrollbar appear, which
+        // narrows us, which shrinks the plan, which removes the scrollbar… forever. So only
+        // zoom back in when we gained more room than a scrollbar could give.
+        const last = lastFit.current;
+        if (last && f.cell > last.cell && f.h === last.h && f.w - last.w <= SCROLLBAR_SLACK) return;
+        lastFit.current = f;
         fitted.current = true;
-        setFitSize(c);
-        setCell(c);
+        setFitSize(f.cell);
+        setCell(f.cell);
       });
     });
     ro.observe(el);
