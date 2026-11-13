@@ -173,6 +173,7 @@ func (s *Server) getWorkspace(w http.ResponseWriter, r *http.Request, a store.Ac
 		fail(w, r, s.log, err)
 		return
 	}
+	ws.FloorLayoutLocked = s.cfg.FloorLayoutLocked
 	ok(w, http.StatusOK, ws)
 }
 

@@ -305,6 +305,8 @@ export const workspaceSchema = z.object({
   settings: settingsSchema,
   serverTime: z.iso.datetime(),
   undoWindowSeconds: z.number().int().min(0),
+  /** Floor layouts are read-only (server FLOOR_LAYOUT_LOCKED): no builder, new floors or publishing. */
+  floorLayoutLocked: z.boolean().default(false),
 });
 
 export type MemberStatus = z.infer<typeof memberStatusSchema>;

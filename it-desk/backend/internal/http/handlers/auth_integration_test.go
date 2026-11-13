@@ -49,6 +49,7 @@ func liveServer(t *testing.T) (*httptest.Server, *Server) {
 	cfg.CookieSecure = false
 	cfg.SessionTTL, cfg.SessionIdleTimeout = time.Hour, time.Hour
 	cfg.UndoWindow = 10 * time.Minute
+	cfg.FloorLayoutLocked = false
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	d, err := db.New(cfg, log)
 	if err != nil {
@@ -521,5 +522,47 @@ func seedTestFloor(t *testing.T, ctx context.Context, d *db.DB) {
 			VALUES ($1,'flr_t','seat',$2,$3,1,1,$4,$5)`, e.ID, e.X, e.Y, e.Code, e.TeamID); err != nil {
 			t.Fatal(err)
 		}
+	}
+}
+
+// With FLOOR_LAYOUT_LOCKED on, an admin can read layouts and re-zone but not change them.
+func TestFloorLayoutLocked(t *testing.T) {
+	ts, srv := liveServer(t)
+	srv.cfg.FloorLayoutLocked = true
+	admin := newClient(t, ts).mustLogin("admin@example.com")
+	lead := newClient(t, ts).mustLogin("lead@example.com")
+	for _, c := range []struct{ method, path string }{
+		{"POST", "/api/v1/floors"},
+		{"POST", "/api/v1/floors/flr_t/duplicate"},
+		{"PUT", "/api/v1/floors/flr_t/draft"},
+		{"PATCH", "/api/v1/floors/flr_t/draft"},
+		{"DELETE", "/api/v1/floors/flr_t/draft"},
+		{"POST", "/api/v1/floors/flr_t/publish"},
+	} {
+		if r := admin.do(c.method, c.path, map[string]any{}); r.Status != 403 || r.Error.Code != "layout_locked" {
+			t.Errorf("%s %s as admin: got %d %s, want 403 layout_locked", c.method, c.path, r.Status, r.Error.Code)
+		}
+		if r := lead.do(c.method, c.path, map[string]any{}); r.Status != 403 || r.Error.Code != "forbidden" {
+			t.Errorf("%s %s as lead: got %d %s, want 403 forbidden", c.method, c.path, r.Status, r.Error.Code)
+		}
+	}
+	for _, c := range []struct {
+		method, path string
+		body         any
+	}{
+		{"GET", "/api/v1/floors/flr_t", nil},
+		{"GET", "/api/v1/floors/flr_t/draft", nil},
+		{"POST", "/api/v1/floors/flr_t/zones", map[string]any{"dryRun": true}},
+	} {
+		if r := admin.do(c.method, c.path, c.body); r.Status == 403 {
+			t.Errorf("%s %s as admin: got 403 %s, want allowed", c.method, c.path, r.Error.Code)
+		}
+	}
+	r := admin.do("GET", "/api/v1/workspace", nil)
+	var ws struct {
+		FloorLayoutLocked bool `json:"floorLayoutLocked"`
+	}
+	if err := json.Unmarshal(r.Data, &ws); err != nil || !ws.FloorLayoutLocked {
+		t.Errorf("workspace floorLayoutLocked = %v (err %v), want true", ws.FloorLayoutLocked, err)
 	}
 }

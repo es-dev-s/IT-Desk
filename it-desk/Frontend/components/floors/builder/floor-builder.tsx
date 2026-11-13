@@ -11,6 +11,7 @@ import {
   Eye,
   Keyboard,
   Loader2,
+  Lock,
   MousePointer2,
   Redo2,
   RefreshCw,
@@ -38,7 +39,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tip } from "@/components/ui/tooltip";
-import { useOccupancy, useTeamColors, useTeamsById } from "@/store/selectors";
+import { useFloorLayoutLocked, useOccupancy, useTeamColors, useTeamsById } from "@/store/selectors";
 import { FloorCanvas, type FloorCanvasHandle } from "../floor-canvas";
 import { useZoneAction } from "../zone-action";
 import { addSeats, blocked, eraseAt, fitGrid, intersects, lineCells, make, rectOf, stepCells, topAt, type Cell } from "./geometry";
@@ -128,7 +129,26 @@ type Drag = { tool: Tool; a: Cell; b: Cell; last: Cell; additive: boolean };
 const isTyping = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 
 /** Admin floor builder: paint the layout, number seats, paint team zones, publish. */
+/** The layout builder, or a notice when floor layouts are locked (the server refuses the writes too). */
 export function FloorBuilder({ floorId }: { floorId: string }) {
+  const locked = useFloorLayoutLocked();
+  if (locked)
+    return (
+      <EmptyState
+        icon={Lock}
+        title="Floor layouts are locked"
+        description="Layouts can’t be edited. Team zones, seat numbers and seating are still managed from the floor view."
+        action={
+          <Link href={`/floors?floor=${floorId}`} className={buttonClass("secondary", "md")} data-testid="layout-locked-view">
+            View floor
+          </Link>
+        }
+      />
+    );
+  return <LayoutBuilder floorId={floorId} />;
+}
+
+function LayoutBuilder({ floorId }: { floorId: string }) {
   const b = useBuilderDoc(floorId);
   const { doc } = b;
   const [meta, setMeta] = useState<FloorSummary | null>(null);

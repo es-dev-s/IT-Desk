@@ -57,6 +57,8 @@ export type WorkspaceState = {
   /** Writes in flight. */
   pending: number;
   undoWindowSeconds: number;
+  /** Floor layouts can’t be edited (the server refuses layout writes). */
+  floorLayoutLocked: boolean;
 
   currentTeamId: string;
   /** Team the user asked for (admin/IT team switcher); null = server default. */
@@ -117,6 +119,7 @@ const tempId = (prefix: string) => `tmp_${prefix}_${Date.now().toString(36)}${(s
 
 const EMPTY: Omit<WorkspaceState, "status" | "loadError" | "syncError" | "lastSyncedAt" | "pending" | "requestedTeamId" | "switching" | "permissions"> = {
   undoWindowSeconds: 0,
+  floorLayoutLocked: false,
   currentTeamId: "",
   user: { id: "", name: "", email: "", title: "", role: "team_lead" },
   teams: {},
@@ -136,6 +139,7 @@ function fromSnapshot(ws: WorkspaceResponse) {
   syncServerTime(ws.serverTime);
   return {
     undoWindowSeconds: ws.undoWindowSeconds,
+    floorLayoutLocked: ws.floorLayoutLocked,
     currentTeamId: ws.currentTeamId,
     user: ws.user,
     teams: indexById(ws.teams),

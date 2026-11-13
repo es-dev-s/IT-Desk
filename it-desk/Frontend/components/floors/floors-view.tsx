@@ -13,7 +13,7 @@ import { Button, buttonClass } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Kbd } from "@/components/ui/kbd";
 import { SearchField } from "@/components/ui/search-field";
-import { useFloors, useOccupancy, useTeamColors, useTeamsById } from "@/store/selectors";
+import { useFloorLayoutLocked, useFloors, useOccupancy, useTeamColors, useTeamsById } from "@/store/selectors";
 import { FloorCanvas, type FloorCanvasHandle, type SeatTone } from "./floor-canvas";
 import { SeatSwatch, type SeatLegendItem } from "./seat-legend";
 import { SeatPanel, type MoveState } from "./seat-panel";
@@ -39,6 +39,7 @@ export function FloorsView() {
   const isLead = role === "team_lead";
   const canSeat = can("seats.assign");
   const canManage = can("floors.manage");
+  const layoutLocked = useFloorLayoutLocked();
 
   const floors = useFloors();
   const occ = useOccupancy();
@@ -257,9 +258,11 @@ export function FloorsView() {
         <EmptyState
           icon={Building2}
           title="No floors yet"
-          description={canManage ? "Create the first floor, then paint each team’s zone on it." : "An admin hasn’t published any floor plans yet."}
+          description={
+            canManage && !layoutLocked ? "Create the first floor, then paint each team’s zone on it." : "No floor plans have been published yet."
+          }
           action={
-            canManage ? (
+            canManage && !layoutLocked ? (
               <Link href="/floors/manage" className={buttonClass("primary", "md")}>
                 Set up floors
               </Link>
@@ -464,15 +467,17 @@ export function FloorsView() {
                     <MousePointerSquareDashed />
                     {editing ? "Done" : "Edit zones"}
                   </Button>
-                  <Link
-                    href={`/floors/${floor.id}/edit`}
-                    className={buttonClass("ghost", "icon-sm")}
-                    data-testid="edit-layout"
-                    title="Edit layout"
-                    aria-label="Edit layout"
-                  >
-                    <PencilRuler />
-                  </Link>
+                  {layoutLocked ? null : (
+                    <Link
+                      href={`/floors/${floor.id}/edit`}
+                      className={buttonClass("ghost", "icon-sm")}
+                      data-testid="edit-layout"
+                      title="Edit layout"
+                      aria-label="Edit layout"
+                    >
+                      <PencilRuler />
+                    </Link>
+                  )}
                   <Link
                     href="/floors/manage"
                     className={buttonClass("ghost", "icon-sm")}

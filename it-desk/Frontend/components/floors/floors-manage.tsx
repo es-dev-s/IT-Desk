@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, Copy, Eye, Loader2, MoreHorizontal, PencilLine, PencilRuler, Plus, Trash2 } from "lucide-react";
+import { Building2, Copy, Eye, Loader2, Lock, MoreHorizontal, PencilLine, PencilRuler, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as DM from "@radix-ui/react-dropdown-menu";
@@ -18,7 +18,7 @@ import { Field, inputClass } from "@/components/ui/field";
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/modal";
 import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTeamColors, useTeamsById } from "@/store/selectors";
+import { useFloorLayoutLocked, useTeamColors, useTeamsById } from "@/store/selectors";
 import { useWorkspaceApi } from "@/store/workspace-provider";
 
 const errText = (e: unknown) => (e instanceof ApiError ? e.message : "Something went wrong. Try again.");
@@ -27,6 +27,7 @@ const errText = (e: unknown) => (e instanceof ApiError ? e.message : "Something 
 export function FloorsManage() {
   const router = useRouter();
   const ws = useWorkspaceApi();
+  const locked = useFloorLayoutLocked();
   const [floors, setFloors] = useState<FloorSummary[] | null>(null);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<FloorSummary | null>(null);
@@ -70,10 +71,18 @@ export function FloorsManage() {
         <Link href="/floors" className={buttonClass("secondary", "md")}>
           <Eye /> View floors
         </Link>
-        <Button variant="primary" onClick={() => setCreating(true)} data-testid="new-floor">
-          <Plus /> New floor
-        </Button>
+        {locked ? null : (
+          <Button variant="primary" onClick={() => setCreating(true)} data-testid="new-floor">
+            <Plus /> New floor
+          </Button>
+        )}
       </div>
+      {locked ? (
+        <p className="mb-4 flex items-center gap-2 rounded-lg border border-line bg-neutral-50 px-3 py-2 text-[13px] text-neutral-600" data-testid="layout-locked">
+          <Lock className="size-4 shrink-0 text-neutral-400" aria-hidden />
+          Floor layouts are locked. You can still rename floors, edit team zones and seat numbers, and seat people.
+        </p>
+      ) : null}
 
       {floors === null ? (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -85,11 +94,17 @@ export function FloorsManage() {
         <EmptyState
           icon={Building2}
           title="No floors yet"
-          description="Start from a template — two facing rows of desks around a centre block, with a door — and adjust it in the builder."
+          description={
+            locked
+              ? "Floor layouts are locked, so new floors can’t be created here."
+              : "Start from a template — two facing rows of desks around a centre block, with a door — and adjust it in the builder."
+          }
           action={
-            <Button variant="primary" onClick={() => setCreating(true)}>
-              <Plus /> New floor
-            </Button>
+            locked ? undefined : (
+              <Button variant="primary" onClick={() => setCreating(true)}>
+                <Plus /> New floor
+              </Button>
+            )
           }
         />
       ) : (
@@ -127,12 +142,13 @@ export function FloorsManage() {
 function FloorCard({ floor: f, onEdit, onCopy, onDelete }: { floor: FloorSummary; onEdit: () => void; onCopy: () => void; onDelete: () => void }) {
   const teams = useTeamsById();
   const colors = useTeamColors();
+  const locked = useFloorLayoutLocked();
   const pct = f.stats.seats ? Math.round((f.stats.occupied / f.stats.seats) * 100) : 0;
   const zones = Object.entries(f.stats.byTeam).sort((a, b) => b[1] - a[1]);
   const status =
     f.status === "draft"
       ? { label: "Draft", cls: "bg-neutral-100 text-neutral-700" }
-      : f.hasUnpublishedChanges
+      : f.hasUnpublishedChanges && !locked
         ? { label: "Unpublished changes", cls: "bg-amber-100 text-amber-800" }
         : { label: "Live", cls: "bg-emerald-50 text-emerald-700" };
   return (
@@ -154,7 +170,7 @@ function FloorCard({ floor: f, onEdit, onCopy, onDelete }: { floor: FloorSummary
           <DM.Portal>
             <DM.Content align="end" sideOffset={4} className="z-50 min-w-44 rounded-xl border border-line bg-white p-1 shadow-overlay">
               <MenuItem onSelect={onEdit} icon={PencilLine} label="Rename & details" />
-              <MenuItem onSelect={onCopy} icon={Copy} label="Duplicate" />
+              {locked ? null : <MenuItem onSelect={onCopy} icon={Copy} label="Duplicate" />}
               <DM.Separator className="my-1 h-px bg-line" />
               <MenuItem onSelect={onDelete} icon={Trash2} label="Delete" danger />
             </DM.Content>
@@ -185,13 +201,19 @@ function FloorCard({ floor: f, onEdit, onCopy, onDelete }: { floor: FloorSummary
       )}
 
       <div className="mt-auto flex gap-2 pt-4">
-        <Link href={`/floors/${f.id}/edit`} className={buttonClass("secondary", "sm", "flex-1")} data-testid="floor-edit">
-          <PencilRuler /> Edit layout
-        </Link>
+        {locked ? null : (
+          <Link href={`/floors/${f.id}/edit`} className={buttonClass("secondary", "sm", "flex-1")} data-testid="floor-edit">
+            <PencilRuler /> Edit layout
+          </Link>
+        )}
         {f.status === "published" ? (
-          <Link href={`/floors?floor=${f.id}`} className={buttonClass("ghost", "sm")}>
+          <Link href={`/floors?floor=${f.id}`} className={buttonClass(locked ? "secondary" : "ghost", "sm", locked ? "flex-1" : undefined)}>
             <Eye /> View
           </Link>
+        ) : locked ? (
+          <p className="flex items-center gap-1.5 text-[12px] text-neutral-400">
+            <Lock className="size-3.5" aria-hidden /> Draft — layouts are locked
+          </p>
         ) : null}
       </div>
     </li>

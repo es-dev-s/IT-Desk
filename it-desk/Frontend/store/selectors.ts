@@ -50,6 +50,8 @@ export function useOverview() {
 }
 
 export const useFloors = () => useWorkspace((s) => s.floors);
+/** Floor layouts are read-only: hide the builder, New floor and Duplicate. */
+export const useFloorLayoutLocked = () => useWorkspace((s) => s.floorLayoutLocked);
 
 /** Seat id → seat (code, floor, zone) across the published floors. */
 export function useSeatIndex() {

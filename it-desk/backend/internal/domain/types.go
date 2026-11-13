@@ -208,6 +208,8 @@ type Workspace struct {
 	Settings          Settings `json:"settings"`
 	ServerTime        Time     `json:"serverTime"`
 	UndoWindowSeconds int      `json:"undoWindowSeconds"`
+	// FloorLayoutLocked: layouts are read-only (FLOOR_LAYOUT_LOCKED); the UI hides the builder.
+	FloorLayoutLocked bool `json:"floorLayoutLocked"`
 }
 
 type TransferResult struct {

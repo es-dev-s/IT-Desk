@@ -40,6 +40,7 @@ type Config struct {
 	AdminPassword      string
 	AdminName          string
 	UndoWindow         time.Duration
+	FloorLayoutLocked  bool // layouts are read-only: no new/duplicated floors, draft edits or publish (zones and seating still work)
 	MigrateOnStart     bool
 	LogLevel           slog.Level
 	LogFormat          string
@@ -91,6 +92,7 @@ func Load() (Config, error) {
 		AdminPassword:      os.Getenv("ADMIN_PASSWORD"),
 		AdminName:          str("ADMIN_NAME", "IT-Desk Admin"),
 		UndoWindow:         dur("UNDO_WINDOW", 10*time.Minute),
+		FloorLayoutLocked:  boolean("FLOOR_LAYOUT_LOCKED", true),
 		MigrateOnStart:     boolean("MIGRATE_ON_START", true),
 		LogFormat:          str("LOG_FORMAT", "text"),
 	}

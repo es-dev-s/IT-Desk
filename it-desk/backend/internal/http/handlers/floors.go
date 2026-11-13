@@ -18,6 +18,9 @@ package handlers
 //	POST   /api/v1/zones/move                 move a team's zone (any floor)         floors.manage
 //	POST   /api/v1/zone-changes/{id}/undo     undo a zone change in the window       floors.manage
 //	PUT    /api/v1/members/{id}/seat          seat a person                          seats.assign
+//
+// While FLOOR_LAYOUT_LOCKED is on (the default), the layout writes — create, duplicate,
+// draft PUT/PATCH/DELETE and publish — answer 403 layout_locked.
 
 import (
 	"net/http"
@@ -32,15 +35,25 @@ type route func(pattern string, perm auth.Permission, h actorHandler)
 func (s *Server) floorRoutes(read, write route) {
 	read("GET /api/v1/floors", auth.PermViewFloor, s.getFloors)
 	read("GET /api/v1/floors/{id}", auth.PermViewFloor, s.getFloor)
-	write("POST /api/v1/floors", auth.PermManageFloors, s.postFloor)
+	// Layout writes are refused while FLOOR_LAYOUT_LOCKED is on (the default).
+	layout := func(h actorHandler) actorHandler {
+		return func(w http.ResponseWriter, r *http.Request, a store.Actor) {
+			if s.cfg.FloorLayoutLocked {
+				fail(w, r, s.log, domain.Forbidden("layout_locked", "Floor layouts are locked and can’t be edited."))
+				return
+			}
+			h(w, r, a)
+		}
+	}
+	write("POST /api/v1/floors", auth.PermManageFloors, layout(s.postFloor))
 	write("PATCH /api/v1/floors/{id}", auth.PermManageFloors, s.patchFloor)
 	write("DELETE /api/v1/floors/{id}", auth.PermManageFloors, s.deleteFloor)
-	write("POST /api/v1/floors/{id}/duplicate", auth.PermManageFloors, s.duplicateFloor)
+	write("POST /api/v1/floors/{id}/duplicate", auth.PermManageFloors, layout(s.duplicateFloor))
 	read("GET /api/v1/floors/{id}/draft", auth.PermManageFloors, s.getDraft)
-	write("PUT /api/v1/floors/{id}/draft", auth.PermManageFloors, s.saveDraft(false))
-	write("PATCH /api/v1/floors/{id}/draft", auth.PermManageFloors, s.saveDraft(true))
-	write("DELETE /api/v1/floors/{id}/draft", auth.PermManageFloors, s.discardDraft)
-	write("POST /api/v1/floors/{id}/publish", auth.PermManageFloors, s.publishFloor)
+	write("PUT /api/v1/floors/{id}/draft", auth.PermManageFloors, layout(s.saveDraft(false)))
+	write("PATCH /api/v1/floors/{id}/draft", auth.PermManageFloors, layout(s.saveDraft(true)))
+	write("DELETE /api/v1/floors/{id}/draft", auth.PermManageFloors, layout(s.discardDraft))
+	write("POST /api/v1/floors/{id}/publish", auth.PermManageFloors, layout(s.publishFloor))
 	write("POST /api/v1/floors/{id}/zones", auth.PermManageFloors, s.assignZone)
 	write("PUT /api/v1/floors/{id}/seat-codes", auth.PermManageFloors, s.putSeatCodes)
 	write("POST /api/v1/zones/move", auth.PermManageFloors, s.moveZone)

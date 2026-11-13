@@ -10,6 +10,25 @@ the live plan (scoped to their role), and people get seated on it.
   in another team's zone needs a transfer.
 - **IT** gets read-only access.
 
+## Layout lock (`FLOOR_LAYOUT_LOCKED`, on by default)
+
+Floor layouts are **read-only**. While `FLOOR_LAYOUT_LOCKED=true` (the default, see
+`backend/.env.example`):
+
+- The API answers `403 layout_locked` to every layout write: `POST /floors`,
+  `POST /floors/{id}/duplicate`, `PUT`/`PATCH`/`DELETE /floors/{id}/draft` and
+  `POST /floors/{id}/publish`. Reads (including `GET …/draft`) still work.
+- The UI hides **New floor**, **Duplicate** and **Edit layout**, and `/floors/{id}/edit`
+  shows a "layouts are locked" notice instead of the builder. The workspace payload
+  carries `floorLayoutLocked` for this.
+- Everything else still works: rename & details, delete (empty floors), team zones,
+  moving zones, seat numbers and seating people.
+- Layouts still come in through `go run ./cmd/floors-import` (it writes through the
+  store, not the HTTP API).
+
+Set `FLOOR_LAYOUT_LOCKED=false` and restart the API to use the builder described
+below again.
+
 ## Data model (migration `0007_floors.sql`)
 
 | Table / column | Notes |
