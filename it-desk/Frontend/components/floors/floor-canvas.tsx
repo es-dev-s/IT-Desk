@@ -33,6 +33,13 @@ const PILL = 36;
 
 export type SeatTone = "default" | "disabled" | "target" | "current";
 
+/** Occupied by the viewer's own team (green) or another team (red). */
+export type SeatRelation = "own" | "other";
+const RELATION_LOOK: Record<SeatRelation, { background: string; borderColor: string }> = {
+  own: { background: "rgb(220 252 231)", borderColor: "rgb(34 197 94)" },
+  other: { background: "rgb(254 226 226)", borderColor: "rgb(239 68 68)" },
+};
+
 /** The small "now" text drawn on a mover's current desk (canvas and legend). */
 export const NOW_MARK_CLASS = "text-[8.5px] font-bold uppercase tracking-wide text-neutral-600";
 
@@ -51,6 +58,7 @@ export function seatLook({
   tone = "default",
   dimmed = false,
   outOfFocus = false,
+  relation,
 }: {
   color: TeamColor;
   zoned: boolean;
@@ -62,6 +70,8 @@ export function seatLook({
   dimmed?: boolean;
   /** Outside the zone the view is focused on (e.g. another team's zone in a lead's picker). */
   outOfFocus?: boolean;
+  /** Seat picker: who holds an occupied seat relative to the viewer's team. Overrides the zone colour. */
+  relation?: SeatRelation;
 }): { className: string; style: React.CSSProperties } {
   return {
     className: cn(
@@ -84,6 +94,7 @@ export function seatLook({
             borderColor: zoned ? color.line : "rgb(0 0 0 / 0.42)",
             borderStyle: "solid",
             borderWidth: 1,
+            ...(occupied && relation ? RELATION_LOOK[relation] : {}),
           }),
     },
   };
@@ -112,6 +123,8 @@ export type FloorCanvasProps = {
   highlight?: ReadonlySet<string> | null;
   /** Team whose zone is emphasised (the lead's own zone). */
   focusTeamId?: string | null;
+  /** When set, occupied seats are green for this team's people and red for everyone else's. */
+  ownTeamId?: string | null;
   /** Seat that gets the "now" mark (the person's current desk), even while it is also selected. */
   nowSeatId?: string;
   tone?: (seat: FloorElement) => SeatTone;
@@ -155,6 +168,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
     selected,
     highlight,
     focusTeamId,
+    ownTeamId,
     nowSeatId,
     tone,
     invalid,
@@ -481,7 +495,8 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
         ]
           .filter(Boolean)
           .join(", ");
-        const look = seatLook({ color, zoned: Boolean(e.teamId), occupied: Boolean(occ), lead, selected: isSel, tone: t, dimmed: dim, outOfFocus: focusDim && !highlight });
+        const relation: SeatRelation | undefined = ownTeamId && occ ? (occ.teamId === ownTeamId ? "own" : "other") : undefined;
+        const look = seatLook({ color, zoned: Boolean(e.teamId), occupied: Boolean(occ), lead, selected: isSel, tone: t, dimmed: dim, outOfFocus: focusDim && !highlight, relation });
         const named = showName && occ;
         const shown = occ ? (occ.redacted || !occ.name ? "Taken" : tileName(occ.name)) : "";
         const numberColor = e.teamId ? color.ink : "rgb(0 0 0 / 0.7)";
@@ -612,7 +627,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
       }),
     // occupant/tone/teamName are folded into `sig`; handlers go through `live`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ordered, cs, gap, sig, highlight, selected, invalid, colors, edit, showText, showName, focusTeamId, nowSeatId, tabStop],
+    [ordered, cs, gap, sig, highlight, selected, invalid, colors, edit, showText, showName, focusTeamId, ownTeamId, nowSeatId, tabStop],
   );
 
   const hoverSeat = hover ? seats.find((s) => s.id === hover.id) : undefined;
@@ -688,7 +703,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
 
       {hover && hoverSeat && typeof document !== "undefined"
         ? createPortal(
-            <HoverCard seat={hoverSeat} rect={hover.rect} occ={occupant?.(hoverSeat.id)} colors={colors} teamName={teamName} tone={tone?.(hoverSeat)} />,
+            <HoverCard seat={hoverSeat} rect={hover.rect} occ={occupant?.(hoverSeat.id)} colors={colors} teamName={teamName} tone={tone?.(hoverSeat)} ownTeamId={ownTeamId} />,
             document.body,
           )
         : null}
@@ -855,6 +870,7 @@ function HoverCard({
   colors,
   teamName,
   tone,
+  ownTeamId,
 }: {
   seat: FloorElement;
   rect: DOMRect;
@@ -862,6 +878,7 @@ function HoverCard({
   colors: Record<string, TeamColor>;
   teamName: (id: string) => string;
   tone?: SeatTone;
+  ownTeamId?: string | null;
 }) {
   const zone = seat.teamId;
   const zc = (zone && colors[zone]) || NO_TEAM_COLOR;
@@ -924,7 +941,10 @@ function HoverCard({
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-medium text-neutral-900">{occ.redacted || !occ.name ? "Someone from another team" : occ.name}</p>
-                <p className="truncate text-[11px] text-neutral-500">{teamName(occ.teamId)}</p>
+                {/* Your own team's people: name only. Everyone else (and any lead): name and team. */}
+                {ownTeamId && occ.teamId === ownTeamId && !occ.isLead ? null : (
+                  <p className="truncate text-[11px] text-neutral-500">{teamName(occ.teamId)}</p>
+                )}
               </div>
             </div>
             <div className="mt-2 flex items-center gap-2 text-[11px] text-neutral-500">
@@ -933,7 +953,7 @@ function HoverCard({
                   <Crown className="size-3" aria-hidden /> Team lead
                 </span>
               ) : null}
-              {!occ.redacted ? <span className="tnum">{pluralize(occ.devices, "device")}</span> : null}
+              {!occ.redacted && occ.memberId ? <span className="tnum">{pluralize(occ.devices, "device")}</span> : null}
               {zone && occ.teamId !== zone ? <span className="text-amber-700">Outside own zone</span> : null}
             </div>
           </>
