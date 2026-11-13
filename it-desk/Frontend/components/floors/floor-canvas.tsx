@@ -36,9 +36,11 @@ export type SeatTone = "default" | "disabled" | "target" | "current";
 /** Occupied by the viewer's own team (green) or another team (red). */
 export type SeatRelation = "own" | "other";
 const RELATION_LOOK: Record<SeatRelation, { background: string; borderColor: string }> = {
-  own: { background: "rgb(220 252 231)", borderColor: "rgb(34 197 94)" },
-  other: { background: "rgb(254 226 226)", borderColor: "rgb(239 68 68)" },
+  own: { background: "rgb(187 247 208)", borderColor: "rgb(22 163 74)" },
+  other: { background: "rgb(254 202 202)", borderColor: "rgb(220 38 38)" },
 };
+/** Text/dot colour on a red or green seat. */
+export const RELATION_INK: Record<SeatRelation, string> = { own: "rgb(21 128 61)", other: "rgb(185 28 28)" };
 
 /** The small "now" text drawn on a mover's current desk (canvas and legend). */
 export const NOW_MARK_CLASS = "text-[8.5px] font-bold uppercase tracking-wide text-neutral-600";
@@ -59,6 +61,7 @@ export function seatLook({
   dimmed = false,
   outOfFocus = false,
   relation,
+  byTeam = false,
 }: {
   color: TeamColor;
   zoned: boolean;
@@ -72,7 +75,32 @@ export function seatLook({
   outOfFocus?: boolean;
   /** Seat picker: who holds an occupied seat relative to the viewer's team. Overrides the zone colour. */
   relation?: SeatRelation;
+  /**
+   * Add-member picker: colour by who sits there, not by zone. Occupied seats
+   * are solid red/green (never faded); every empty seat is white — dotted when
+   * pickable, a faint solid outline when not.
+   */
+  byTeam?: boolean;
 }): { className: string; style: React.CSSProperties } {
+  if (byTeam) {
+    const strong = occupied && relation;
+    return {
+      className: cn(
+        occupied && "shadow-[0_0.5px_1px_rgb(0_0_0/0.06)]",
+        lead && "ring-1 ring-amber-500",
+        selected && "z-10 !ring-[2.5px] !ring-accent ring-offset-1 ring-offset-[#fbfbfa]",
+        tone === "target" && "z-10 ring-[2.5px] ring-accent ring-offset-1 ring-offset-[#fbfbfa]",
+        tone === "disabled" && "cursor-not-allowed",
+        !strong && tone === "disabled" && "opacity-60",
+        dimmed && tone !== "target" && "opacity-45",
+      ),
+      style: strong
+        ? { ...RELATION_LOOK[relation], borderStyle: "solid", borderWidth: 1.5 }
+        : tone === "disabled"
+          ? { background: "white", borderColor: "rgb(0 0 0 / 0.18)", borderStyle: "solid", borderWidth: 1 }
+          : { background: "white", borderColor: "rgb(0 0 0 / 0.42)", borderStyle: "dotted", borderWidth: 1.5 },
+    };
+  }
   return {
     className: cn(
       occupied && "shadow-[0_0.5px_1px_rgb(0_0_0/0.06)]",
@@ -125,6 +153,8 @@ export type FloorCanvasProps = {
   focusTeamId?: string | null;
   /** When set, occupied seats are green for this team's people and red for everyone else's. */
   ownTeamId?: string | null;
+  /** Lead name of a team (hover card on an empty lead desk). */
+  leadName?: (teamId: string) => string | undefined;
   /** Seat that gets the "now" mark (the person's current desk), even while it is also selected. */
   nowSeatId?: string;
   tone?: (seat: FloorElement) => SeatTone;
@@ -169,6 +199,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
     highlight,
     focusTeamId,
     ownTeamId,
+    leadName,
     nowSeatId,
     tone,
     invalid,
@@ -496,10 +527,12 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
           .filter(Boolean)
           .join(", ");
         const relation: SeatRelation | undefined = ownTeamId && occ ? (occ.teamId === ownTeamId ? "own" : "other") : undefined;
-        const look = seatLook({ color, zoned: Boolean(e.teamId), occupied: Boolean(occ), lead, selected: isSel, tone: t, dimmed: dim, outOfFocus: focusDim && !highlight, relation });
+        const byTeam = Boolean(ownTeamId);
+        const look = seatLook({ color, zoned: Boolean(e.teamId), occupied: Boolean(occ), lead, selected: isSel, tone: t, dimmed: dim, outOfFocus: focusDim && !highlight, relation, byTeam });
         const named = showName && occ;
         const shown = occ ? (occ.redacted || !occ.name ? "Taken" : tileName(occ.name)) : "";
-        const numberColor = e.teamId ? color.ink : "rgb(0 0 0 / 0.7)";
+        // Colouring by team: no zone tints anywhere on the tile.
+        const numberColor = byTeam ? (relation ? RELATION_INK[relation] : "rgb(0 0 0 / 0.6)") : e.teamId ? color.ink : "rgb(0 0 0 / 0.7)";
         const content = (
           <>
             {named ? (
@@ -529,7 +562,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
                   cs >= 40 ? "text-[12px]" : cs >= 28 ? "text-[10.5px]" : "text-[9px]",
                   occ ? "font-semibold" : "font-medium",
                 )}
-                style={{ color: occ ? (e.teamId ? color.ink : "rgb(0 0 0 / 0.7)") : numberColor }}
+                style={{ color: occ && !byTeam ? (e.teamId ? color.ink : "rgb(0 0 0 / 0.7)") : numberColor }}
                 data-seat-number
               >
                 {e.code || "–"}
@@ -539,7 +572,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
               <span
                 aria-hidden
                 className={cn("absolute rounded-full", showText ? "bottom-[3px] left-1/2 size-1 -translate-x-1/2" : "inset-[34%]")}
-                style={{ background: color.fill }}
+                style={{ background: relation ? RELATION_INK[relation] : color.fill }}
               />
             ) : null}
             {lead ? (
@@ -703,7 +736,7 @@ export const FloorCanvas = forwardRef<FloorCanvasHandle, FloorCanvasProps>(funct
 
       {hover && hoverSeat && typeof document !== "undefined"
         ? createPortal(
-            <HoverCard seat={hoverSeat} rect={hover.rect} occ={occupant?.(hoverSeat.id)} colors={colors} teamName={teamName} tone={tone?.(hoverSeat)} ownTeamId={ownTeamId} />,
+            <HoverCard seat={hoverSeat} rect={hover.rect} occ={occupant?.(hoverSeat.id)} colors={colors} teamName={teamName} tone={tone?.(hoverSeat)} ownTeamId={ownTeamId} leadName={leadName} />,
             document.body,
           )
         : null}
@@ -871,6 +904,7 @@ function HoverCard({
   teamName,
   tone,
   ownTeamId,
+  leadName,
 }: {
   seat: FloorElement;
   rect: DOMRect;
@@ -879,10 +913,14 @@ function HoverCard({
   teamName: (id: string) => string;
   tone?: SeatTone;
   ownTeamId?: string | null;
+  leadName?: (teamId: string) => string | undefined;
 }) {
   const zone = seat.teamId;
   const zc = (zone && colors[zone]) || NO_TEAM_COLOR;
-  const oc = (occ && colors[occ.teamId]) || NO_TEAM_COLOR;
+  const relation: SeatRelation | undefined = ownTeamId && occ ? (occ.teamId === ownTeamId ? "own" : "other") : undefined;
+  const avatar = relation ? RELATION_INK[relation] : ((occ && colors[occ.teamId]) || NO_TEAM_COLOR).fill;
+  // An empty lead desk: whose desk it is (the zone team's lead).
+  const deskLead = !occ && seat.leadSeat && zone ? leadName?.(zone) : undefined;
   const width = 232;
   const left = clamp(rect.left + rect.width / 2 - width / 2, 8, (typeof window !== "undefined" ? window.innerWidth : 1200) - width - 8);
   const below = rect.top < 170;
@@ -930,7 +968,7 @@ function HoverCard({
         {occ ? (
           <>
             <div className="flex items-center gap-2">
-              <span className="grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold text-white" style={{ background: oc.fill }}>
+              <span className="grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold text-white" style={{ background: avatar }}>
                 {occ.redacted || !occ.name
                   ? "·"
                   : occ.name
@@ -948,6 +986,17 @@ function HoverCard({
               </div>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-neutral-500">
+              {relation ? (
+                <span
+                  className={cn(
+                    "rounded-full px-1.5 py-0.5 font-medium ring-1",
+                    relation === "own" ? "bg-green-50 text-green-700 ring-green-200" : "bg-red-50 text-red-700 ring-red-200",
+                  )}
+                  data-testid="seat-hover-relation"
+                >
+                  {relation === "own" ? "Your team" : "Other team"}
+                </span>
+              ) : null}
               {occ.isLead ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 font-medium text-amber-700 ring-1 ring-amber-200">
                   <Crown className="size-3 shrink-0" aria-hidden /> Team lead
@@ -957,6 +1006,18 @@ function HoverCard({
               {zone && occ.teamId !== zone ? <span className="text-amber-700">Outside own zone</span> : null}
             </div>
           </>
+        ) : deskLead ? (
+          <div className="flex items-center gap-2" data-testid="seat-hover-desk-lead">
+            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-amber-50 text-amber-600 ring-1 ring-amber-200">
+              <Crown className="size-3.5" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[13px] font-medium text-neutral-900">{deskLead}</p>
+              <p className="truncate text-[11px] text-neutral-500">
+                {teamName(zone!)} · Team lead desk{tone === "disabled" ? " · not available" : ""}
+              </p>
+            </div>
+          </div>
         ) : (
           <p className="text-[12px] text-neutral-600">
             {tone === "disabled" ? "Not available for this move" : tone === "target" ? "Free · click to place here" : "Free seat"}

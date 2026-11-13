@@ -51,6 +51,8 @@ export function SeatPicker({
 }) {
   const colors = useTeamColors();
   const teamName = (id: string) => (rules.teams[id] as { name?: string } | undefined)?.name ?? "Another team";
+  const leadName = (id: string) => (rules.teams[id] as { leadName?: string } | undefined)?.leadName || undefined;
+  const byTeam = colorByTeam && Boolean(destId);
   const moving = useMemo(() => new Set(movers.map((m) => m.id)), [movers]);
   const occ = useMemo(() => occupancy(rules.floors, rules.members, rules.memberIds), [rules.floors, rules.members, rules.memberIds]);
   const owner = useMemo(() => {
@@ -128,6 +130,21 @@ export function SeatPicker({
     const add = (it: SeatLegendItem, prefer = false) => {
       if (prefer || !found.has(it.key)) found.set(it.key, it);
     };
+    if (byTeam) {
+      // Coloured by who sits there: red other team, green own team, white free.
+      for (const e of floor.elements) {
+        if (e.kind !== "seat") continue;
+        const t = tone(e);
+        const o = holder(e.id);
+        const relation = o ? (o.teamId === destId ? "own" : "other") : undefined;
+        if (t === "target") add({ key: "chosen", label: "Selected", occupied: Boolean(o), relation, tone: t, byTeam });
+        else if (o) add(relation === "own" ? { key: "own", label: "Your team", occupied: true, relation, tone: t, byTeam } : { key: "taken", label: "Other team", occupied: true, relation, tone: t, byTeam });
+        else if (t === "default") add({ key: "free", label: "Available", tone: t, byTeam });
+        else add({ key: "unavailable", label: "Free · not yours to assign", tone: "disabled", byTeam });
+        if (Boolean(o?.isLead) || e.leadSeat) add({ key: "lead", label: "Team lead", zoned: false, lead: true, byTeam });
+      }
+      return ["free", "own", "taken", "chosen", "unavailable", "lead"].flatMap((k) => (found.has(k) ? [found.get(k)!] : []));
+    }
     for (const e of floor.elements) {
       if (e.kind !== "seat") continue;
       const t = tone(e);
@@ -183,7 +200,8 @@ export function SeatPicker({
         occupant={holder}
         selected={selected}
         focusTeamId={anyZone ? null : destId}
-        ownTeamId={colorByTeam ? destId || null : null}
+        ownTeamId={byTeam ? destId : null}
+        leadName={byTeam ? leadName : undefined}
         tone={tone}
         nowSeatId={active?.seatId || undefined}
         mode="pick"

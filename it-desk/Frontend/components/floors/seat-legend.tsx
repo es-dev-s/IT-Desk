@@ -1,7 +1,7 @@
 "use client";
 
 import { Crown } from "lucide-react";
-import { NOW_MARK_CLASS, seatLook, type SeatRelation, type SeatTone } from "@/components/floors/floor-canvas";
+import { NOW_MARK_CLASS, RELATION_INK, seatLook, type SeatRelation, type SeatTone } from "@/components/floors/floor-canvas";
 import { NO_TEAM_COLOR, type TeamColor } from "@/lib/team-colors";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,8 @@ export type SeatLegendItem = {
   tone?: SeatTone;
   outOfFocus?: boolean;
   relation?: SeatRelation;
+  /** Drawn the way the add-member picker colours seats (by occupant, not zone). */
+  byTeam?: boolean;
   /** Draw the "now" mark (current desk). */
   now?: boolean;
 };
@@ -31,6 +33,7 @@ export function SeatSwatch({ item }: { item: SeatLegendItem }) {
     tone: item.tone,
     outOfFocus: item.outOfFocus,
     relation: item.relation,
+    byTeam: item.byTeam,
   });
   return (
     <span
@@ -39,7 +42,7 @@ export function SeatSwatch({ item }: { item: SeatLegendItem }) {
       className={cn("relative inline-flex h-3.5 shrink-0 items-center justify-center rounded-[3px] border", item.now ? "w-7" : "w-3.5", look.className, "z-0")}
       style={look.style}
     >
-      {item.occupied ? <span className="size-1 rounded-full" style={{ background: color.fill }} /> : null}
+      {item.occupied ? <span className="size-1 rounded-full" style={{ background: item.relation ? RELATION_INK[item.relation] : color.fill }} /> : null}
       {item.lead ? (
         <Crown className="absolute -right-0.5 -top-0.5 size-2 text-amber-600" strokeWidth={2.5} fill="currentColor" fillOpacity={0.18} />
       ) : null}
