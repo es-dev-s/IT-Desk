@@ -4,10 +4,10 @@ package handlers
 // the member report workspace-wide but only their own IT tasks.
 //
 //	GET /api/v1/reports/members   ?teamId=&q=&format=xlsx              reports.view
-//	GET /api/v1/reports/it-tasks  ?teamId=&itMember=&status=&q=&format=xlsx  reports.view
+//	GET /api/v1/reports/it-tasks  ?teamId=&itMember=&status=&q=&startDate=&endDate=&format=xlsx  reports.view
 //
-// format=xlsx downloads the same rows as an Excel workbook; utcOffset (minutes
-// east of UTC) sets the day its dates are written in.
+// format=xlsx downloads the same rows as an Excel workbook. IT task date ranges
+// and their exports use Nepal Time, the timezone shown in the app.
 
 import (
 	"net/http"
@@ -30,6 +30,36 @@ func reportFilter(r *http.Request) store.ReportFilter {
 	return store.ReportFilter{TeamID: q.Get("teamId"), Query: q.Get("q"), ITMember: q.Get("itMember"), Status: q.Get("status")}
 }
 
+var itTaskReportZone = time.FixedZone("NPT", (5*60+45)*60)
+
+func itTaskReportFilter(r *http.Request) (store.ReportFilter, error) {
+	f := reportFilter(r)
+	q := r.URL.Query()
+	start, end := q.Get("startDate"), q.Get("endDate")
+	if start == "" && end == "" {
+		return f, nil
+	}
+	from, startErr := time.ParseInLocation(time.DateOnly, start, itTaskReportZone)
+	through, endErr := time.ParseInLocation(time.DateOnly, end, itTaskReportZone)
+	fields := map[string]string{}
+	if startErr != nil || from.Year() < 1 || from.Format(time.DateOnly) != start {
+		fields["startDate"] = "Enter a start date (YYYY-MM-DD)"
+	}
+	if endErr != nil || through.Year() < 1 || through.Format(time.DateOnly) != end {
+		fields["endDate"] = "Enter an end date (YYYY-MM-DD)"
+	}
+	if len(fields) > 0 {
+		return f, domain.Invalid("Enter a valid start and end date.", fields)
+	}
+	if through.Before(from) {
+		const message = "End date must be on or after start date."
+		return f, domain.Invalid(message, map[string]string{"endDate": message})
+	}
+	f.From = from
+	f.Until = through.AddDate(0, 0, 1)
+	return f, nil
+}
+
 // wantsXLSX reports whether the caller asked for the Excel download; any other format is an error.
 func wantsXLSX(r *http.Request) (bool, error) {
 	switch r.URL.Query().Get("format") {
@@ -50,14 +80,14 @@ func exportZone(r *http.Request) *time.Location {
 	return time.FixedZone("", m*60)
 }
 
-func (s *Server) sendXLSX(w http.ResponseWriter, r *http.Request, name string, sheet xlsx.Sheet) {
+func (s *Server) sendXLSX(w http.ResponseWriter, r *http.Request, name string, sheet xlsx.Sheet, zone *time.Location) {
 	data, err := xlsx.Bytes(sheet)
 	if err != nil {
 		fail(w, r, s.log, err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	w.Header().Set("Content-Disposition", `attachment; filename="`+name+"-"+s.store.Now().In(exportZone(r)).Format("2006-01-02")+`.xlsx"`)
+	w.Header().Set("Content-Disposition", `attachment; filename="`+name+"-"+s.store.Now().In(zone).Format(time.DateOnly)+`.xlsx"`)
 	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
@@ -87,7 +117,7 @@ func (s *Server) getMemberDeviceReport(w http.ResponseWriter, r *http.Request, a
 		device.AssetTag = "" // the number has its own column
 		sheet.Rows = append(sheet.Rows, []string{row.MemberLabel(), row.TeamName, row.SeatLabel(), device.DeviceLabel(), row.AssetTag})
 	}
-	s.sendXLSX(w, r, "member-device-report", sheet)
+	s.sendXLSX(w, r, "member-device-report", sheet, exportZone(r))
 }
 
 func (s *Server) getITTaskReport(w http.ResponseWriter, r *http.Request, a store.Actor) {
@@ -96,7 +126,12 @@ func (s *Server) getITTaskReport(w http.ResponseWriter, r *http.Request, a store
 		fail(w, r, s.log, err)
 		return
 	}
-	rep, err := s.store.ITTaskReport(r.Context(), a, reportFilter(r))
+	filter, err := itTaskReportFilter(r)
+	if err != nil {
+		fail(w, r, s.log, err)
+		return
+	}
+	rep, err := s.store.ITTaskReport(r.Context(), a, filter)
 	if err != nil {
 		fail(w, r, s.log, err)
 		return
@@ -105,8 +140,11 @@ func (s *Server) getITTaskReport(w http.ResponseWriter, r *http.Request, a store
 		ok(w, http.StatusOK, rep)
 		return
 	}
-	zone := exportZone(r)
-	day := func(t time.Time) string { return t.In(zone).Format("2006-01-02") }
+	zone := itTaskReportZone
+	if filter.From.IsZero() && r.URL.Query().Has("utcOffset") {
+		zone = exportZone(r)
+	}
+	day := func(t time.Time) string { return t.In(zone).Format(time.DateOnly) }
 	sheet := xlsx.Sheet{Name: "IT tasks", Headers: []string{"Assigned Date", "Completed Date", "Team Member Name", "Team", "IT Member", "Request", "Status", "Task Description"},
 		Widths: []float64{14, 15, 26, 22, 24, 12, 13, 70}}
 	status := map[string]string{"open": "Assigned", "in_progress": "In progress", "resolved": "Completed"}
@@ -117,5 +155,5 @@ func (s *Server) getITTaskReport(w http.ResponseWriter, r *http.Request, a store
 		}
 		sheet.Rows = append(sheet.Rows, []string{day(row.AssignedAt.Time), done, row.MemberName, row.TeamName, row.ITMember, row.Ticket, status[row.Status], row.Description})
 	}
-	s.sendXLSX(w, r, "it-task-report", sheet)
+	s.sendXLSX(w, r, "it-task-report", sheet, zone)
 }

@@ -60,12 +60,13 @@ export function TeamsView() {
   }, [teams]);
 
   const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return teams.filter(
-      (t) =>
-        (filter === "all" || (filter === "no_lead" ? t.leads.length === 0 : t.leads.length > 0)) &&
-        (!q || `${t.name} ${t.code} ${t.location} ${t.leads.map((l) => l.name).join(" ")}`.toLowerCase().includes(q)),
-    );
+    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    return teams.filter((team) => {
+      const hasLead = team.leads.length > 0;
+      if (filter !== "all" && hasLead !== (filter === "has_lead")) return false;
+      const searchable = [team.name, team.code, team.location, ...team.leads.map((lead) => lead.name)].join(" ").toLowerCase();
+      return words.every((word) => searchable.includes(word));
+    });
   }, [teams, query, filter]);
 
   const onDone = (r: UserDialogResult) => {
@@ -111,7 +112,7 @@ export function TeamsView() {
       </div>
 
       <div role="group" aria-label="Team tools" className="mb-4 flex flex-wrap items-center gap-2">
-        <SearchField size="md" className="min-w-[220px] flex-1 sm:max-w-80" value={query} onChange={setQuery} label="Search teams" placeholder="Team, code, lead or floor" />
+        <SearchField size="md" className="w-full sm:w-80" value={query} onChange={setQuery} label="Search teams" placeholder="Search by team name, code, lead, or floor" />
         <Segmented size="md" className="max-w-full overflow-x-auto" label="Lead" value={filter} onChange={setFilter} options={filterOptions} />
         <div className="ml-auto flex items-center gap-2">
           <Button size="icon" variant="ghost" aria-label="Reload teams" onClick={() => void reload()} disabled={reloading}>

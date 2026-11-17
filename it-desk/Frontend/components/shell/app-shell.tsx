@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [canRequest]);
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="app-shell flex min-h-dvh">
       <a
         href="#main"
         className="fixed left-4 top-3 z-[90] -translate-y-16 rounded-lg bg-neutral-900 px-3 py-2 text-[13px] font-medium text-white focus:translate-y-0"

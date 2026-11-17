@@ -20,8 +20,10 @@ type ReportFilter struct {
 	TeamID string
 	Query  string
 	// IT task report only.
-	ITMember string // the IT member's name; ignored for IT accounts
-	Status   string // "", "completed" or "open"
+	ITMember string    // the IT member's name; ignored for IT accounts
+	Status   string    // "", "completed" or "open"
+	From     time.Time // inclusive start of the date range
+	Until    time.Time // exclusive end of the date range
 }
 
 // reportTeam is the team a report is limited to: the lead's own, else the one asked for.
@@ -148,13 +150,20 @@ func (s *Store) ITTaskReport(ctx context.Context, actor Actor, f ReportFilter) (
 		case "open":
 			conds = append(conds, "r.status <> 'resolved'")
 		}
+		if !f.From.IsZero() {
+			period := "tstzrange(" + arg(f.From) + ", " + arg(f.Until) + ", '[)')"
+			conds = append(conds, "(dates.assigned_at <@ "+period+" OR dates.completed_at <@ "+period+")")
+		}
 		rows, err := tx.Query(ctx, `SELECT r.id, r.ticket, r.request_type, r.status,
-				COALESCE((SELECT max(e.at) FROM it_request_events e WHERE e.request_id = r.id AND e.kind = 'assigned'), r.started_at, r.created_at),
-				r.closed_at, r.staff_id, COALESCE(r.staff_name, r.assignee_name, ''), r.team_id, COALESCE(t.name, ''),
+				dates.assigned_at, dates.completed_at, r.staff_id, COALESCE(r.staff_name, r.assignee_name, ''), r.team_id, COALESCE(t.name, ''),
 				COALESCE(NULLIF(r.for_member_name, ''), r.requester_name), r.issue_category, r.title, r.device, r.resolution
 			FROM it_requests r LEFT JOIN teams t ON t.id = r.team_id
+			CROSS JOIN LATERAL (
+				SELECT COALESCE((SELECT max(e.at) FROM it_request_events e WHERE e.request_id = r.id AND e.kind = 'assigned'), r.started_at, r.created_at) AS assigned_at,
+					CASE WHEN r.status = 'resolved' THEN r.closed_at END AS completed_at
+			) dates
 			WHERE `+strings.Join(conds, " AND ")+`
-			ORDER BY 5 DESC, r.id`, args...)
+			ORDER BY dates.assigned_at DESC, r.id`, args...)
 		if err != nil {
 			return err
 		}
@@ -169,15 +178,15 @@ func (s *Store) ITTaskReport(ctx context.Context, actor Actor, f ReportFilter) (
 			var r domain.ITTaskRow
 			var x extra
 			var assigned time.Time
-			var closed *time.Time
-			if err := rows.Scan(&r.RequestID, &r.Ticket, &r.Type, &r.Status, &assigned, &closed, &r.StaffID, &r.ITMember, &r.TeamID, &r.TeamName,
+			var completed *time.Time
+			if err := rows.Scan(&r.RequestID, &r.Ticket, &r.Type, &r.Status, &assigned, &completed, &r.StaffID, &r.ITMember, &r.TeamID, &r.TeamName,
 				&r.MemberName, &x.category, &x.title, &x.device, &x.resolution); err != nil {
 				rows.Close()
 				return err
 			}
 			r.AssignedAt = domain.NewTime(assigned)
-			if closed != nil && r.Status == domain.RequestResolved {
-				v := domain.NewTime(*closed)
+			if completed != nil {
+				v := domain.NewTime(*completed)
 				r.CompletedAt = &v
 			}
 			list = append(list, r)

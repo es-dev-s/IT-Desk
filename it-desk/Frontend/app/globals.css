@@ -127,6 +127,60 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+@page it-task-report {
+  size: landscape;
+  margin: 12mm;
+}
+
+@media print {
+  .app-shell:has(.it-task-report) {
+    display: block;
+    min-height: 0;
+  }
+
+  .app-shell:has(.it-task-report) > :is(a, aside),
+  .app-shell:has(.it-task-report) > div:has(> #main) > :is(header, footer) {
+    display: none;
+  }
+
+  .app-shell:has(.it-task-report) > div:has(> #main) {
+    display: block;
+  }
+
+  .app-shell:has(.it-task-report) #main {
+    padding: 0;
+  }
+
+  .it-task-report {
+    page: it-task-report;
+  }
+
+  .it-task-report > div:has(> table) {
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .it-task-report table {
+    min-width: 0 !important;
+    font-size: 10pt;
+  }
+
+  .it-task-report :is(th, td) {
+    position: static;
+    min-width: 0;
+    padding: 3px 6px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .it-task-report tr {
+    break-inside: avoid;
+  }
+}
+
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: rgb(0 0 0 / 0.14) transparent;
