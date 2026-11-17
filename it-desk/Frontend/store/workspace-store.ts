@@ -94,6 +94,7 @@ export type WorkspaceActions = {
   upsertTransfer: (t: Transfer) => void;
   /** Seat (or unseat with null) a person. Admin: any seat; lead: own people inside the own zone. */
   assignSeat: (memberId: string, seatId: string | null) => Promise<ActionResult<{ member: Member }>>;
+  assignLeadSeat: (userId: string, seatId: string) => Promise<ActionResult<{ member: Member }>>;
   /** Merge one member the API returned (added or edited), ignoring older versions. */
   applyMember: (m: Member) => void;
   markExit: (input: {
@@ -485,6 +486,22 @@ export function createWorkspaceStore(initial: { permissions?: readonly string[] 
           resync();
           return toFailure(err);
         } finally {
+          end();
+        }
+      },
+
+      assignLeadSeat: async (userId, seatId) => {
+        if (!allowed("seats.assign") || get().user.role !== "admin") return DENIED;
+        begin();
+        try {
+          const member = await floorsApi.assignLeadSeat(userId, seatId);
+          get().applyMember(member);
+          return { ok: true, undoKey: "", member };
+        } catch (err) {
+          const failure = toFailure(err);
+          return { ...failure, error: failure.fields?.seat ?? failure.error };
+        } finally {
+          resync();
           end();
         }
       },

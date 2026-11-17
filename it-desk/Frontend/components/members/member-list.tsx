@@ -1,7 +1,7 @@
 "use client";
 
 import { LeadBadge } from "@/components/floors/lead-badge";
-import type { RosterEntry } from "@/lib/schemas";
+import type { RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { cn, pluralize } from "@/lib/utils";
 import { useTeamsById } from "@/store/selectors";
 import { Avatar } from "@/components/ui/avatar";
@@ -15,12 +15,14 @@ export function MemberList({
   members,
   selected,
   onToggle,
+  onAssignLeadSeat,
   selectable = true,
 }: {
   selectable?: boolean;
   members: RosterEntry[];
   selected: Record<string, true>;
   onToggle: (id: string) => void;
+  onAssignLeadSeat?: (lead: UnrosteredLead) => void;
 }) {
   const { open } = useMemberDetailLink();
   const teams = useTeamsById();
@@ -47,22 +49,22 @@ export function MemberList({
             <li
               key={entry.id}
               data-testid="member-row"
-              tabIndex={m ? 0 : undefined}
-              aria-label={m ? `${m.name}${isLead ? ", team lead" : ""}. ${selecting && active ? "Toggle selection" : "View details"}` : undefined}
-              onClick={m ? () => (selecting && active ? onToggle(m.id) : open(m.id)) : undefined}
-              onKeyDown={m ? (e) => {
+              tabIndex={0}
+              aria-label={`${entry.name}${isLead ? ", team lead" : ""}. ${selecting && active ? "Toggle selection" : "View details"}`}
+              onClick={() => (selecting && active ? onToggle(entry.id) : open(entry.id))}
+              onKeyDown={(e) => {
                 if (e.target !== e.currentTarget) return;
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  open(m.id);
-                } else if (e.key === " " && active) {
+                  open(entry.id);
+                } else if (e.key === " ") {
                   e.preventDefault();
-                  onToggle(m.id);
+                  if (active) onToggle(entry.id);
+                  else open(entry.id);
                 }
-              } : undefined}
+              }}
               className={cn(
-                "flex h-14 select-none items-center gap-4 px-4 outline-none transition-colors duration-150 focus-visible:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/35",
-                m && "cursor-pointer",
+                "flex h-14 cursor-pointer select-none items-center gap-4 px-4 outline-none transition-colors duration-150 focus-visible:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/35",
                 isSelected ? "bg-accent-soft/50" : "hover:bg-neutral-50",
               )}
             >
@@ -102,32 +104,28 @@ export function MemberList({
               <span className="hidden w-44 truncate text-[13px] text-neutral-600 md:block">{m?.subGroup}</span>
               <span className="tnum hidden w-20 text-[13px] text-neutral-600 md:block">{m ? pluralize(m.devices.length, "device") : ""}</span>
               <span className="flex min-w-0 items-center justify-end gap-1">
-                {m ? (
-                  <>
-                    <button
-                      type="button"
-                      data-testid="member-view-details"
-                      aria-label={`View details for ${m.name}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        open(m.id);
-                      }}
-                      onKeyDown={(e) => e.stopPropagation()}
-                      className="inline-flex h-7 items-center gap-0.5 rounded-md pl-2 pr-1 text-[12px] font-medium text-neutral-600 outline-none transition-colors hover:bg-accent-soft hover:text-accent-ink focus-visible:ring-2 focus-visible:ring-accent/35"
-                    >
-                      <span className="max-sm:hidden">View details</span>
-                      <ChevronRight className="size-3.5" aria-hidden />
-                    </button>
-                    <span className="w-7">
-                      <MemberMenuButton member={m} />
-                    </span>
-                  </>
-                ) : null}
+                <button
+                  type="button"
+                  data-testid="member-view-details"
+                  aria-label={`View details for ${entry.name}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    open(entry.id);
+                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  className="inline-flex h-7 items-center gap-0.5 rounded-md pl-2 pr-1 text-[12px] font-medium text-neutral-600 outline-none transition-colors hover:bg-accent-soft hover:text-accent-ink focus-visible:ring-2 focus-visible:ring-accent/35"
+                >
+                  <span className="max-sm:hidden">View details</span>
+                  <ChevronRight className="size-3.5" aria-hidden />
+                </button>
+                <span className="w-7">
+                  <MemberMenuButton entry={entry} onAssignLeadSeat={onAssignLeadSeat} />
+                </span>
                 {isLead ? <LeadBadge compact className="self-start" /> : null}
               </span>
             </li>
           );
-          return m ? <MemberContextMenu key={m.id} member={m}>{row}</MemberContextMenu> : row;
+          return <MemberContextMenu key={entry.id} entry={entry} onAssignLeadSeat={onAssignLeadSeat}>{row}</MemberContextMenu>;
         })}
       </ul>
     </div>

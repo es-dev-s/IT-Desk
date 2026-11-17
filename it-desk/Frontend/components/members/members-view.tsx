@@ -1,10 +1,10 @@
 "use client";
 
 import { Check, LayoutGrid, Map as MapIcon, Minus, Rows3, SearchX, UserPlus, UsersRound } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { compareSeats } from "@/lib/constants";
-import type { ItStatus, RosterEntry } from "@/lib/schemas";
+import type { ItStatus, RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { useCurrentTeam, useTeamMembers, useTeamsById, useTransfers } from "@/store/selectors";
 import { useUI, type MemberSort, type MembersView as View } from "@/store/ui-store";
 import { useWorkspace } from "@/store/workspace-provider";
@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { BulkBar } from "./bulk-bar";
 import { useSession } from "@/components/auth/session-provider";
 import { TeamSwitcher } from "@/components/auth/team-switcher";
+import { LeadSeatDialog } from "./lead-seat-dialog";
 import { MemberList } from "./member-list";
 import { SeatMap } from "./seat-map";
 import { SeatTile } from "./seat-tile";
@@ -59,11 +60,13 @@ export function MembersView() {
   const isAdmin = session.user.role === "admin";
   const defaultStatus = isAdmin && team ? "all" : "active";
   const status = f.status ?? defaultStatus;
-  // Admins see the floor read-only: no selection, no bulk bar.
+  // Bulk selection is for transfers and exits.
   const selectable = can("transfers.create") || can("exits.create");
   const onToggle = selectable ? toggle : ignore;
   const canManage = can("members.manage");
+  const canSeatLead = isAdmin && can("seats.assign");
   const openMemberDialog = useUI((s) => s.openMemberDialog);
+  const [leadToSeat, setLeadToSeat] = useState<UnrosteredLead | null>(null);
   const [toolbarRef, toolbarWidth] = useElementWidth<HTMLDivElement>();
 
   const transfers = useTransfers();
@@ -313,12 +316,19 @@ export function MembersView() {
                 pending={pending.get(m.id)}
                 onToggle={onToggle}
                 selectable={selectable}
+                onAssignLeadSeat={canSeatLead ? setLeadToSeat : undefined}
               />
             </li>
           ))}
         </ul>
       ) : (
-        <MemberList members={visible} selected={f.selected} onToggle={onToggle} selectable={selectable} />
+        <MemberList
+          members={visible}
+          selected={f.selected}
+          onToggle={onToggle}
+          selectable={selectable}
+          onAssignLeadSeat={canSeatLead ? setLeadToSeat : undefined}
+        />
       )}
 
       {f.view !== "map" && filtered.length > visible.length ? (
@@ -331,6 +341,7 @@ export function MembersView() {
       ) : null}
 
       <BulkBar ids={selectedIds} />
+      {canSeatLead && leadToSeat ? <LeadSeatDialog lead={leadToSeat} onClose={() => setLeadToSeat(null)} /> : null}
     </>
   );
 }

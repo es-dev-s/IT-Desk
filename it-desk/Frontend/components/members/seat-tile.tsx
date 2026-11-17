@@ -4,7 +4,7 @@ import { LeadBadge } from "@/components/floors/lead-badge";
 import { Check, ChevronRight, Laptop } from "lucide-react";
 import { useMemberDetailLink } from "@/lib/member-detail-link";
 import { memo } from "react";
-import type { ItStatus, RosterEntry } from "@/lib/schemas";
+import type { ItStatus, RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 import { IT_STATUS_LABEL, ItStatusGlyph } from "@/components/ui/status";
@@ -26,6 +26,7 @@ export const SeatTile = memo(function SeatTile({
   selecting,
   pending,
   onToggle,
+  onAssignLeadSeat,
   selectable = true,
 }: {
   entry: RosterEntry;
@@ -37,6 +38,7 @@ export const SeatTile = memo(function SeatTile({
   /** IT status of an open transfer that involves this member, if any. */
   pending?: ItStatus;
   onToggle: (id: string) => void;
+  onAssignLeadSeat?: (lead: UnrosteredLead) => void;
 }) {
   const member = "status" in entry ? entry : null;
   const isLead = member?.isLead ?? true;
@@ -54,23 +56,24 @@ export const SeatTile = memo(function SeatTile({
       data-card
       data-selected={selected || undefined}
       data-testid="member-card"
-      role={member ? "button" : undefined}
-      tabIndex={member ? 0 : undefined}
-      aria-label={member ? `${entry.name}${isLead ? ", team lead" : ""}, seat ${seatLabel(member.seat, "none")}. ${selecting && canSelect ? "Toggle selection" : "View details"}` : undefined}
-      onClick={member ? onCard : undefined}
-      onKeyDown={member ? (e) => {
+      role="button"
+      tabIndex={0}
+      aria-label={`${entry.name}${isLead ? ", team lead" : ""}, seat ${seatLabel(member?.seat, "none")}. ${selecting && canSelect ? "Toggle selection" : "View details"}`}
+      onClick={onCard}
+      onKeyDown={(e) => {
         if (e.target !== e.currentTarget) return;
         if (e.key === "Enter") {
           e.preventDefault();
           view();
-        } else if (e.key === " " && canSelect) {
+        } else if (e.key === " ") {
           e.preventDefault();
-          toggle();
+          if (canSelect) toggle();
+          else view();
         }
-      } : undefined}
+      }}
       className={cn(
         "group relative flex h-[156px] select-none flex-col rounded-2xl p-4 outline-none max-sm:h-[140px] max-sm:p-3.5",
-        member && "cursor-pointer",
+        "cursor-pointer",
         "focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
         "transition-[transform,box-shadow,background-color] duration-200 ease-out will-change-transform",
         "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/35 has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-canvas",
@@ -117,7 +120,7 @@ export const SeatTile = memo(function SeatTile({
                 </button>
               </span>
             ) : null}
-            {member && active ? <MemberMenuButton member={member} className={cn("rounded-full", reveal)} /> : null}
+            {active ? <MemberMenuButton entry={entry} onAssignLeadSeat={onAssignLeadSeat} className={cn("rounded-full", reveal)} /> : null}
             {isLead ? <LeadBadge compact className="ml-1 mr-1 size-5" /> : null}
           </div>
         ) : null}
@@ -147,9 +150,9 @@ export const SeatTile = memo(function SeatTile({
         <span title={member?.subGroup ?? entry.email} className="min-w-0 truncate">
           {member?.subGroup ?? entry.email}
         </span>
-        {member ? (
-          <span className="ml-auto flex shrink-0 items-center gap-2">
-            {!active ? (
+        <span className="ml-auto flex shrink-0 items-center gap-2">
+          {member ? (
+            !active ? (
               <StateTag tone={member.status === "resigned" ? "red" : "amber"}>{member.status === "resigned" ? "Resigned" : "Unknown"}</StateTag>
             ) : pending ? (
               <span
@@ -164,28 +167,28 @@ export const SeatTile = memo(function SeatTile({
                 <Laptop className="size-3.5 text-neutral-400" aria-hidden />
                 {member.devices.length}
               </span>
-            )}
-            <button
-              type="button"
-              data-testid="member-view-details"
-              aria-label={`View details for ${member.name}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                view();
-              }}
-              onKeyDown={(e) => e.stopPropagation()}
-              className="-mr-1.5 inline-flex h-6 items-center gap-0.5 rounded-md pl-1.5 pr-1 text-[12px] font-medium text-neutral-600 outline-none transition-colors hover:bg-accent-soft hover:text-accent-ink focus-visible:ring-2 focus-visible:ring-accent/35"
-            >
-              <span className="max-[420px]:hidden">View details</span>
-              <span className="hidden max-[420px]:inline">Details</span>
-              <ChevronRight className="size-3.5" aria-hidden />
-            </button>
-          </span>
-        ) : null}
+            )
+          ) : null}
+          <button
+            type="button"
+            data-testid="member-view-details"
+            aria-label={`View details for ${entry.name}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              view();
+            }}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="-mr-1.5 inline-flex h-6 items-center gap-0.5 rounded-md pl-1.5 pr-1 text-[12px] font-medium text-neutral-600 outline-none transition-colors hover:bg-accent-soft hover:text-accent-ink focus-visible:ring-2 focus-visible:ring-accent/35"
+          >
+            <span className="max-[420px]:hidden">View details</span>
+            <span className="hidden max-[420px]:inline">Details</span>
+            <ChevronRight className="size-3.5" aria-hidden />
+          </button>
+        </span>
       </div>
     </div>
   );
-  return member ? <MemberContextMenu member={member}>{card}</MemberContextMenu> : card;
+  return <MemberContextMenu entry={entry} onAssignLeadSeat={onAssignLeadSeat}>{card}</MemberContextMenu>;
 });
 
 function StateTag({ tone, children }: { tone: "red" | "amber"; children: React.ReactNode }) {

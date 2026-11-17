@@ -18,6 +18,7 @@ package handlers
 //	POST   /api/v1/zones/move                 move a team's zone (any floor)         floors.manage
 //	POST   /api/v1/zone-changes/{id}/undo     undo a zone change in the window       floors.manage
 //	PUT    /api/v1/members/{id}/seat          seat a person                          seats.assign
+//	POST   /api/v1/admin/users/{id}/seat      roster and seat a team lead           users.manage
 
 import (
 	"net/http"
@@ -46,6 +47,7 @@ func (s *Server) floorRoutes(read, write route) {
 	write("POST /api/v1/zones/move", auth.PermManageFloors, s.moveZone)
 	write("POST /api/v1/zone-changes/{id}/undo", auth.PermManageFloors, s.undoZoneChange)
 	write("PUT /api/v1/members/{id}/seat", auth.PermAssignSeat, s.putSeat)
+	write("POST /api/v1/admin/users/{id}/seat", auth.PermManageUsers, s.postLeadSeat)
 }
 
 func respond(w http.ResponseWriter, r *http.Request, s *Server, status int, v any, err error) {
@@ -173,6 +175,18 @@ func (s *Server) putSeat(w http.ResponseWriter, r *http.Request, a store.Actor) 
 	}
 	m, err := s.store.AssignSeat(r.Context(), a, r.PathValue("id"), in)
 	respond(w, r, s, http.StatusOK, m, err)
+}
+
+func (s *Server) postLeadSeat(w http.ResponseWriter, r *http.Request, a store.Actor) {
+	var in struct {
+		SeatID string `json:"seatId"`
+	}
+	if err := decode(r, &in); err != nil {
+		fail(w, r, s.log, err)
+		return
+	}
+	m, err := s.store.AssignUnrosteredLeadSeat(r.Context(), a, r.PathValue("id"), in.SeatID)
+	respond(w, r, s, http.StatusCreated, m, err)
 }
 
 func (s *Server) putSeatCodes(w http.ResponseWriter, r *http.Request, a store.Actor) {

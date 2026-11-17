@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -189,39 +190,97 @@ func (s *Store) CreateMember(ctx context.Context, actor Actor, in domain.MemberI
 		if err := lockMemberTeam(ctx, tx, in.TeamID); err != nil {
 			return err
 		}
-		id := NewID("mem")
-		if err := s.checkMemberWrite(ctx, tx, actor, in, id, nil); err != nil {
-			return err
+		var err error
+		out, err = s.createMember(ctx, tx, actor, in, isLead)
+		return err
+	})
+	return out, mapMemberWriteErr(err)
+}
+
+// createMember inserts the roster record with the team already locked.
+func (s *Store) createMember(ctx context.Context, tx pgx.Tx, actor Actor, in domain.MemberInput, isLead bool) (domain.Member, error) {
+	id := NewID("mem")
+	if err := s.checkMemberWrite(ctx, tx, actor, in, id, nil); err != nil {
+		return domain.Member{}, err
+	}
+	if isLead {
+		if err := ensureSingleMemberLead(ctx, tx, in.TeamID, id); err != nil {
+			return domain.Member{}, err
 		}
-		if isLead {
-			if err := ensureSingleMemberLead(ctx, tx, in.TeamID, id); err != nil {
-				return err
-			}
+	}
+	if _, err := tx.Exec(ctx, `INSERT INTO members (id, name, email, employee_id, role, sub_group, team_id, seat_id, is_lead, status, joined_at, hue)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'active',$10,$11)`,
+		id, in.Name, nullable(in.Email), nullable(in.EmployeeID), in.Designation, in.SubGroup, in.TeamID, in.SeatID, isLead,
+		s.Now().Format("2006-01-02"), domain.HueFor(in.Name)); err != nil {
+		return domain.Member{}, err
+	}
+	for i, d := range in.Devices {
+		if err := insertDevice(ctx, tx, id, i, d); err != nil {
+			return domain.Member{}, err
 		}
-		if _, err := tx.Exec(ctx, `INSERT INTO members (id, name, email, employee_id, role, sub_group, team_id, seat_id, is_lead, status, joined_at, hue)
-			VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'active',$10,$11)`,
-			id, in.Name, nullable(in.Email), nullable(in.EmployeeID), in.Designation, in.SubGroup, in.TeamID, in.SeatID, isLead,
-			s.Now().Format("2006-01-02"), domain.HueFor(in.Name)); err != nil {
-			return mapMemberWriteErr(err)
+	}
+	if err := audit(ctx, tx, actor, "member.created", "member", id, map[string]any{
+		"name": in.Name, "teamId": in.TeamID, "seatId": in.SeatID, "isLead": isLead, "devices": len(in.Devices)}); err != nil {
+		return domain.Member{}, err
+	}
+	m, err := membersByID(ctx, tx, []string{id}, false)
+	if err != nil {
+		return domain.Member{}, err
+	}
+	out := m[id]
+	if err := s.publishFloors(ctx, tx, actor, "occupancy", addFloor(nil, out.FloorID)...); err != nil {
+		return domain.Member{}, err
+	}
+	if err := s.publishMembers(ctx, tx, actor, id, "created", out.Version, &in.TeamID); err != nil {
+		return domain.Member{}, err
+	}
+	return out, nil
+}
+
+// AssignUnrosteredLeadSeat creates and seats a lead's roster record atomically.
+func (s *Store) AssignUnrosteredLeadSeat(ctx context.Context, actor Actor, userID, seatID string) (domain.Member, error) {
+	if actor.User.Role != "admin" {
+		return domain.Member{}, domain.Forbidden("forbidden", "Only an admin can seat a lead who isn't on the roster.")
+	}
+	seatID = domain.NormalizeSeat(seatID)
+	if seatID == "" {
+		return domain.Member{}, domain.Invalid("Choose a seat on a published floor.", nil)
+	}
+	var out domain.Member
+	err := s.withTx(ctx, writeTx, func(tx pgx.Tx) error {
+		in := domain.MemberInput{SeatID: &seatID}
+		err := tx.QueryRow(ctx, `SELECT name, email, title, team_id FROM users
+			WHERE id = $1 AND role = 'team_lead' AND status = 'active' FOR UPDATE`, userID).
+			Scan(&in.Name, &in.Email, &in.Designation, &in.TeamID)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.NotFound("Active team lead not found.")
 		}
-		for i, d := range in.Devices {
-			if err := insertDevice(ctx, tx, id, i, d); err != nil {
-				return mapMemberWriteErr(err)
-			}
-		}
-		if err := audit(ctx, tx, actor, "member.created", "member", id, map[string]any{
-			"name": in.Name, "teamId": in.TeamID, "seatId": in.SeatID, "isLead": isLead, "devices": len(in.Devices)}); err != nil {
-			return err
-		}
-		m, err := membersByID(ctx, tx, []string{id}, false)
 		if err != nil {
 			return err
 		}
-		out = m[id]
-		if err := s.publishFloors(ctx, tx, actor, "occupancy", addFloor(nil, out.FloorID)...); err != nil {
+		if utf8.RuneCountInString(strings.TrimSpace(in.Designation)) < 2 {
+			in.Designation = "Team Lead"
+		}
+		if err := s.prepareMember(actor, &in); err != nil {
 			return err
 		}
-		return s.publishMembers(ctx, tx, actor, id, "created", out.Version, &in.TeamID)
+		if err := lockMemberTeam(ctx, tx, in.TeamID); err != nil {
+			return err
+		}
+		var rosterTeam string
+		err = tx.QueryRow(ctx, `SELECT team_id FROM members WHERE lower(email) = $1
+			ORDER BY (team_id = $2) DESC LIMIT 1`, in.Email, in.TeamID).Scan(&rosterTeam)
+		switch {
+		case err == nil && rosterTeam == in.TeamID:
+			return domain.Conflict("lead_already_rostered", "This lead is already on the roster. Select their roster entry to assign a seat.")
+		case err == nil:
+			return domain.Conflict("lead_already_rostered", "This lead's email is on another team's roster. Update that record before assigning a seat.")
+		case !errors.Is(err, pgx.ErrNoRows):
+			return err
+		}
+		// The matching active account supplies the lead badge for this roster record.
+		out, err = s.createMember(ctx, tx, actor, in, false)
+		return err
 	})
 	return out, mapMemberWriteErr(err)
 }
