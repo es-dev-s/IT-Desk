@@ -13,11 +13,13 @@ export function TeamSwitcher({
   label = "Team in focus",
   testId = "team-switcher",
   size = "sm",
+  singleChevron,
 }: {
   className?: string;
   label?: string;
   testId?: string;
   size?: "sm" | "md";
+  singleChevron?: boolean;
 }) {
   const teams = useTeams();
   const currentTeamId = useWorkspace((s) => s.requestedTeamId ?? s.currentTeamId);
@@ -36,6 +38,7 @@ export function TeamSwitcher({
         onChange={(id) => void selectTeam(id)}
         teams={teams}
         showLeads
+        singleChevron={singleChevron}
         testId={testId}
       />
     </div>

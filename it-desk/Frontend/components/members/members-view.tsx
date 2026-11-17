@@ -47,6 +47,8 @@ export function MembersView() {
   const all = useTeamMembers();
   const teams = useTeamsById();
   const unrosteredLeads = useWorkspace((s) => s.unrosteredLeads);
+  const selectedTeamId = useWorkspace((s) => s.requestedTeamId ?? s.currentTeamId);
+  const selectTeam = useWorkspace((s) => s.selectTeam);
   const f = useUI(useShallow((s) => s.members));
   const setMembers = useUI((s) => s.setMembers);
   const toggle = useUI((s) => s.toggleSelected);
@@ -114,18 +116,19 @@ export function MembersView() {
   const visible = filtered.slice(0, f.visible);
 
   const isMap = f.view === "map";
+  const teamOff = isAdmin && selectedTeamId !== "";
   const statusOff = !isMap && status !== defaultStatus;
   const groupOff = subGroup !== "all";
   const sortOff = !isMap && f.sort !== "seat";
+  const filterCount = Number(teamOff) + Number(groupOff) + Number(sortOff);
   const statusInline = (toolbarWidth ?? 0) >= 920;
+  const clearTeam = () => {
+    if (teamOff) void selectTeam("");
+  };
 
   return (
     <>
       <h1 className="sr-only">Members</h1>
-
-      {isAdmin ? (
-        <TeamSwitcher className="mb-3 w-56 max-w-full" size="md" label="Filter members by team" testId="member-team-filter" />
-      ) : null}
 
       {/* One-row toolbar. Status sits inline on wide containers and moves into Filters below 920px. */}
       <Toolbar ref={toolbarRef} label="Member tools" className="mb-6">
@@ -150,13 +153,21 @@ export function MembersView() {
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <FiltersPopover
             labelClassName="@max-[480px]:sr-only"
-            canReset={statusOff || groupOff || sortOff}
-            onReset={() => setMembers({ status: null, subGroup: "all", sort: "seat" })}
+            canReset={statusOff || filterCount > 0}
+            onReset={() => {
+              setMembers({ status: null, subGroup: "all", sort: "seat" });
+              clearTeam();
+            }}
             tiers={[
-              { value: +statusOff + +groupOff + +sortOff, className: "grid @min-[920px]:hidden" },
-              { value: +groupOff + +sortOff, className: "hidden @min-[920px]:grid" },
+              { value: Number(statusOff) + filterCount, className: "grid @min-[920px]:hidden" },
+              { value: filterCount, className: "hidden @min-[920px]:grid" },
             ]}
           >
+            {isAdmin ? (
+              <FilterRow label="Team">
+                <TeamSwitcher className="min-w-0" size="md" label="Filter members by team" testId="member-team-filter" singleChevron />
+              </FilterRow>
+            ) : null}
             {isMap || statusInline ? null : (
               <FilterRow label="Status">
                 <SelectField
@@ -281,7 +292,10 @@ export function MembersView() {
             title="No members match"
             description="Try a different name or seat, or clear the filters."
             action={
-              <Button size="sm" onClick={reset}>
+              <Button size="sm" onClick={() => {
+                reset();
+                clearTeam();
+              }}>
                 Clear filters
               </Button>
             }
