@@ -8,7 +8,17 @@ import { useWorkspace } from "@/store/workspace-provider";
  * Admin/IT: choose which team the team-scoped pages show (kept in `?teamId=`).
  * The admin is not on a team, so "All teams" (org-wide) is the default.
  */
-export function TeamSwitcher({ className }: { className?: string }) {
+export function TeamSwitcher({
+  className,
+  label = "Team in focus",
+  testId = "team-switcher",
+  size = "sm",
+}: {
+  className?: string;
+  label?: string;
+  testId?: string;
+  size?: "sm" | "md";
+}) {
   const teams = useTeams();
   const currentTeamId = useWorkspace((s) => s.requestedTeamId ?? s.currentTeamId);
   const switching = useWorkspace((s) => s.switching);
@@ -18,15 +28,15 @@ export function TeamSwitcher({ className }: { className?: string }) {
     <div className={className} aria-busy={switching || undefined}>
       <TeamCombobox
         variant="toolbar"
-        size="sm"
+        size={size}
         className="w-full"
-        label="Team in focus"
+        label={label}
         value={currentTeamId}
         extras={[{ value: "", label: "All teams", hint: `Organisation-wide · ${memberCount} people` }]}
         onChange={(id) => void selectTeam(id)}
         teams={teams}
         showLeads
-        testId="team-switcher"
+        testId={testId}
       />
     </div>
   );

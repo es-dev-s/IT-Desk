@@ -25,6 +25,11 @@ export const seatSchema = z
   .regex(SEAT_CODE_PATTERN, "Use a seat code like L4-A01");
 
 export const teamLeadSchema = z.object({ id, name: z.string() });
+const unrosteredLeadSchema = teamLeadSchema.extend({
+  teamId: id,
+  title: z.string(),
+  email: z.string(),
+});
 
 /** A team in the directory. Leads and counts are derived by the server; a new team can have no lead and no people. */
 export const teamSchema = z.object({
@@ -298,6 +303,7 @@ export const workspaceSchema = z.object({
   user: userSchema,
   teams: z.array(teamSchema),
   members: z.array(memberSchema),
+  unrosteredLeads: z.array(unrosteredLeadSchema).default([]),
   transfers: z.array(transferSchema),
   exits: z.array(exitRecordSchema),
   /** Published floors with occupancy (other teams' people redacted for leads). */
@@ -315,6 +321,7 @@ export type Team = z.infer<typeof teamSchema>;
 export type TeamLead = z.infer<typeof teamLeadSchema>;
 export type Device = z.infer<typeof deviceSchema>;
 export type Member = z.infer<typeof memberSchema>;
+export type RosterEntry = Member | z.infer<typeof unrosteredLeadSchema>;
 export type Move = z.infer<typeof moveSchema>;
 export type Transfer = z.infer<typeof transferSchema>;
 export type ExitRecord = z.infer<typeof exitRecordSchema>;

@@ -24,7 +24,7 @@ type UIState = {
   members: {
     view: MembersView;
     query: string;
-    status: "all" | MemberStatus;
+    status: "all" | MemberStatus | null; // null uses the current roster's default.
     subGroup: string;
     sort: MemberSort;
     selected: Record<string, true>;
@@ -59,7 +59,7 @@ export const useUI = create<UIState>()((set) => ({
   members: {
     view: "grid",
     query: "",
-    status: "active",
+    status: null,
     subGroup: "all",
     sort: "seat",
     selected: {},
@@ -101,6 +101,6 @@ export const useUI = create<UIState>()((set) => ({
   clearSelection: () => set((s) => ({ members: { ...s.members, selected: {} } })),
   resetMemberFilters: () =>
     set((s) => ({
-      members: { ...s.members, query: "", status: "active", subGroup: "all", visible: MEMBER_PAGE_SIZE },
+      members: { ...s.members, query: "", status: null, subGroup: "all", visible: MEMBER_PAGE_SIZE },
     })),
 }));

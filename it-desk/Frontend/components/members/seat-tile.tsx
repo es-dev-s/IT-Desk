@@ -4,7 +4,7 @@ import { LeadBadge } from "@/components/floors/lead-badge";
 import { Check, ChevronRight, Laptop } from "lucide-react";
 import { useMemberDetailLink } from "@/lib/member-detail-link";
 import { memo } from "react";
-import type { ItStatus, Member } from "@/lib/schemas";
+import type { ItStatus, RosterEntry } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 import { IT_STATUS_LABEL, ItStatusGlyph } from "@/components/ui/status";
@@ -20,14 +20,16 @@ const reveal =
  * Fixed height so every row lines up; hover lift is transform + shadow only, so nothing reflows.
  */
 export const SeatTile = memo(function SeatTile({
-  member,
+  entry,
+  teamName,
   selected,
   selecting,
   pending,
   onToggle,
   selectable = true,
 }: {
-  member: Member;
+  entry: RosterEntry;
+  teamName?: string;
   /** False for read-only roles: no selection controls at all. */
   selectable?: boolean;
   selected: boolean;
@@ -36,64 +38,68 @@ export const SeatTile = memo(function SeatTile({
   pending?: ItStatus;
   onToggle: (id: string) => void;
 }) {
-  const active = member.status === "active";
-  const canSelect = active && selectable;
-  const toggle = () => onToggle(member.id);
+  const member = "status" in entry ? entry : null;
+  const isLead = member?.isLead ?? true;
+  const active = !member || member.status === "active";
+  const canSelect = Boolean(member && active && selectable);
+  const designation = "title" in entry ? entry.title || "Team Lead" : entry.role;
+  const seat = seatLabel(member?.seat, "No seat");
+  const toggle = () => onToggle(entry.id);
   const { open } = useMemberDetailLink();
-  const view = () => open(member.id);
+  const view = () => open(entry.id);
   // While a selection is in progress a click keeps selecting; otherwise it opens the details.
   const onCard = selecting && canSelect ? toggle : view;
-  return (
-    <MemberContextMenu member={member}>
-      <div
-        data-card
-        data-selected={selected || undefined}
-        data-testid="member-card"
-        role="button"
-        tabIndex={0}
-        aria-label={`${member.name}, seat ${seatLabel(member.seat, "none")}. ${selecting && canSelect ? "Toggle selection" : "View details"}`}
-        onClick={onCard}
-        onKeyDown={(e) => {
-          if (e.target !== e.currentTarget) return;
-          if (e.key === "Enter") {
-            e.preventDefault();
-            view();
-          } else if (e.key === " " && canSelect) {
-            e.preventDefault();
-            toggle();
-          }
-        }}
-        className={cn(
-          "group relative flex h-[156px] cursor-pointer select-none flex-col rounded-2xl p-4 outline-none max-sm:h-[140px] max-sm:p-3.5",
-          "focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
-          "transition-[transform,box-shadow,background-color] duration-200 ease-out will-change-transform",
-          "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/35 has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-canvas",
-          active
-            ? selected
-              ? "bg-white shadow-[0_0_0_2px_var(--color-accent),0_8px_24px_-12px_rgb(201_72_10/0.45)]"
-              : "bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.04),0_2px_6px_-2px_rgb(0_0_0/0.04)] motion-safe:[@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_0_0_1px_rgb(0_0_0/0.07),0_2px_4px_rgb(0_0_0/0.04),0_12px_28px_-12px_rgb(0_0_0/0.18)]"
-            : "bg-neutral-50/80 shadow-[0_0_0_1px_rgb(0_0_0/0.05)]",
-        )}
-      >
-        {/* Seat + controls */}
-        <div className="flex h-7 items-start justify-between gap-2">
-          <span
-            className={cn(
-              "tnum inline-flex h-7 items-center rounded-lg px-2 text-[14px] font-semibold tracking-[-0.01em]",
-              !active ? "bg-neutral-900/[0.04] text-neutral-400" : selected ? "bg-accent text-white" : "bg-neutral-900/[0.05] text-neutral-900",
-            )}
-          >
-            {seatLabel(member.seat, "No seat")}
-          </span>
-          {active ? (
-            <div className="-mr-1 -mt-0.5 flex items-center gap-0.5">
-              {canSelect ? (
+  const card = (
+    <div
+      data-card
+      data-selected={selected || undefined}
+      data-testid="member-card"
+      role={member ? "button" : undefined}
+      tabIndex={member ? 0 : undefined}
+      aria-label={member ? `${entry.name}${isLead ? ", team lead" : ""}, seat ${seatLabel(member.seat, "none")}. ${selecting && canSelect ? "Toggle selection" : "View details"}` : undefined}
+      onClick={member ? onCard : undefined}
+      onKeyDown={member ? (e) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === "Enter") {
+          e.preventDefault();
+          view();
+        } else if (e.key === " " && canSelect) {
+          e.preventDefault();
+          toggle();
+        }
+      } : undefined}
+      className={cn(
+        "group relative flex h-[156px] select-none flex-col rounded-2xl p-4 outline-none max-sm:h-[140px] max-sm:p-3.5",
+        member && "cursor-pointer",
+        "focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
+        "transition-[transform,box-shadow,background-color] duration-200 ease-out will-change-transform",
+        "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/35 has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-canvas",
+        active
+          ? selected
+            ? "bg-white shadow-[0_0_0_2px_var(--color-accent),0_8px_24px_-12px_rgb(201_72_10/0.45)]"
+            : "bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.04),0_2px_6px_-2px_rgb(0_0_0/0.04)] motion-safe:[@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_0_0_1px_rgb(0_0_0/0.07),0_2px_4px_rgb(0_0_0/0.04),0_12px_28px_-12px_rgb(0_0_0/0.18)]"
+          : "bg-neutral-50/80 shadow-[0_0_0_1px_rgb(0_0_0/0.05)]",
+      )}
+    >
+      {/* Seat + controls */}
+      <div className="flex h-7 items-start justify-between gap-2">
+        <span
+          className={cn(
+            "tnum inline-flex h-7 items-center rounded-lg px-2 text-[14px] font-semibold tracking-[-0.01em]",
+            !active ? "bg-neutral-900/[0.04] text-neutral-400" : selected ? "bg-accent text-white" : "bg-neutral-900/[0.05] text-neutral-900",
+          )}
+        >
+          {seat}
+        </span>
+        {(member && active) || isLead ? (
+          <div className="-mr-1 -mt-0.5 flex h-7 items-center gap-0.5">
+            {canSelect ? (
               <span className={cn("transition-opacity duration-150", !(selected || selecting) && reveal)}>
                 <button
                   type="button"
                   role="checkbox"
                   aria-checked={selected}
-                  aria-label={`Select ${member.name}`}
+                  aria-label={`Select ${entry.name}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggle();
@@ -110,34 +116,38 @@ export const SeatTile = memo(function SeatTile({
                   </span>
                 </button>
               </span>
-              ) : null}
-              <MemberMenuButton member={member} className={cn("rounded-full", reveal)} />
-            </div>
-          ) : null}
-        </div>
-
-        {/* Person */}
-        <div className="mt-auto flex min-w-0 items-center gap-3">
-          <span className="relative shrink-0 max-sm:hidden"><Avatar name={member.name} size="md" ring={active ? true : "muted"} className={member.isLead ? "ring-2 ring-amber-400" : undefined} />{member.isLead ? <LeadBadge compact className="absolute -right-1 -top-1" /> : null}</span>
-          <div className="min-w-0">
-            <p
-              title={member.name}
-              className={cn("truncate text-[15px] font-semibold leading-5 tracking-[-0.015em]", active ? "text-neutral-900" : "text-neutral-500")}
-            >
-              {member.name}
-            </p>
-            {member.isLead ? <LeadBadge className="mt-0.5" /> : null}
-            <p title={member.role} className="truncate text-xs leading-4 text-neutral-500">
-              {member.role}
-            </p>
+            ) : null}
+            {member && active ? <MemberMenuButton member={member} className={cn("rounded-full", reveal)} /> : null}
+            {isLead ? <LeadBadge compact className="ml-1 mr-1 size-5" /> : null}
           </div>
-        </div>
+        ) : null}
+      </div>
 
-        {/* Context */}
-        <div className="mt-3 flex h-6 items-center gap-2 border-t border-neutral-900/[0.06] pt-3 text-xs text-neutral-500 max-sm:mt-2.5 max-sm:pt-2.5">
-          <span title={member.subGroup} className="min-w-0 truncate">
-            {member.subGroup}
-          </span>
+      {/* Person */}
+      <div className="mt-auto flex min-w-0 items-center gap-3">
+        <span className="relative shrink-0 max-sm:hidden">
+          <Avatar name={entry.name} size="md" ring={active ? true : "muted"} className={isLead ? "ring-2 ring-amber-400" : undefined} />
+        </span>
+        <div className="min-w-0">
+          <p
+            title={entry.name}
+            className={cn("truncate text-[15px] font-semibold leading-5 tracking-[-0.015em]", active ? "text-neutral-900" : "text-neutral-500")}
+          >
+            {entry.name}
+          </p>
+          <p title={designation} className="truncate text-xs leading-4 text-neutral-500">
+            {designation}
+          </p>
+          {isLead && teamName ? <p title={teamName} className="truncate text-xs leading-4 text-neutral-500">{teamName}</p> : null}
+        </div>
+      </div>
+
+      {/* Context */}
+      <div className="mt-3 flex h-6 items-center gap-2 border-t border-neutral-900/[0.06] pt-3 text-xs text-neutral-500 max-sm:mt-2.5 max-sm:pt-2.5">
+        <span title={member?.subGroup ?? entry.email} className="min-w-0 truncate">
+          {member?.subGroup ?? entry.email}
+        </span>
+        {member ? (
           <span className="ml-auto flex shrink-0 items-center gap-2">
             {!active ? (
               <StateTag tone={member.status === "resigned" ? "red" : "amber"}>{member.status === "resigned" ? "Resigned" : "Unknown"}</StateTag>
@@ -171,10 +181,11 @@ export const SeatTile = memo(function SeatTile({
               <ChevronRight className="size-3.5" aria-hidden />
             </button>
           </span>
-        </div>
+        ) : null}
       </div>
-    </MemberContextMenu>
+    </div>
   );
+  return member ? <MemberContextMenu member={member}>{card}</MemberContextMenu> : card;
 });
 
 function StateTag({ tone, children }: { tone: "red" | "amber"; children: React.ReactNode }) {

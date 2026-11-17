@@ -69,6 +69,7 @@ export type WorkspaceState = {
   teamIds: string[];
   members: Record<string, Member>;
   memberIds: string[];
+  unrosteredLeads: WorkspaceResponse["unrosteredLeads"];
   transfers: Record<string, Transfer>;
   transferIds: string[];
   exits: Record<string, ExitRecord>;
@@ -123,6 +124,7 @@ const EMPTY: Omit<WorkspaceState, "status" | "loadError" | "syncError" | "lastSy
   teamIds: [],
   members: {},
   memberIds: [],
+  unrosteredLeads: [],
   transfers: {},
   transferIds: [],
   exits: {},
@@ -142,6 +144,7 @@ function fromSnapshot(ws: WorkspaceResponse) {
     teamIds: ws.teams.map((t) => t.id),
     members: indexById(ws.members),
     memberIds: ws.members.map((m) => m.id),
+    unrosteredLeads: ws.unrosteredLeads,
     transfers: indexById(ws.transfers),
     transferIds: ws.transfers.map((t) => t.id),
     exits: indexById(ws.exits),
@@ -502,6 +505,9 @@ export function createWorkspaceStore(initial: { permissions?: readonly string[] 
           return {
             members: { ...cur.members, [m.id]: m },
             memberIds: prev ? cur.memberIds : [...cur.memberIds, m.id],
+            unrosteredLeads: m.isLead && m.email
+              ? cur.unrosteredLeads.filter((lead) => lead.teamId !== m.teamId || lead.email.toLowerCase() !== m.email.toLowerCase())
+              : cur.unrosteredLeads,
           };
         }),
 
