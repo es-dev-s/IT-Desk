@@ -42,7 +42,7 @@ import { Tip } from "@/components/ui/tooltip";
 import { useOccupancy, useTeamColors, useTeamsById } from "@/store/selectors";
 import { FloorCanvas, type FloorCanvasHandle } from "../floor-canvas";
 import { useZoneAction } from "../zone-action";
-import { addSeats, blocked, eraseAt, fitGrid, intersects, lineCells, make, rectOf, stepCells, topAt, type Cell } from "./geometry";
+import { addSeats, blocked, eraseAt, fitGrid, intersects, lineCells, make, rectOf, seatRefusal, stepCells, topAt, type Cell } from "./geometry";
 import { Inspector } from "./inspector";
 import { useBuilderDoc, type Doc } from "./use-builder-doc";
 
@@ -226,7 +226,11 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
       last: c,
       additive: e.shiftKey || e.metaKey || e.ctrlKey,
     };
-    if (tool === "seat") b.change((x) => ({ ...x, elements: addSeats(x.elements, [c], x.cols, x.rows) }), "stroke");
+    if (tool === "seat") {
+      const why = seatRefusal(els, c);
+      if (why) toast.message(why, { id: "place" });
+      b.change((x) => ({ ...x, elements: addSeats(x.elements, [c], x.cols, x.rows) }), "stroke");
+    }
     else if (tool === "erase") b.change((x) => ({ ...x, elements: eraseAt(x.elements, [c]) }), "stroke");
     else if (tool === "door" || tool === "label") {
       const el = make(tool, c.x, c.y, {
@@ -282,6 +286,11 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
         setSel((s) => new Set([...(d.additive ? s : []), ...inside.map((e) => e.id)]));
       }
     } else if (d.tool === "row") {
+      const cells = lineCells(d.a, d.b);
+      const free = cells.filter((c) => !seatRefusal(els, c)).length;
+      if (free === 0) toast.message("No room for a row there — every cell is already taken", { id: "place" });
+      else if (free < cells.length)
+        toast.message(`Added ${free} of ${cells.length} seats — the other cells were already taken`, { id: "place" });
       b.change((x) => ({
         ...x,
         elements: addSeats(x.elements, lineCells(d.a, d.b), x.cols, x.rows),
@@ -482,7 +491,13 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
           </h1>
           <p className="flex flex-wrap items-center gap-x-2 text-[12px] text-neutral-500">
             {status ? <span data-testid="builder-status">{status}</span> : null}
-            <SaveBadge state={b.save.state} at={b.save.at} error={b.save.error} onReload={() => void b.reload()} />
+            <SaveBadge
+              state={b.save.state}
+              at={b.save.at}
+              error={b.save.error}
+              pendingPublish={meta?.status === "published" && status !== "Live"}
+              onReload={() => void b.reload()}
+            />
           </p>
         </div>
         <div className="flex items-center gap-1">
@@ -651,7 +666,19 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
   );
 }
 
-function SaveBadge({ state, at, error, onReload }: { state: string; at: string | null; error?: string; onReload: () => void }) {
+function SaveBadge({
+  state,
+  at,
+  error,
+  pendingPublish,
+  onReload,
+}: {
+  state: string;
+  at: string | null;
+  error?: string;
+  pendingPublish?: boolean;
+  onReload: () => void;
+}) {
   if (state === "saving" || state === "dirty")
     return (
       <span className="inline-flex items-center gap-1" data-testid="save-state" data-state="saving">
@@ -677,6 +704,7 @@ function SaveBadge({ state, at, error, onReload }: { state: string; at: string |
     <span className="inline-flex items-center gap-1" data-testid="save-state" data-state="saved">
       <Cloud className="size-3" /> Draft saved
       {at ? ` ${formatTimeAgo(at)}` : ""}
+      {pendingPublish ? <span className="font-medium text-amber-700"> · Publish to make it live</span> : null}
     </span>
   );
 }

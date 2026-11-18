@@ -70,6 +70,24 @@ export function addSeats(els: FloorElement[], cells: Cell[], cols: number, rows:
   return out;
 }
 
+const KIND_NAME: Record<Kind, string> = {
+  seat: "a seat",
+  door: "a door",
+  block: "a block / aisle",
+  room: "a room",
+  void: "a void area",
+  wall: "a wall",
+  label: "a label",
+};
+
+/** Why a seat can't go on this cell, or null when it can. */
+export function seatRefusal(els: readonly FloorElement[], c: Cell): string | null {
+  const probe = make("seat", c.x, c.y);
+  const hit = els.find((e) => overlaps(e, probe));
+  if (!hit) return null;
+  return hit.kind === "seat" ? "There's already a seat there" : `That cell is covered by ${KIND_NAME[hit.kind]} — erase it first or pick an empty cell`;
+}
+
 /** Remove the top element under each cell. */
 export function eraseAt(els: FloorElement[], cells: Cell[]) {
   let out = els;

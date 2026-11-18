@@ -62,7 +62,14 @@ export function useBuilderDoc(floorId: string) {
     setH((s) => {
       if (!s.doc) return s;
       const raw = fn(s.doc);
-      if (raw === s.doc) return s;
+      // Tools rebuild the doc object even when they changed nothing (a seat
+      // dropped on an occupied cell). Treat that as a no-op so it doesn't add
+      // an undo step or trigger a "Draft saved" for an edit that never happened.
+      if (
+        raw === s.doc ||
+        (raw.elements === s.doc.elements && raw.cols === s.doc.cols && raw.rows === s.doc.rows && raw.seatPrefix === s.doc.seatPrefix)
+      )
+        return s;
       const snap = kind === "step" || !s.stroke;
       return {
         doc: numbered(raw),
