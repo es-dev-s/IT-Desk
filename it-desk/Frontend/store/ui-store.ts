@@ -21,6 +21,8 @@ type UIState = {
   detail: Overlay<{ transferId: string | null }>;
   /** Add (memberId null) or edit a member. */
   memberDialog: Overlay<{ memberId: string | null }>;
+  /** Team lead (roster id or unrostered account id) whose seat is being picked. */
+  leadSeatId: string | null;
   members: {
     view: MembersView;
     query: string;
@@ -40,6 +42,8 @@ type UIState = {
   closeDetail: () => void;
   openMemberDialog: (memberId?: string | null) => void;
   closeMemberDialog: () => void;
+  openLeadSeat: (leadId: string) => void;
+  closeLeadSeat: () => void;
   setMembers: (patch: Partial<UIState["members"]>) => void;
   toggleSelected: (memberId: string) => void;
   setSelection: (memberIds: string[]) => void;
@@ -56,6 +60,7 @@ export const useUI = create<UIState>()((set) => ({
   exit: { open: false, nonce: 0, kind: "resigned", memberIds: [] },
   detail: { open: false, nonce: 0, transferId: null },
   memberDialog: { open: false, nonce: 0, memberId: null },
+  leadSeatId: null,
   members: {
     view: "grid",
     query: "",
@@ -76,6 +81,8 @@ export const useUI = create<UIState>()((set) => ({
   closeDetail: () => set((s) => ({ detail: { ...s.detail, open: false } })),
   openMemberDialog: (memberId = null) => set({ memberDialog: { open: true, nonce: ++nonce, memberId }, paletteOpen: false }),
   closeMemberDialog: () => set((s) => ({ memberDialog: { ...s.memberDialog, open: false } })),
+  openLeadSeat: (leadSeatId) => set({ leadSeatId, paletteOpen: false }),
+  closeLeadSeat: () => set({ leadSeatId: null }),
   setMembers: (patch) =>
     set((s) => {
       const filterChanged = "query" in patch || "status" in patch || "subGroup" in patch || "sort" in patch;

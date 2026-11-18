@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -147,6 +148,9 @@ func (s *Store) CreateUser(ctx context.Context, actor Actor, in domain.UserInput
 			VALUES ($1,$2,$3,$4,$5,NULLIF($6,''),$7,true,$8)`, id, in.Email, in.Name, in.Title, in.Role, in.TeamID, tempHash, actor.User.ID); err != nil {
 			return mapUserWriteErr(err)
 		}
+		if err := s.ensureLeadRoster(ctx, tx, actor, id); err != nil {
+			return err
+		}
 		if err := audit(ctx, tx, actor, "user.created", "user", id, map[string]any{"email": in.Email, "role": in.Role, "teamId": in.TeamID}); err != nil {
 			return err
 		}
@@ -262,6 +266,17 @@ func (s *Store) UpdateUser(ctx context.Context, actor Actor, id string, in domai
 			if _, err := tx.Exec(ctx, `UPDATE teams SET lead_name = $2 WHERE id = $1`, in.TeamID, in.Name); err != nil {
 				return err
 			}
+			// A lead whose sign-in email changes keeps the same roster record.
+			if role == "team_lead" && pt == in.TeamID && !strings.EqualFold(prevEmail, in.Email) {
+				if _, err := tx.Exec(ctx, `UPDATE members SET email = lower($3), version = version + 1, updated_at = now()
+					WHERE team_id = $1 AND lower(email) = lower($2)
+					AND NOT EXISTS (SELECT 1 FROM members o WHERE lower(o.email) = lower($3))`, in.TeamID, prevEmail, in.Email); err != nil {
+					return err
+				}
+			}
+			if err := s.ensureLeadRoster(ctx, tx, actor, id); err != nil {
+				return err
+			}
 		}
 		if err := audit(ctx, tx, actor, "user.updated", "user", id, map[string]any{
 			"email": in.Email, "role": in.Role, "teamId": in.TeamID, "previousRole": role, "sessionsRevoked": privChange}); err != nil {
@@ -320,6 +335,9 @@ func (s *Store) SetUserStatus(ctx context.Context, actor Actor, id string, enabl
 			}
 			if _, err := tx.Exec(ctx, `UPDATE users SET status = 'active', failed_attempts = 0, locked_until = NULL,
 				version = version + 1, updated_at = now() WHERE id = $1`, id); err != nil {
+				return err
+			}
+			if err := s.ensureLeadRoster(ctx, tx, actor, id); err != nil {
 				return err
 			}
 		}

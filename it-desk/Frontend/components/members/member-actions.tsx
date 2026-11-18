@@ -3,52 +3,59 @@
 import * as CM from "@radix-ui/react-context-menu";
 import * as DM from "@radix-ui/react-dropdown-menu";
 import { Armchair, CircleHelp, Ellipsis, Building2, PanelRightOpen, PencilLine, UserX } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMemberDetailLink } from "@/lib/member-detail-link";
-import type { Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import { canPickLeadSeat, isSelfEntry } from "@/lib/roster-self";
+import type { RosterEntry } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { useUI } from "@/store/ui-store";
 import { useSession } from "@/components/auth/session-provider";
 import { menuContentClass, menuItemClass, menuItemDangerClass, menuLabelClass, menuSeparatorClass } from "@/components/ui/menu";
 
 type Action = { id: string; label: string; icon: React.ComponentType; danger?: boolean; run: () => void };
-type MemberActionProps = { entry: RosterEntry; onAssignLeadSeat?: (lead: UnrosteredLead | Member) => void };
+type MemberActionProps = { entry: RosterEntry };
 
 /** One action list for both the right-click menu and the ⋯ menu. Acts on the selection when the member is in it. */
-function useMemberActions({ entry, onAssignLeadSeat }: MemberActionProps) {
+function useMemberActions({ entry }: MemberActionProps) {
   const selected = useUI((s) => s.members.selected);
   const openTransfer = useUI((s) => s.openTransfer);
   const openExit = useUI((s) => s.openExit);
   const openMemberDialog = useUI((s) => s.openMemberDialog);
-  const { can } = useSession();
+  const openLeadSeat = useUI((s) => s.openLeadSeat);
+  const { can, session } = useSession();
+  const router = useRouter();
   const { open: openDetail } = useMemberDetailLink();
+  const self = isSelfEntry(entry, session.user);
+  const pickSeat = canPickLeadSeat(entry, self, can);
   const view: Action[] = [{ id: "view", label: "View details", icon: PanelRightOpen, run: () => openDetail(entry.id) }];
   if (!("status" in entry)) {
     const actions: (Action | "sep")[] = [...view];
-    if (onAssignLeadSeat) {
-      actions.push("sep", { id: "seat", label: "Assign seat", icon: Armchair, run: () => onAssignLeadSeat(entry) });
-    }
+    // An unrostered lead's details are their account profile.
+    if (self) actions.push("sep", { id: "edit", label: "Edit profile", icon: PencilLine, run: () => router.push("/settings") });
+    if (pickSeat) actions.push("sep", { id: "seat", label: "Assign seat", icon: Armchair, run: () => openLeadSeat(entry.id) });
     return { actions, heading: entry.name };
   }
   const member = entry;
   const active = member.status === "active";
   const selectedIds = Object.keys(selected);
-  const ids = selected[member.id] && selectedIds.length > 1 ? selectedIds : [member.id];
+  const ids = !self && selected[member.id] && selectedIds.length > 1 ? selectedIds : [member.id];
   const heading = ids.length > 1 ? `${ids.length} selected` : member.name;
   const edits: Action[] =
     can("members.manage") && ids.length === 1
       ? [{ id: "edit", label: "Edit details", icon: PencilLine, run: () => openMemberDialog(member.id) }]
       : [];
-  // Admins can't raise transfers, so a seated lead's own seat is changed here.
-  const leadSeat: Action[] = active && member.isLead && onAssignLeadSeat && !can("transfers.create")
-    ? [{ id: "lead-seat", label: member.seatId ? "Change seat" : "Assign seat", icon: Armchair, run: () => onAssignLeadSeat(member) }]
+  // A lead's seat is picked directly: admins can't raise transfers, and a lead seats themselves.
+  const leadSeat: Action[] = pickSeat
+    ? [{ id: "lead-seat", label: member.seatId ? "Change seat" : "Assign seat", icon: Armchair, run: () => openLeadSeat(member.id) }]
     : [];
-  const moves: Action[] = active && can("transfers.create")
+  // A lead doesn't transfer or exit themselves from their own card.
+  const moves: Action[] = active && !self && can("transfers.create")
     ? [
         { id: "seat", label: "Move to another seat", icon: Armchair, run: () => openTransfer(ids, "internal") },
         { id: "team", label: "Transfer to another team", icon: Building2, run: () => openTransfer(ids, "team") },
       ]
     : [];
-  const exits: Action[] = active && can("exits.create")
+  const exits: Action[] = active && !self && can("exits.create")
     ? [
         { id: "resigned", label: "Mark as resigned", icon: UserX, danger: true, run: () => openExit("resigned", ids) },
         { id: "unknown", label: "Mark as unknown", icon: CircleHelp, run: () => openExit("unknown", ids) },

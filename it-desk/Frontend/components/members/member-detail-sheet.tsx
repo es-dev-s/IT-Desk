@@ -19,7 +19,9 @@ import {
   UserX,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { canPickLeadSeat, isSelfEntry } from "@/lib/roster-self";
 import { EMPTY_REQUEST_FORM } from "@/lib/requests";
 import type { MemberDetail, MemberHistoryItem, MemberStatus, UnrosteredLead } from "@/lib/schemas";
 import { formatDateTime } from "@/lib/format";
@@ -243,6 +245,8 @@ function ProfileHeading({ name, title, status, teamName, isLead, hue }: {
 
 const nptTime = (iso: string) => `${formatDateTime(iso)} NPT`;
 
+type DetailAction = { id: string; label: string; icon: React.ComponentType; danger?: boolean; run: () => void };
+
 function DetailContent({ data, onClose }: { data: MemberDetail | UnrosteredLead; onClose: () => void }) {
   const person = "member" in data ? data.member : data;
   const member = "status" in person ? person : null;
@@ -250,23 +254,35 @@ function DetailContent({ data, onClose }: { data: MemberDetail | UnrosteredLead;
   const status = member?.status ?? "active";
   const devices = member?.devices ?? [];
   const history = "history" in data ? data.history : [];
-  const { can } = useSession();
+  const { can, session } = useSession();
+  const router = useRouter();
   const teams = useTeamsById();
   const openMemberDialog = useUI((s) => s.openMemberDialog);
+  const openLeadSeat = useUI((s) => s.openLeadSeat);
   const openTransfer = useUI((s) => s.openTransfer);
   const openExit = useUI((s) => s.openExit);
   const openRequest = useRequests((s) => s.openDialog);
   const active = status === "active";
   const team = teams[person.teamId];
+  // A team lead viewing their own profile edits it and picks their own seat; no transfers or exits.
+  const self = isSelfEntry(person, session.user);
+  const pickSeat = canPickLeadSeat(person, self, can);
   // Close first so only one overlay owns focus; the next dialog opens on the page.
   const then = (fn: () => void) => () => {
     onClose();
     setTimeout(fn, 0);
   };
-  const actions = member ? [
+  const leadSeat: DetailAction | false = pickSeat && {
+    id: "lead-seat",
+    label: member?.seatId ? "Change seat" : "Assign seat",
+    icon: Armchair,
+    run: then(() => openLeadSeat(person.id)),
+  };
+  const actions: DetailAction[] = (member ? [
     can("members.manage") && { id: "edit", label: "Edit", icon: PencilLine, run: then(() => openMemberDialog(member.id)) },
-    active && can("transfers.create") && { id: "transfer", label: "Transfer", icon: ArrowLeftRight, run: then(() => openTransfer([member.id], "team")) },
-    active && can("transfers.create") && { id: "seat", label: "Move seat", icon: Armchair, run: then(() => openTransfer([member.id], "internal")) },
+    leadSeat,
+    active && !self && can("transfers.create") && { id: "transfer", label: "Transfer", icon: ArrowLeftRight, run: then(() => openTransfer([member.id], "team")) },
+    active && !self && can("transfers.create") && { id: "seat", label: "Move seat", icon: Armchair, run: then(() => openTransfer([member.id], "internal")) },
     active && can("requests.create") && {
       id: "request",
       label: "Request IT",
@@ -279,9 +295,13 @@ function DetailContent({ data, onClose }: { data: MemberDetail | UnrosteredLead;
       icon: TriangleAlert,
       run: then(() => openRequest({ ...EMPTY_REQUEST_FORM, type: "issue", forMemberId: member.id, teamId: member.teamId })),
     },
-    active && can("exits.create") && { id: "resigned", label: "Mark resigned", icon: UserX, danger: true, run: then(() => openExit("resigned", [member.id])) },
-    active && can("exits.create") && { id: "unknown", label: "Mark unknown", icon: CircleHelp, run: then(() => openExit("unknown", [member.id])) },
-  ].filter((action) => action !== false) : [];
+    active && !self && can("exits.create") && { id: "resigned", label: "Mark resigned", icon: UserX, danger: true, run: then(() => openExit("resigned", [member.id])) },
+    active && !self && can("exits.create") && { id: "unknown", label: "Mark unknown", icon: CircleHelp, run: then(() => openExit("unknown", [member.id])) },
+  ] : [
+    // Unrostered lead: their details are the account profile; a seat creates the roster record.
+    self && { id: "edit", label: "Edit profile", icon: PencilLine, run: then(() => router.push("/settings")) },
+    leadSeat,
+  ]).filter((action): action is DetailAction => action !== false);
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">

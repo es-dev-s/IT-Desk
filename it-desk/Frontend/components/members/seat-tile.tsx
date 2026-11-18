@@ -4,7 +4,7 @@ import { LeadBadge } from "@/components/floors/lead-badge";
 import { Check, ChevronRight, Laptop } from "lucide-react";
 import { useMemberDetailLink } from "@/lib/member-detail-link";
 import { memo } from "react";
-import type { ItStatus, Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import type { ItStatus, RosterEntry } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 import { IT_STATUS_LABEL, ItStatusGlyph } from "@/components/ui/status";
@@ -26,7 +26,7 @@ export const SeatTile = memo(function SeatTile({
   selecting,
   pending,
   onToggle,
-  onAssignLeadSeat,
+  self = false,
   selectable = true,
 }: {
   entry: RosterEntry;
@@ -38,12 +38,13 @@ export const SeatTile = memo(function SeatTile({
   /** IT status of an open transfer that involves this member, if any. */
   pending?: ItStatus;
   onToggle: (id: string) => void;
-  onAssignLeadSeat?: (lead: UnrosteredLead | Member) => void;
+  /** The signed-in team lead's own card: pinned first, never part of a bulk selection. */
+  self?: boolean;
 }) {
   const member = "status" in entry ? entry : null;
   const isLead = member?.isLead ?? true;
   const active = !member || member.status === "active";
-  const canSelect = Boolean(member && active && selectable);
+  const canSelect = Boolean(member && active && selectable && !self);
   const designation = "title" in entry ? entry.title || "Team Lead" : entry.role;
   const seat = seatLabel(member?.seat, "No seat");
   const toggle = () => onToggle(entry.id);
@@ -58,7 +59,7 @@ export const SeatTile = memo(function SeatTile({
       data-testid="member-card"
       role="button"
       tabIndex={0}
-      aria-label={`${entry.name}${isLead ? ", team lead" : ""}, seat ${seatLabel(member?.seat, "none")}. ${selecting && canSelect ? "Toggle selection" : "View details"}`}
+      aria-label={`${entry.name}${self ? " (you)" : ""}${isLead ? ", team lead" : ""}, seat ${seatLabel(member?.seat, "none")}. ${selecting && canSelect ? "Toggle selection" : "View details"}`}
       onClick={onCard}
       onKeyDown={(e) => {
         if (e.target !== e.currentTarget) return;
@@ -120,7 +121,7 @@ export const SeatTile = memo(function SeatTile({
                 </button>
               </span>
             ) : null}
-            {active ? <MemberMenuButton entry={entry} onAssignLeadSeat={onAssignLeadSeat} className={cn("rounded-full", reveal)} /> : null}
+            {active ? <MemberMenuButton entry={entry} className={cn("rounded-full", reveal)} /> : null}
             {isLead ? <LeadBadge compact className="ml-1 mr-1 size-5" /> : null}
           </div>
         ) : null}
@@ -137,6 +138,7 @@ export const SeatTile = memo(function SeatTile({
             className={cn("truncate text-[15px] font-semibold leading-5 tracking-[-0.015em]", active ? "text-neutral-900" : "text-neutral-500")}
           >
             {entry.name}
+            {self ? <span className="ml-1.5 align-middle text-[11px] font-medium text-neutral-500">(You)</span> : null}
           </p>
           <p title={designation} className="truncate text-xs leading-4 text-neutral-500">
             {designation}
@@ -188,7 +190,7 @@ export const SeatTile = memo(function SeatTile({
       </div>
     </div>
   );
-  return <MemberContextMenu entry={entry} onAssignLeadSeat={onAssignLeadSeat}>{card}</MemberContextMenu>;
+  return <MemberContextMenu entry={entry}>{card}</MemberContextMenu>;
 });
 
 function StateTag({ tone, children }: { tone: "red" | "amber"; children: React.ReactNode }) {

@@ -10,7 +10,18 @@ import { Modal, ModalBody, ModalFooter } from "@/components/ui/modal";
 import { useSession } from "@/components/auth/session-provider";
 import type { Member, UnrosteredLead } from "@/lib/schemas";
 import { useSeatIndex } from "@/store/selectors";
+import { useUI } from "@/store/ui-store";
 import { useWorkspace, useWorkspaceApi } from "@/store/workspace-provider";
+
+/** Mounted once in the app shell; the members page and the detail sheet open it via `openLeadSeat`. */
+export function LeadSeatHost() {
+  const leadId = useUI((s) => s.leadSeatId);
+  const close = useUI((s) => s.closeLeadSeat);
+  const { can } = useSession();
+  const lead = useWorkspace((s) => (leadId ? s.members[leadId] ?? s.unrosteredLeads.find((entry) => entry.id === leadId) : undefined));
+  if (!lead || !can("seats.assign")) return null;
+  return <LeadSeatDialog key={lead.id} lead={lead} onClose={close} />;
+}
 
 /**
  * Seat a team lead: an unrostered lead gets a roster record on first seating;
