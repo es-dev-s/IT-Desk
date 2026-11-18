@@ -69,6 +69,7 @@ export type WorkspaceState = {
   teamIds: string[];
   members: Record<string, Member>;
   memberIds: string[];
+  unrosteredLeads: WorkspaceResponse["unrosteredLeads"];
   transfers: Record<string, Transfer>;
   transferIds: string[];
   exits: Record<string, ExitRecord>;
@@ -93,6 +94,7 @@ export type WorkspaceActions = {
   upsertTransfer: (t: Transfer) => void;
   /** Seat (or unseat with null) a person. Admin: any seat; lead: own people inside the own zone. */
   assignSeat: (memberId: string, seatId: string | null) => Promise<ActionResult<{ member: Member }>>;
+  assignLeadSeat: (userId: string, seatId: string) => Promise<ActionResult<{ member: Member }>>;
   /** Merge one member the API returned (added or edited), ignoring older versions. */
   applyMember: (m: Member) => void;
   markExit: (input: {
@@ -123,6 +125,7 @@ const EMPTY: Omit<WorkspaceState, "status" | "loadError" | "syncError" | "lastSy
   teamIds: [],
   members: {},
   memberIds: [],
+  unrosteredLeads: [],
   transfers: {},
   transferIds: [],
   exits: {},
@@ -142,6 +145,7 @@ function fromSnapshot(ws: WorkspaceResponse) {
     teamIds: ws.teams.map((t) => t.id),
     members: indexById(ws.members),
     memberIds: ws.members.map((m) => m.id),
+    unrosteredLeads: ws.unrosteredLeads,
     transfers: indexById(ws.transfers),
     transferIds: ws.transfers.map((t) => t.id),
     exits: indexById(ws.exits),
@@ -486,6 +490,22 @@ export function createWorkspaceStore(initial: { permissions?: readonly string[] 
         }
       },
 
+      assignLeadSeat: async (userId, seatId) => {
+        if (!allowed("seats.assign") || get().user.role !== "admin") return DENIED;
+        begin();
+        try {
+          const member = await floorsApi.assignLeadSeat(userId, seatId);
+          get().applyMember(member);
+          return { ok: true, undoKey: "", member };
+        } catch (err) {
+          const failure = toFailure(err);
+          return { ...failure, error: failure.fields?.seat ?? failure.error };
+        } finally {
+          resync();
+          end();
+        }
+      },
+
       applyMember: (m) =>
         set((cur) => {
           const prev = cur.members[m.id];
@@ -502,6 +522,9 @@ export function createWorkspaceStore(initial: { permissions?: readonly string[] 
           return {
             members: { ...cur.members, [m.id]: m },
             memberIds: prev ? cur.memberIds : [...cur.memberIds, m.id],
+            unrosteredLeads: m.isLead && m.email
+              ? cur.unrosteredLeads.filter((lead) => lead.teamId !== m.teamId || lead.email.toLowerCase() !== m.email.toLowerCase())
+              : cur.unrosteredLeads,
           };
         }),
 

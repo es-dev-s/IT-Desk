@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { useChat } from "@/store/chat-store";
 
-/** Keeps the Messages nav badge fresh: every 20s while visible, and on focus. The Messages page polls faster itself. */
+/** Keeps direct and request unread badges fresh while the app is open. */
 export function ChatUnreadSync() {
   const refresh = useChat((s) => s.refresh);
-  const onMessages = usePathname() === "/messages";
   useEffect(() => {
-    if (onMessages) return;
     void refresh();
     const tick = () => {
       if (document.visibilityState === "visible") void refresh();
@@ -22,6 +19,6 @@ export function ChatUnreadSync() {
       document.removeEventListener("visibilitychange", tick);
       window.removeEventListener("focus", tick);
     };
-  }, [refresh, onMessages]);
+  }, [refresh]);
   return null;
 }

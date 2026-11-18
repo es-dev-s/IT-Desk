@@ -34,13 +34,17 @@ rejected requests are left out; seat-move transfers are not included.
   resolution note. A new or replacement device's number only appears if IT wrote
   it in that note.
 
+Use **Start Date**, **End Date**, and **Apply dates** to see tasks assigned or
+completed during that period. Both dates are inclusive in Nepal Time. **Print**
+and **Export to Excel** use the applied range and the caller's existing access.
+
 ## API
 
 ```
 GET /api/v1/reports/members   ?teamId=&q=&format=xlsx
-GET /api/v1/reports/it-tasks  ?teamId=&itMember=&status=completed|open&q=&format=xlsx&utcOffset=345
+GET /api/v1/reports/it-tasks  ?teamId=&itMember=&status=completed|open&q=&startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&format=xlsx
 ```
 
 `q` matches every word against the row's text. `format=xlsx` returns the
-workbook (written by `backend/internal/xlsx`, standard library only);
-`utcOffset` is minutes east of UTC for the dates in it.
+workbook (written by `backend/internal/xlsx`, standard library only).
+Unfiltered IT task exports also accept `utcOffset` (minutes east of UTC).

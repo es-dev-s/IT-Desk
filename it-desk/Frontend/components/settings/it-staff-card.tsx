@@ -84,7 +84,7 @@ export function ITStaffCard() {
     <Card data-testid="it-staff-card">
       <CardHeader
         title="IT staff"
-        description="People requesters can pick under “Assign to”. Link someone’s IT login and they see the chats routed to them and reply as themselves."
+        description="Link each IT member’s login so they can read and reply to direct messages and see requests routed to them."
       />
       {list && list.length ? (
         <div className="hidden items-center gap-3 border-t border-line bg-neutral-50/60 px-5 py-1.5 text-[11px] font-medium uppercase tracking-wide text-neutral-400 sm:flex">

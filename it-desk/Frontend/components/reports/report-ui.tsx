@@ -18,13 +18,11 @@ export function useDebounced<T>(value: T, ms = 250) {
 }
 
 /**
- * Loads a report whenever `key` changes. Keeps the previous rows on screen
- * while the next ones load, and drops answers that arrive out of order.
+ * Loads a report whenever `key` changes and drops answers that arrive out of
+ * order. `currentData` is only available for the current successful request.
  */
 export function useReport<T>(key: string, load: (signal: AbortSignal) => Promise<T>) {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState<{ key: string; attempt: number; data: T | null; error: string | null } | null>(null);
   const [attempt, setAttempt] = useState(0);
   const loadRef = useRef(load);
   useEffect(() => {
@@ -32,24 +30,27 @@ export function useReport<T>(key: string, load: (signal: AbortSignal) => Promise
   });
   useEffect(() => {
     const ctl = new AbortController();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch on filter change
-    setLoading(true);
     loadRef.current(ctl.signal).then(
       (d) => {
         if (ctl.signal.aborted) return;
-        setData(d);
-        setError(null);
-        setLoading(false);
+        setResult({ key, attempt, data: d, error: null });
       },
       (e: unknown) => {
         if (ctl.signal.aborted) return;
-        setError(e instanceof ApiError ? e.message : "Couldn’t load the report. Check your connection and try again.");
-        setLoading(false);
+        const error = e instanceof ApiError ? e.message : "Couldn’t load the report. Check your connection and try again.";
+        setResult((previous) => ({ key, attempt, data: previous?.data ?? null, error }));
       },
     );
     return () => ctl.abort();
   }, [key, attempt]);
-  return { data, error, loading, retry: () => setAttempt((n) => n + 1) };
+  const current = result?.key === key && result.attempt === attempt ? result : null;
+  return {
+    data: result?.data ?? null,
+    currentData: current?.error === null ? current.data : null,
+    error: current?.error ?? null,
+    loading: !current,
+    retry: () => setAttempt((n) => n + 1),
+  };
 }
 
 export function ExportButton({ href, disabled }: { href: string; disabled?: boolean }) {

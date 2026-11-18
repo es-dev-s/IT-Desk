@@ -420,6 +420,8 @@ export const floorsApi = {
   /** Seat a person (null = unseat). Admin: any seat; lead: own people inside own zone. */
   assignSeat: (memberId: string, body: { seatId: string | null; expectedVersion?: number }) =>
     request(`/members/${enc(memberId)}/seat`, { method: "PUT", body, schema: memberSchema, ...withKey() }),
+  assignLeadSeat: (userId: string, seatId: string) =>
+    request(`/admin/users/${enc(userId)}/seat`, { method: "POST", body: { seatId }, schema: memberSchema, ...withKey() }),
 };
 
 /* ----------------------------------------------------------------------------

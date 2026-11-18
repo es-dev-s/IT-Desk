@@ -1,7 +1,7 @@
 "use client";
 
 import * as Popover from "@radix-ui/react-popover";
-import { Check, ChevronsUpDown, Search, UserRoundX } from "lucide-react";
+import { Check, ChevronDown, ChevronsUpDown, Search, UserRoundX } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 import type { Team } from "@/lib/schemas";
 import { cn, pluralize } from "@/lib/utils";
@@ -41,6 +41,7 @@ export function TeamCombobox({
   prefix,
   testId = "team-combobox",
   disabled,
+  singleChevron = false,
 }: {
   teams: Team[];
   value: string;
@@ -60,6 +61,7 @@ export function TeamCombobox({
   prefix?: string;
   testId?: string;
   disabled?: boolean;
+  singleChevron?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -81,6 +83,7 @@ export function TeamCombobox({
 
   const selectedTeam = teams.find((t) => t.id === value) ?? null;
   const selectedExtra = selectedTeam ? null : (extras.find((o) => o.value === value) ?? null);
+  const Chevron = singleChevron ? ChevronDown : ChevronsUpDown;
 
   const choose = (v: string) => {
     onChange(v);
@@ -134,7 +137,7 @@ export function TeamCombobox({
         ) : (
           <span className={cn("min-w-0 truncate text-neutral-400", variant === "toolbar" && "pl-1")}>{placeholder}</span>
         )}
-        <ChevronsUpDown className="absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-neutral-400" aria-hidden />
+        <Chevron className={cn("absolute top-1/2 size-4 -translate-y-1/2 text-neutral-400", singleChevron ? "right-2" : "right-2.5")} aria-hidden />
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content

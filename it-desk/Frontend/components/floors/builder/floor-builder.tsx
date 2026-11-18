@@ -23,6 +23,7 @@ import {
   Undo2,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { floorsApi } from "@/lib/api";
@@ -129,6 +130,8 @@ const isTyping = (t: EventTarget | null) => t instanceof HTMLElement && (t.isCon
 
 /** Admin floor builder: paint the layout, number seats, paint team zones, publish. */
 export function FloorBuilder({ floorId }: { floorId: string }) {
+  const router = useRouter();
+  const liveFloorHref = `/floors?floor=${encodeURIComponent(floorId)}`;
   const b = useBuilderDoc(floorId);
   const { doc } = b;
   const [meta, setMeta] = useState<FloorSummary | null>(null);
@@ -166,6 +169,7 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
   const selection = useMemo(() => els.filter((e) => sel.has(e.id)), [els, sel]);
   const problems = Object.keys(issues).length;
   const seatCount = els.filter((e) => e.kind === "seat").length;
+  const canPublish = doc !== null && problems === 0 && seatCount > 0 && !zone.busy && b.save.state !== "conflict";
 
   // Drop selection entries that no longer exist (undo, erase).
   useEffect(() => {
@@ -332,7 +336,7 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
   };
 
   const publish = () => {
-    if (!doc || problems || !seatCount) return;
+    if (!canPublish) return;
     void zone.execute({
       title: `Publish ${meta?.name ?? "floor"}`,
       done: `${meta?.name ?? "Floor"} is live`,
@@ -352,10 +356,7 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
           floors: [floorId],
         };
       },
-      onDone: () => {
-        void loadMeta();
-        void b.reload();
-      },
+      onDone: () => router.replace(liveFloorHref),
     });
   };
 
@@ -509,14 +510,14 @@ export function FloorBuilder({ floorId }: { floorId: string }) {
           </Tip>
         ) : null}
         {meta?.status === "published" ? (
-          <Link href={`/floors?floor=${floorId}`} className={buttonClass("secondary", "md")}>
+          <Link href={liveFloorHref} className={buttonClass("secondary", "md")}>
             <Eye /> View live
           </Link>
         ) : null}
         <Button
           variant="primary"
           onClick={publish}
-          disabled={problems > 0 || !seatCount || zone.busy !== null || b.save.state === "conflict"}
+          disabled={!canPublish}
           title={problems ? "Fix the problems listed on the right first" : !seatCount ? "Add at least one seat" : "Publish (⌘↵)"}
           data-testid="publish-floor"
         >

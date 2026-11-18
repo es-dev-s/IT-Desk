@@ -344,6 +344,11 @@ export function FloorsView() {
           const z = floor ? seatsOf(floor).find((e) => e.teamId && colors[e.teamId]) : undefined;
           return z?.teamId ? colors[z.teamId] : undefined;
         })()} moving={Boolean(moving)} byTeam={byTeam} />
+        {canManage ? (
+          <Link href="/floors/manage" className={buttonClass("secondary", "md")} data-testid="manage-floors">
+            <LayoutGrid /> Manage floors
+          </Link>
+        ) : null}
       </div>
 
       {q ? (
@@ -477,15 +482,6 @@ export function FloorsView() {
                     aria-label="Edit layout"
                   >
                     <PencilRuler />
-                  </Link>
-                  <Link
-                    href="/floors/manage"
-                    className={buttonClass("ghost", "icon-sm")}
-                    data-testid="manage-floors"
-                    title="Manage floors"
-                    aria-label="Manage floors"
-                  >
-                    <LayoutGrid />
                   </Link>
                 </div>
               ) : null}

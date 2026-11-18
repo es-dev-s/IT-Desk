@@ -21,7 +21,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { EMPTY_REQUEST_FORM } from "@/lib/requests";
-import type { MemberDetail, MemberHistoryItem } from "@/lib/schemas";
+import type { MemberDetail, MemberHistoryItem, MemberStatus, UnrosteredLead } from "@/lib/schemas";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { onLive } from "@/lib/live-bus";
@@ -38,6 +38,7 @@ import { useSession } from "@/components/auth/session-provider";
 import { useUI } from "@/store/ui-store";
 import { useRequests } from "@/store/requests-store";
 import { useFloors, useOccupancy, useTeamColors, useTeamsById } from "@/store/selectors";
+import { useWorkspace } from "@/store/workspace-provider";
 
 type State = { status: "loading" } | { status: "error"; message: string; notFound: boolean } | { status: "ready"; data: MemberDetail };
 
@@ -46,6 +47,8 @@ export function MemberDetailSheet() {
   const { memberId, close } = useMemberDetailLink();
   // Keep the last id while the sheet animates out.
   const [shownId, setShownId] = useState(memberId);
+  const lead = useWorkspace((s) => s.unrosteredLeads.find((entry) => entry.id === shownId));
+  const loadingWorkspace = useWorkspace((s) => s.status === "idle" || s.status === "loading");
   if (memberId && memberId !== shownId) setShownId(memberId);
   return (
     <Sheet
@@ -55,7 +58,19 @@ export function MemberDetailSheet() {
       className="max-sm:left-0 max-sm:w-auto max-sm:max-w-none"
       header={<span />}
     >
-      {shownId ? <DetailBody key={shownId} id={shownId} onClose={close} /> : null}
+      {shownId ? (
+        <div className="flex min-h-0 flex-1 flex-col" data-testid="member-detail">
+          <div className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-line px-6 max-sm:px-4">
+            <p className="text-[13px] font-medium text-neutral-500">Member details</p>
+            <SheetClose />
+          </div>
+          {loadingWorkspace ? <DetailSkeleton /> : lead ? (
+            <DetailContent data={lead} onClose={close} />
+          ) : (
+            <DetailBody key={shownId} id={shownId} onClose={close} />
+          )}
+        </div>
+      ) : null}
     </Sheet>
   );
 }
@@ -103,11 +118,7 @@ function DetailBody({ id, onClose }: { id: string; onClose: () => void }) {
   }, [load]);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col" data-testid="member-detail">
-      <div className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-line px-6 max-sm:px-4">
-        <p className="text-[13px] font-medium text-neutral-500">Member details</p>
-        <SheetClose />
-      </div>
+    <>
       {state.status === "loading" ? (
         <DetailSkeleton />
       ) : state.status === "error" ? (
@@ -133,7 +144,7 @@ function DetailBody({ id, onClose }: { id: string; onClose: () => void }) {
       ) : (
         <DetailContent data={state.data} onClose={onClose} />
       )}
-    </div>
+    </>
   );
 }
 
@@ -183,68 +194,107 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
+function WorkEmailFact({ email }: { email: string }) {
+  return (
+    <div className="col-span-2 min-w-0 rounded-xl bg-neutral-900/[0.03] px-3 py-2 max-[380px]:col-span-1">
+      <dt className="text-[11px] text-neutral-500">Work email</dt>
+      <dd className="truncate text-[13px] font-medium text-neutral-900">
+        {email ? (
+          <a href={`mailto:${email}`} className="inline-flex items-center gap-1.5 hover:text-accent-ink">
+            <Mail className="size-3.5 text-neutral-400" aria-hidden />
+            {email}
+          </a>
+        ) : (
+          <span className="text-neutral-400">Not set</span>
+        )}
+      </dd>
+    </div>
+  );
+}
+
+function ProfileHeading({ name, title, status, teamName, isLead, hue }: {
+  name: string;
+  title: string;
+  status: MemberStatus;
+  teamName?: string;
+  isLead: boolean;
+  hue?: number;
+}) {
+  return (
+    <div className="flex items-center gap-4">
+      <span className="relative shrink-0">
+        <Avatar name={name} hue={hue} size="lg" ring={status === "active" ? true : "muted"} className={cn("size-14 text-base", isLead && "ring-2 ring-amber-400")} />
+        {isLead ? <LeadBadge compact className="absolute -right-1 -top-1" /> : null}
+      </span>
+      <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
+          <h2 className="truncate text-lg font-semibold tracking-[-0.02em] text-neutral-900" data-testid="member-detail-name">{name}</h2>
+          {isLead ? <LeadBadge /> : null}
+        </div>
+        <p className="truncate text-[13px] text-neutral-500">{title}</p>
+        <div className="mt-1.5 flex items-center gap-2">
+          <StatusPill status={status} />
+          {teamName ? <span className="truncate text-xs text-neutral-500">{teamName}</span> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const nptTime = (iso: string) => `${formatDateTime(iso)} NPT`;
 
-function DetailContent({ data, onClose }: { data: MemberDetail; onClose: () => void }) {
-  const m = data.member;
+function DetailContent({ data, onClose }: { data: MemberDetail | UnrosteredLead; onClose: () => void }) {
+  const person = "member" in data ? data.member : data;
+  const member = "status" in person ? person : null;
+  const designation = "title" in person ? person.title || "Team Lead" : person.role;
+  const status = member?.status ?? "active";
+  const devices = member?.devices ?? [];
+  const history = "history" in data ? data.history : [];
   const { can } = useSession();
   const teams = useTeamsById();
   const openMemberDialog = useUI((s) => s.openMemberDialog);
   const openTransfer = useUI((s) => s.openTransfer);
   const openExit = useUI((s) => s.openExit);
   const openRequest = useRequests((s) => s.openDialog);
-  const active = m.status === "active";
-  const team = teams[m.teamId];
+  const active = status === "active";
+  const team = teams[person.teamId];
   // Close first so only one overlay owns focus; the next dialog opens on the page.
   const then = (fn: () => void) => () => {
     onClose();
     setTimeout(fn, 0);
   };
-  const actions = [
-    can("members.manage") && { id: "edit", label: "Edit", icon: PencilLine, run: then(() => openMemberDialog(m.id)) },
-    active && can("transfers.create") && { id: "transfer", label: "Transfer", icon: ArrowLeftRight, run: then(() => openTransfer([m.id], "team")) },
-    active && can("transfers.create") && { id: "seat", label: "Move seat", icon: Armchair, run: then(() => openTransfer([m.id], "internal")) },
+  const actions = member ? [
+    can("members.manage") && { id: "edit", label: "Edit", icon: PencilLine, run: then(() => openMemberDialog(member.id)) },
+    active && can("transfers.create") && { id: "transfer", label: "Transfer", icon: ArrowLeftRight, run: then(() => openTransfer([member.id], "team")) },
+    active && can("transfers.create") && { id: "seat", label: "Move seat", icon: Armchair, run: then(() => openTransfer([member.id], "internal")) },
     active && can("requests.create") && {
       id: "request",
       label: "Request IT",
       icon: LifeBuoy,
-      run: then(() => openRequest({ ...EMPTY_REQUEST_FORM, forMemberId: m.id, teamId: m.teamId })),
+      run: then(() => openRequest({ ...EMPTY_REQUEST_FORM, forMemberId: member.id, teamId: member.teamId })),
     },
     active && can("requests.create") && {
       id: "issue",
       label: "Report issue",
       icon: TriangleAlert,
-      run: then(() => openRequest({ ...EMPTY_REQUEST_FORM, type: "issue", forMemberId: m.id, teamId: m.teamId })),
+      run: then(() => openRequest({ ...EMPTY_REQUEST_FORM, type: "issue", forMemberId: member.id, teamId: member.teamId })),
     },
-    active && can("exits.create") && { id: "resigned", label: "Mark resigned", icon: UserX, danger: true, run: then(() => openExit("resigned", [m.id])) },
-    active && can("exits.create") && { id: "unknown", label: "Mark unknown", icon: CircleHelp, run: then(() => openExit("unknown", [m.id])) },
-  ].filter(Boolean) as { id: string; label: string; icon: React.ComponentType; danger?: boolean; run: () => void }[];
+    active && can("exits.create") && { id: "resigned", label: "Mark resigned", icon: UserX, danger: true, run: then(() => openExit("resigned", [member.id])) },
+    active && can("exits.create") && { id: "unknown", label: "Mark unknown", icon: CircleHelp, run: then(() => openExit("unknown", [member.id])) },
+  ].filter((action) => action !== false) : [];
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
       {/* Header */}
       <div className="px-6 pb-5 pt-6 max-sm:px-4">
-        <div className="flex items-center gap-4">
-          <span className="relative shrink-0">
-            <Avatar name={m.name} hue={m.hue} size="lg" ring={active ? true : "muted"} className={cn("size-14 text-base", m.isLead && "ring-2 ring-amber-400")} />
-            {m.isLead ? <LeadBadge compact className="absolute -right-1 -top-1" /> : null}
-          </span>
-          <div className="min-w-0">
-            <div className="flex min-w-0 items-center gap-2">
-              <h2 className="truncate text-lg font-semibold tracking-[-0.02em] text-neutral-900" data-testid="member-detail-name">
-                {m.name}
-              </h2>
-              {m.isLead ? <LeadBadge /> : null}
-            </div>
-            <p className="truncate text-[13px] text-neutral-500">
-              {m.role} · {m.subGroup}
-            </p>
-            <div className="mt-1.5 flex items-center gap-2">
-              <StatusPill status={m.status} />
-              {team ? <span className="truncate text-xs text-neutral-500">{team.name}</span> : null}
-            </div>
-          </div>
-        </div>
+        <ProfileHeading
+          name={person.name}
+          title={member ? `${designation} · ${member.subGroup}` : designation}
+          status={status}
+          teamName={team?.name}
+          isLead={member?.isLead ?? true}
+          hue={member?.hue}
+        />
         {actions.length ? (
           <div className="mt-5 flex flex-wrap gap-2" data-testid="member-detail-actions">
             {actions.map((a) => (
@@ -259,35 +309,23 @@ function DetailContent({ data, onClose }: { data: MemberDetail; onClose: () => v
 
       <Section title="Profile" icon={Building2}>
         <dl className="grid grid-cols-2 gap-2 max-[380px]:grid-cols-1">
-          <Fact label="Designation">{m.role}</Fact>
-          <Fact label="Group">{m.subGroup}</Fact>
+          <Fact label="Designation">{designation}</Fact>
+          <Fact label="Group">{member?.subGroup ?? "—"}</Fact>
           <Fact label="Team">{team?.name ?? "—"}</Fact>
-          <Fact label="Status">{MEMBER_STATUS_LABEL[m.status]}</Fact>
-          <div className="col-span-2 min-w-0 rounded-xl bg-neutral-900/[0.03] px-3 py-2 max-[380px]:col-span-1">
-            <dt className="text-[11px] text-neutral-500">Work email</dt>
-            <dd className="truncate text-[13px] font-medium text-neutral-900">
-              {m.email ? (
-                <a href={`mailto:${m.email}`} className="inline-flex items-center gap-1.5 hover:text-accent-ink">
-                  <Mail className="size-3.5 text-neutral-400" aria-hidden />
-                  {m.email}
-                </a>
-              ) : (
-                <span className="text-neutral-400">Not set</span>
-              )}
-            </dd>
-          </div>
-          {m.employeeId ? <Fact label="Employee ID">{m.employeeId}</Fact> : null}
+          <Fact label="Status">{MEMBER_STATUS_LABEL[status]}</Fact>
+          <WorkEmailFact email={person.email} />
+          {member?.employeeId ? <Fact label="Employee ID">{member.employeeId}</Fact> : null}
         </dl>
       </Section>
 
       <Section title="Seat" icon={MapPin} testId="member-detail-seat">
-        <SeatLocator seatId={m.seatId} floorId={m.floorId} seat={m.seat} name={m.name} />
+        <SeatLocator seatId={member?.seatId ?? null} floorId={member?.floorId ?? null} seat={member?.seat ?? null} name={person.name} />
       </Section>
 
-      <Section title={`Devices · ${m.devices.length}`} icon={Laptop} testId="member-detail-devices">
-        {m.devices.length ? (
+      <Section title={`Devices · ${devices.length}`} icon={Laptop} testId="member-detail-devices">
+        {devices.length ? (
           <ul className="divide-y divide-line overflow-hidden rounded-xl ring-1 ring-line">
-            {m.devices.map((d) => {
+            {devices.map((d) => {
               const Icon = DEVICE_ICON[d.kind];
               return (
                 <li key={d.id} className="flex items-center gap-3 px-3 py-2.5">
@@ -309,9 +347,9 @@ function DetailContent({ data, onClose }: { data: MemberDetail; onClose: () => v
       </Section>
 
       <Section title="History" icon={History} testId="member-detail-history">
-        {data.history.length ? (
+        {history.length ? (
           <ol className="relative space-y-4 before:absolute before:bottom-2 before:left-[11px] before:top-2 before:w-px before:bg-line">
-            {data.history.map((h, i) => (
+            {history.map((h, i) => (
               <TimelineItem key={`${h.kind}-${h.refId ?? ""}-${h.at}-${i}`} item={h} />
             ))}
           </ol>
@@ -320,13 +358,15 @@ function DetailContent({ data, onClose }: { data: MemberDetail; onClose: () => v
         )}
       </Section>
 
-      <div className="flex flex-wrap gap-x-6 gap-y-1 border-t border-line px-6 py-4 text-xs text-neutral-500 max-sm:px-4" data-testid="member-detail-times">
-        <span className="inline-flex items-center gap-1.5">
-          <Clock3 className="size-3.5" aria-hidden />
-          Created {nptTime(data.createdAt)}
-        </span>
-        <span>Updated {nptTime(data.updatedAt)}</span>
-      </div>
+      {"createdAt" in data ? (
+        <div className="flex flex-wrap gap-x-6 gap-y-1 border-t border-line px-6 py-4 text-xs text-neutral-500 max-sm:px-4" data-testid="member-detail-times">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock3 className="size-3.5" aria-hidden />
+            Created {nptTime(data.createdAt)}
+          </span>
+          <span>Updated {nptTime(data.updatedAt)}</span>
+        </div>
+      ) : null}
     </div>
   );
 }

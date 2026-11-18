@@ -7,6 +7,42 @@ import (
 	"itdesk/backend/internal/domain"
 )
 
+func TestWorkspaceIncludesUnrosteredLeadsForAdmin(t *testing.T) {
+	st, lead := setup(t)
+	ctx := context.Background()
+	if _, err := st.db.Pool.Exec(ctx, `UPDATE members SET email = CASE id
+		WHEN 'm1' THEN upper($1::text) WHEN 'm2' THEN $2::text END
+		WHERE id IN ('m1', 'm2')`, leadT1.Email, leadT2.Email); err != nil {
+		t.Fatal(err)
+	}
+
+	ws, err := st.Workspace(ctx, as(adminU), "t1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ws.UnrosteredLeads) != 1 {
+		t.Fatalf("expected only the lead without a member on their own team: %+v", ws.UnrosteredLeads)
+	}
+	got := ws.UnrosteredLeads[0]
+	if got.ID != leadT2.ID || got.TeamID != leadT2.TeamID || got.Title != leadT2.Title {
+		t.Errorf("incorrect lead account: %+v", got)
+	}
+	if len(ws.Members) != 4 {
+		t.Errorf("expected four existing roster records, got %d", len(ws.Members))
+	}
+	member, err := st.Member(ctx, as(adminU), "m1")
+	if err != nil || !member.IsLead || member.Seat == nil || *member.Seat != "A-1" {
+		t.Errorf("matched lead should keep their seat and lead flag: %+v, %v", member, err)
+	}
+
+	for _, actor := range []Actor{lead, as(itU)} {
+		ws, err := st.Workspace(ctx, actor, "")
+		if err != nil || len(ws.UnrosteredLeads) != 0 {
+			t.Errorf("%s workspace exposed account-only leads: %+v, %v", actor.User.Role, ws.UnrosteredLeads, err)
+		}
+	}
+}
+
 // Lead status is admin-only: a team lead can't create, promote, demote or
 // transfer out a lead, and editing a lead keeps the flag when it's omitted.
 func TestLeadFlagIsAdminOnly(t *testing.T) {

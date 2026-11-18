@@ -9,192 +9,234 @@ import (
 	"itdesk/backend/internal/domain"
 )
 
-// A lead sees every IT member as a conversation, writes to any of them
-// directly (no request needed) and each pair keeps one continuous thread.
-func TestDirectChatLeadToAnyITMember(t *testing.T) {
+func TestRequestChatScopingUnreadAndStaff(t *testing.T) {
 	st, lead := setup(t)
 	ctx := context.Background()
 	lead2, admin, it := as(leadT2), as(adminU), as(itU)
 	clock := time.Date(2026, 3, 1, 9, 0, 0, 0, time.UTC)
 	st.Now = func() time.Time { clock = clock.Add(time.Second); return clock }
-	akash, manish := "its_akash_adhikari", "its_manish_yadav"
 
-	// Every active IT member is listed for a lead, before anyone has written.
+	staff := "its_akash_adhikari"
+	r1, err := st.CreateITRequest(ctx, lead, domain.ITRequestInput{Items: []domain.ITRequestItem{{Kind: "laptop", Quantity: 1}}, Notes: "New joiner laptop", Priority: "normal", StaffID: staff})
+	if err != nil {
+		t.Fatal(err)
+	}
+	r2, err := st.CreateITRequest(ctx, lead2, domain.ITRequestInput{Items: []domain.ITRequestItem{{Kind: "mouse", Quantity: 1}}, Notes: "Mouse is broken", Priority: "low"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Team scoping: the other team's conversation does not exist for a lead.
+	if _, err := st.PostChatMessage(ctx, lead, r2.ID, "hello", "", nil); !errors.Is(err, errRequestNotFound) {
+		t.Fatalf("lead posting on another team's request: %v", err)
+	}
+	if _, err := st.ChatMessages(ctx, lead, r2.ID, ""); !errors.Is(err, errRequestNotFound) {
+		t.Fatalf("lead reading another team's chat: %v", err)
+	}
+	if _, err := st.MarkChatRead(ctx, lead, r2.ID); !errors.Is(err, errRequestNotFound) {
+		t.Fatalf("lead marking another team's chat: %v", err)
+	}
 	list, err := st.Chats(ctx, lead, ChatFilter{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(list.Items) != 5 || list.Items[0].Staff.ID != manish || list.Items[0].LastMessage != nil || list.Items[0].LastActivityAt != nil ||
-		!list.Items[0].CanPost || list.Items[0].Side != domain.ChatSideLead || list.Items[0].Lead.ID != lead.User.ID {
-		t.Fatalf("lead list: %+v", list.Items)
-	}
-	// IT and admins only list conversations that have started.
-	if l, _ := st.Chats(ctx, it, ChatFilter{}); len(l.Items) != 0 {
-		t.Fatalf("IT list before any message: %+v", l.Items)
+	if len(list.Items) != 1 || list.Items[0].Request.ID != r1.ID {
+		t.Fatalf("lead chats: %+v", list.Items)
 	}
 
-	// Lead → Akash, with no request involved.
-	m1, err := st.PostChatMessage(ctx, lead, lead.User.ID, akash, "  Hi Akash,\r\n\r\n\r\n\r\n\r\nquick question  ", nil)
+	// Requester → IT.
+	m1, err := st.PostChatMessage(ctx, lead, r1.ID, "  Hi Akash,\r\n\r\n\r\n\r\n\r\nwhen can we expect it?  ", "", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if m1.Side != "lead" || m1.SenderName != "Lead One" || !m1.Mine || m1.StaffID != akash || m1.Body != "Hi Akash,\n\n\nquick question" {
-		t.Fatalf("lead message: %+v", m1)
+	if m1.Side != "requester" || m1.SenderName != "Lead One" || !m1.Mine || m1.StaffID != nil || m1.Body != "Hi Akash,\n\n\nwhen can we expect it?" {
+		t.Fatalf("requester message: %+v", m1)
 	}
-
-	// A lead can't open or write in another lead's conversation.
-	if _, err := st.PostChatMessage(ctx, lead2, lead.User.ID, akash, "hi", nil); !errors.Is(err, errChatNotFound) {
-		t.Fatalf("other lead posting: %v", err)
+	if _, err := st.PostChatMessage(ctx, lead, r1.ID, "x", "it", nil); !errors.Is(err, errChatSide) {
+		t.Fatalf("lead posting as IT: %v", err)
 	}
-	if _, err := st.ChatMessages(ctx, lead2, lead.User.ID, akash, ""); !errors.Is(err, errChatNotFound) {
-		t.Fatalf("other lead reading: %v", err)
+	if _, err := st.PostChatMessage(ctx, it, r1.ID, "x", "requester", nil); !errors.Is(err, errChatSide) {
+		t.Fatalf("IT posting as requester: %v", err)
 	}
-	if _, err := st.ChatMessages(ctx, lead, lead.User.ID, "its_nobody", ""); !errors.Is(err, errChatNotFound) {
-		t.Fatalf("unknown staff: %v", err)
-	}
-	// Only team leads have direct conversations with IT.
-	if _, err := st.ChatMessages(ctx, it, admin.User.ID, akash, ""); !errors.Is(err, errChatNotFound) {
-		t.Fatalf("admin as the lead side: %v", err)
-	}
-
-	// Unread for IT; nothing for the lead who wrote it.
-	if u, _ := st.ChatUnread(ctx, it); u.Unread != 1 || u.UnreadChats != 1 {
-		t.Fatalf("IT unread: %+v", u)
-	}
-	if u, _ := st.ChatUnread(ctx, lead); u.Unread != 0 {
-		t.Fatalf("lead unread: %+v", u)
-	}
-
-	// IT replies in the same conversation, shown as Akash (written on his behalf).
-	m2, err := st.PostChatMessage(ctx, it, lead.User.ID, akash, "Sure, what is it?", nil)
-	if err != nil || m2.Side != "it" || m2.SenderName != "Akash Adhikari" || !m2.OnBehalf || m2.AuthorName != "Ivan Tech" {
-		t.Fatalf("IT reply: %+v %v", m2, err)
-	}
-	// A message to Manish is a separate thread.
-	if _, err := st.PostChatMessage(ctx, lead, lead.User.ID, manish, "Hello Manish", nil); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := st.PostChatMessage(ctx, lead, lead.User.ID, akash, "My monitor flickers.", nil); err != nil {
-		t.Fatal(err)
-	}
-
-	th, err := st.ChatMessages(ctx, lead, lead.User.ID, akash, "")
-	if err != nil || len(th.Messages) != 3 || th.Thread.Staff.Name != "Akash Adhikari" || th.Thread.MessageCount != 3 {
-		t.Fatalf("akash thread: %+v %v", th, err)
-	}
-	if th.Thread.OtherReadAt == nil {
-		t.Fatalf("IT replied, so it has read the conversation: %+v", th.Thread)
-	}
-	after, err := st.ChatMessages(ctx, lead, lead.User.ID, akash, m1.ID)
-	if err != nil || len(after.Messages) != 2 || after.Messages[0].ID != m2.ID {
-		t.Fatalf("poll after: %+v %v", after.Messages, err)
-	}
-
-	// Latest activity first in the lead's list; preview from the latest message.
-	list, _ = st.Chats(ctx, lead, ChatFilter{})
-	if len(list.Items) != 5 || list.Items[0].Staff.ID != akash || list.Items[0].LastMessage == nil ||
-		list.Items[0].LastMessage.Body != "My monitor flickers." || list.Items[1].Staff.ID != manish {
-		t.Fatalf("lead list order: %+v", list.Items[:2])
-	}
-	if u, _ := st.ChatUnread(ctx, lead); u.Unread != 0 {
-		t.Fatalf("lead wrote after the reply, so nothing unread: %+v", u)
-	}
-	if u, _ := st.MarkChatRead(ctx, it, lead.User.ID, akash); u.Unread != 1 || u.UnreadChats != 1 {
-		t.Fatalf("IT after reading Akash's thread: %+v", u)
-	}
-
-	// Admin: reads everything, writes nothing, reading doesn't count.
-	for _, staff := range []string{akash, manish} {
-		if _, err := st.PostChatMessage(ctx, admin, lead.User.ID, staff, "Noted.", nil); !errors.Is(err, errChatViewOnly) {
-			t.Fatalf("admin post: %v, want view only", err)
+	for _, c := range []struct {
+		who  Actor
+		want int
+	}{{it, 1}, {admin, 0}, {lead, 0}, {lead2, 0}} {
+		u, err := st.ChatUnread(ctx, c.who)
+		if err != nil || u.Unread != c.want {
+			t.Errorf("%s unread = %+v %v, want %d", c.who.User.Email, u, err, c.want)
 		}
 	}
-	adm, err := st.Chats(ctx, admin, ChatFilter{})
-	if err != nil || len(adm.Items) != 2 || adm.Items[0].CanPost || adm.Items[0].Unread != 0 || adm.Unread != 0 {
-		t.Fatalf("admin list: %+v %v", adm, err)
-	}
-	if _, err := st.MarkChatRead(ctx, admin, lead.User.ID, manish); err != nil {
+
+	// IT → requester, shown as the routed staff member, written by Ivan.
+	m2, err := st.PostChatMessage(ctx, it, r1.ID, "Tomorrow morning.", "", nil)
+	if err != nil {
 		t.Fatal(err)
+	}
+	if m2.Side != "it" || m2.SenderName != "Akash Adhikari" || m2.StaffID == nil || *m2.StaffID != staff || !m2.OnBehalf || m2.AuthorName != "Ivan Tech" {
+		t.Fatalf("IT message: %+v", m2)
+	}
+	if u, _ := st.ChatUnread(ctx, it); u.Unread != 0 {
+		t.Errorf("replying marks IT's side read: %+v", u)
+	}
+	if u, _ := st.ChatUnread(ctx, lead); u.Unread != 1 || u.UnreadChats != 1 {
+		t.Errorf("lead unread after reply: %+v", u)
+	}
+	th, err := st.ChatMessages(ctx, lead, r1.ID, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(th.Messages) != 2 || th.Messages[0].ID != m1.ID || th.Thread.Unread != 1 || th.Thread.Side != "requester" || th.Thread.LastMessage == nil || th.Thread.LastMessage.ID != m2.ID {
+		t.Fatalf("thread: %+v", th)
+	}
+	if th.Thread.OtherReadAt == nil {
+		t.Errorf("IT read it when replying: otherReadAt should be set")
+	}
+	after, err := st.ChatMessages(ctx, lead, r1.ID, m1.ID)
+	if err != nil || len(after.Messages) != 1 || after.Messages[0].ID != m2.ID {
+		t.Fatalf("poll after m1: %+v %v", after.Messages, err)
+	}
+	if u, err := st.MarkChatRead(ctx, lead, r1.ID); err != nil || u.Unread != 0 {
+		t.Fatalf("mark read: %+v %v", u, err)
+	}
+
+	// Admin: view only on a conversation between a lead and IT, whichever side they name.
+	for _, as := range []string{"", "it", "requester"} {
+		if _, err := st.PostChatMessage(ctx, admin, r1.ID, "Noted.", as, nil); !errors.Is(err, errChatViewOnly) {
+			t.Fatalf("admin post as %q: %v, want view only", as, err)
+		}
+	}
+	adminView, err := st.ChatMessages(ctx, admin, r1.ID, "")
+	if err != nil || len(adminView.Messages) != 2 || len(adminView.Thread.CanPostAs) != 0 || adminView.Thread.Unread != 0 {
+		t.Fatalf("admin view: %+v %v", adminView.Thread, err)
+	}
+	// An admin opening it is not IT reading it.
+	if _, err := st.PostChatMessage(ctx, lead, r1.ID, "Thanks!", "", nil); err != nil {
+		t.Fatal(err)
+	}
+	if u, err := st.MarkChatRead(ctx, admin, r1.ID); err != nil || u.Unread != 0 {
+		t.Fatalf("admin mark read: %+v %v", u, err)
 	}
 	if u, _ := st.ChatUnread(ctx, it); u.Unread != 1 {
 		t.Fatalf("IT unread after an admin looked: %+v", u)
 	}
 
-	// Search by name and by message text.
-	if f, _ := st.Chats(ctx, lead, ChatFilter{Query: "manish"}); len(f.Items) != 1 || f.Items[0].Staff.ID != manish {
-		t.Errorf("search by name: %+v", f.Items)
-	}
-	if f, _ := st.Chats(ctx, lead, ChatFilter{Query: "flickers"}); len(f.Items) != 1 || f.Items[0].Staff.ID != akash {
-		t.Errorf("search by message: %+v", f.Items)
-	}
-
-	// Someone who left IT: the conversation stays readable, new messages are
-	// refused, and they drop out of other leads' lists.
-	if _, err := st.db.Pool.Exec(ctx, `UPDATE it_staff SET active = false WHERE id = $1`, akash); err != nil {
+	// Unrouted request: IT replies as "IT team"; once Ivan's account is linked
+	// to a directory entry, he speaks as himself.
+	if _, err := st.PostChatMessage(ctx, it, r2.ID, "Which desk?", "", nil); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := st.PostChatMessage(ctx, lead, lead.User.ID, akash, "Still there?", nil); !errors.Is(err, errChatClosed) {
-		t.Fatalf("post to former staff: %v", err)
+	th2, _ := st.ChatMessages(ctx, lead2, r2.ID, "")
+	if got := th2.Messages[0]; got.SenderName != "IT team" || got.StaffID != nil || got.OnBehalf {
+		t.Fatalf("unrouted IT message: %+v", got)
 	}
-	if l, _ := st.Chats(ctx, lead, ChatFilter{}); len(l.Items) != 5 || l.Items[0].Staff.ID != akash || l.Items[0].CanPost {
-		t.Fatalf("lead keeps the old thread: %+v", l.Items[0])
+	if _, err := st.db.Pool.Exec(ctx, `UPDATE it_staff SET user_id = 'usr_it' WHERE id = 'its_abash_thapa'`); err != nil {
+		t.Fatal(err)
 	}
-	if l, _ := st.Chats(ctx, lead2, ChatFilter{}); len(l.Items) != 4 {
-		t.Fatalf("other lead's list: %d", len(l.Items))
+	m5, err := st.PostChatMessage(ctx, it, r1.ID, "On my way.", "", nil)
+	if err != nil || m5.SenderName != "Abash Thapa" || m5.OnBehalf {
+		t.Fatalf("linked staff message: %+v %v", m5, err)
+	}
+
+	// Filters and ordering.
+	all, _ := st.Chats(ctx, admin, ChatFilter{})
+	if len(all.Items) != 2 || all.Items[0].Request.ID != r1.ID {
+		t.Fatalf("admin chats (latest activity first): %+v", all.Items)
+	}
+	if closed, _ := st.Chats(ctx, admin, ChatFilter{Status: "closed"}); len(closed.Items) != 0 {
+		t.Errorf("closed filter: %d", len(closed.Items))
+	}
+	if found, _ := st.Chats(ctx, admin, ChatFilter{Query: "which desk"}); len(found.Items) != 1 || found.Items[0].Request.ID != r2.ID {
+		t.Errorf("search by message body: %+v", found.Items)
+	}
+	if _, err := st.Chats(ctx, admin, ChatFilter{Status: "bogus"}); err == nil {
+		t.Errorf("bad status filter accepted")
 	}
 
 	// Validation.
 	for _, body := range []string{"", "   \n ", string(make([]rune, domain.MaxMessageBody+1))} {
-		if _, err := st.PostChatMessage(ctx, lead, lead.User.ID, manish, body, nil); err == nil {
+		if _, err := st.PostChatMessage(ctx, lead, r1.ID, body, "", nil); err == nil {
 			t.Errorf("accepted body of %d runes", len([]rune(body)))
 		}
 	}
 	var audits int
-	_ = st.db.Pool.QueryRow(ctx, `SELECT count(*) FROM audit_log WHERE action = 'chat.message'`).Scan(&audits)
-	if audits != 4 {
-		t.Errorf("audited %d messages, want 4", audits)
+	_ = st.db.Pool.QueryRow(ctx, `SELECT count(*) FROM audit_log WHERE action = 'it_request.message'`).Scan(&audits)
+	if audits != 5 {
+		t.Errorf("audited %d messages, want 5", audits)
 	}
 }
 
-// IT staff with their own login see only their own conversations and write
-// as themselves; they can't open someone else's.
-func TestDirectChatLinkedITMember(t *testing.T) {
+// One lead raising several requests has a single conversation holding all of
+// them, each message tagged with its own REQ id; another lead stays separate.
+func TestChatConsolidatesRequestsPerLead(t *testing.T) {
 	st, lead := setup(t)
 	ctx := context.Background()
-	it := as(itU)
-	mine, other := "its_abash_thapa", "its_akash_adhikari"
-	if _, err := st.db.Pool.Exec(ctx, `UPDATE it_staff SET user_id = 'usr_it' WHERE id = $1`, mine); err != nil {
-		t.Fatal(err)
-	}
-	for _, staff := range []string{mine, other} {
-		if _, err := st.PostChatMessage(ctx, lead, lead.User.ID, staff, "Hello", nil); err != nil {
+	lead2, admin := as(leadT2), as(adminU)
+	clock := time.Date(2026, 3, 1, 9, 0, 0, 0, time.UTC)
+	st.Now = func() time.Time { clock = clock.Add(time.Second); return clock }
+	item := []domain.ITRequestItem{{Kind: "mouse", Quantity: 1}}
+	var ids []string
+	for i := 0; i < 3; i++ {
+		r, err := st.CreateITRequest(ctx, lead, domain.ITRequestInput{Items: item, Notes: "Another mouse please", Priority: "normal"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		ids = append(ids, r.ID)
+		if _, err := st.PostChatMessage(ctx, lead, r.ID, "about "+r.Ticket, "", nil); err != nil {
 			t.Fatal(err)
 		}
 	}
-	l, err := st.Chats(ctx, it, ChatFilter{})
-	if err != nil || len(l.Items) != 1 || l.Items[0].Staff.ID != mine || l.MyStaffID == nil || *l.MyStaffID != mine ||
-		l.Items[0].Lead.Name != "Lead One" || l.Items[0].Lead.TeamName == nil || *l.Items[0].Lead.TeamName != "Platform" {
-		t.Fatalf("linked IT list: %+v %v", l, err)
+	other, err := st.CreateITRequest(ctx, lead2, domain.ITRequestInput{Items: item, Notes: "Different team request", Priority: "normal"})
+	if err != nil {
+		t.Fatal(err)
 	}
-	if u, _ := st.ChatUnread(ctx, it); u.Unread != 1 || u.UnreadChats != 1 {
-		t.Fatalf("linked IT unread: %+v", u)
+
+	// An admin sees the same conversations but has nothing unread in them.
+	if al, err := st.Chats(ctx, admin, ChatFilter{}); err != nil || len(al.Items) != 2 || al.UnreadChats != 0 || al.Unread != 0 {
+		t.Fatalf("admin list: %+v %v", al, err)
 	}
-	if _, err := st.ChatMessages(ctx, it, lead.User.ID, other, ""); !errors.Is(err, errChatNotFound) {
-		t.Fatalf("someone else's conversation: %v", err)
+	list, err := st.Chats(ctx, as(itU), ChatFilter{})
+	if err != nil || len(list.Items) != 2 || list.UnreadChats != 1 || list.Unread != 3 {
+		t.Fatalf("IT list: %+v %v", list, err)
 	}
-	m, err := st.PostChatMessage(ctx, it, lead.User.ID, mine, "On it.", nil)
-	if err != nil || m.SenderName != "Abash Thapa" || m.OnBehalf || !m.Mine {
-		t.Fatalf("linked reply: %+v %v", m, err)
+	var conv *domain.ChatThread
+	for i := range list.Items {
+		if list.Items[i].Request.ID == other.ID && len(list.Items[i].Requests) != 1 {
+			t.Fatalf("other lead merged: %+v", list.Items[i].Requests)
+		}
+		if len(list.Items[i].Requests) == 3 {
+			conv = &list.Items[i]
+		}
 	}
-	th, _ := st.ChatMessages(ctx, lead, lead.User.ID, mine, "")
-	if got := th.Messages[len(th.Messages)-1]; got.SenderName != "Abash Thapa" || got.OnBehalf || got.Mine {
-		t.Fatalf("lead's view: %+v", got)
+	if conv == nil || conv.MessageCount != 3 || conv.Unread != 3 || conv.Request.ID != ids[2] {
+		t.Fatalf("lead conversation: %+v", conv)
 	}
-	// IT can start a conversation with a lead who hasn't written yet.
-	if _, err := st.PostChatMessage(ctx, it, leadT2.ID, mine, "Your laptop is ready.", nil); err != nil {
-		t.Fatalf("IT starting a conversation: %v", err)
+
+	// Opening through any of the lead's requests shows the same conversation.
+	for _, id := range ids {
+		th, err := st.ChatMessages(ctx, lead, id, "")
+		if err != nil || len(th.Messages) != 3 || len(th.Thread.Requests) != 3 {
+			t.Fatalf("thread via %s: %+v %v", id, th, err)
+		}
+		for i, m := range th.Messages {
+			if m.RequestID != ids[i] || m.Ticket == "" {
+				t.Fatalf("message %d not tagged with its request: %+v", i, m)
+			}
+		}
 	}
-	if l, _ := st.Chats(ctx, as(leadT2), ChatFilter{}); l.Items[0].Staff.ID != mine || l.Items[0].Unread != 1 {
-		t.Fatalf("lead two sees it first: %+v", l.Items[0])
+	// The other lead's request is not part of it, and polling spans requests.
+	if th, _ := st.ChatMessages(ctx, admin, ids[0], ""); len(th.Messages) != 3 {
+		t.Fatalf("admin view: %d", len(th.Messages))
+	}
+	if th, err := st.ChatMessages(ctx, admin, ids[0], ""); err == nil {
+		first := th.Messages[0].ID
+		if p, _ := st.ChatMessages(ctx, admin, ids[1], first); len(p.Messages) != 2 {
+			t.Fatalf("poll after first: %d", len(p.Messages))
+		}
+	}
+
+	// Reading the conversation clears every request in it.
+	if u, err := st.MarkChatRead(ctx, as(itU), ids[1]); err != nil || u.Unread != 0 || u.UnreadChats != 0 {
+		t.Fatalf("after read: %+v %v", u, err)
 	}
 }

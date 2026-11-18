@@ -349,6 +349,24 @@ func loadSettings(ctx context.Context, q querier, userID string) (domain.Setting
 	return s, nil
 }
 
+func loadUnrosteredLeads(ctx context.Context, q querier) ([]domain.UnrosteredLead, error) {
+	rows, err := q.Query(ctx, `SELECT u.id, u.name, u.team_id, u.title, u.email
+		FROM users u
+		WHERE u.role = 'team_lead' AND u.status = 'active' AND u.team_id IS NOT NULL
+		AND NOT EXISTS (
+			SELECT 1 FROM members m WHERE m.team_id = u.team_id AND lower(m.email) = lower(u.email)
+		)
+		ORDER BY u.name, u.id`)
+	if err != nil {
+		return nil, err
+	}
+	return pgx.CollectRows(rows, func(row pgx.CollectableRow) (domain.UnrosteredLead, error) {
+		var lead domain.UnrosteredLead
+		err := row.Scan(&lead.ID, &lead.Name, &lead.TeamID, &lead.Title, &lead.Email)
+		return lead, err
+	})
+}
+
 // Workspace reads the dashboard snapshot in one consistent transaction,
 // scoped to the actor. teamID selects the team in focus for org-wide roles
 // (admin team switcher); team leads are always pinned to their own team.
@@ -384,6 +402,9 @@ func (s *Store) Workspace(ctx context.Context, actor Actor, teamID string) (doma
 				return err
 			}
 			if actor.User.Role == "admin" {
+				if w.UnrosteredLeads, err = loadUnrosteredLeads(ctx, tx); err != nil {
+					return err
+				}
 				if w.Exits, err = loadExits(ctx, tx, ""); err != nil {
 					return err
 				}

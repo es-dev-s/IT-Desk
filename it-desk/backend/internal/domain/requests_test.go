@@ -130,12 +130,48 @@ func TestITStaffInputValidate(t *testing.T) {
 }
 
 func TestChatSides(t *testing.T) {
-	for role, want := range map[string]string{"team_lead": ChatSideLead, "it": ChatSideIT, "admin": ChatSideIT} {
-		if got := ChatSideFor(role); got != want {
-			t.Errorf("ChatSideFor(%s) = %s, want %s", role, got, want)
+	me, other := "u1", "u2"
+	cases := []struct {
+		role      string
+		requester *string
+		want      string
+	}{
+		{"it", &me, ChatSideIT},
+		{"team_lead", &other, ChatSideRequester},
+		{"admin", &me, ChatSideRequester},
+		{"admin", &other, ChatSideIT},
+		{"admin", nil, ChatSideIT},
+	}
+	for _, c := range cases {
+		if got := ChatSideFor(c.role, me, c.requester); got != c.want {
+			t.Errorf("ChatSideFor(%s, requester=%v) = %s, want %s", c.role, c.requester, got, c.want)
 		}
-		if got := IsChatObserver(role); got != (role == "admin") {
-			t.Errorf("IsChatObserver(%s) = %v", role, got)
+	}
+	// Everyone posts only as themselves; an admin only on a request they raised.
+	for _, c := range []struct {
+		role      string
+		requester *string
+		sides     []string
+	}{
+		{"it", &other, []string{"it"}},
+		{"it", &me, []string{"it"}},
+		{"team_lead", &other, []string{"requester"}},
+		{"admin", &me, []string{"requester"}},
+		{"admin", &other, nil},
+		{"admin", nil, nil},
+		{"", &me, nil},
+	} {
+		for _, side := range []string{"requester", "it", "bogus"} {
+			want := false
+			for _, s := range c.sides {
+				want = want || s == side
+			}
+			if got := CanPostAs(c.role, me, c.requester, side); got != want {
+				t.Errorf("CanPostAs(%q, requester=%v, %q) = %v, want %v", c.role, c.requester, side, got, want)
+			}
+		}
+		if got, want := IsChatObserver(c.role, me, c.requester), c.role == "admin" && c.sides == nil; got != want {
+			t.Errorf("IsChatObserver(%q, requester=%v) = %v, want %v", c.role, c.requester, got, want)
 		}
 	}
 }

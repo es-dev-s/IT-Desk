@@ -63,7 +63,14 @@ type plan struct {
 }
 
 func newPlan(action string) *plan {
-	return &plan{action: action, cellTeam: map[string]*string{}, cellLead: map[string]bool{}, moves: map[string]*string{}}
+	return &plan{
+		action:   action,
+		cellTeam: map[string]*string{},
+		cellLead: map[string]bool{},
+		moves:    map[string]*string{},
+		// Floor edit responses include an array even when nobody is affected.
+		affected: []domain.AffectedMember{},
+	}
 }
 
 type candSeat struct {

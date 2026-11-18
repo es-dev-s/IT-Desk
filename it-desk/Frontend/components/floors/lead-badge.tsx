@@ -6,6 +6,7 @@ export function LeadBadge({ compact = false, className }: { compact?: boolean; c
   if (compact) {
     return (
       <span
+        role="img"
         title="Team lead"
         aria-label="Team lead"
         className={cn("inline-grid size-4 shrink-0 place-items-center rounded-full bg-amber-400 text-amber-950 ring-2 ring-white", className)}
