@@ -104,6 +104,7 @@ func TestPolicyMatrix(t *testing.T) {
 		PermCommentRequest:  {true, true, true},
 		PermFulfilRequest:   {false, false, true},
 		PermManageMembers:   {true, true, false},
+		PermViewReports:     {true, true, true},
 	}
 	if len(want) != len(AllPermissions) {
 		t.Fatalf("matrix test covers %d of %d permissions", len(want), len(AllPermissions))
