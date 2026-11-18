@@ -4,7 +4,7 @@ import { MessagesSquare, Plus, SearchX } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
-import { CHAT_POLL_MS, chatApi, chatHref, counterpart, directChatApi, directChatHref, threadHas, type ChatFilter, type ChatScope, type ChatUnread, type Conversation } from "@/lib/chat";
+import { CHAT_POLL_MS, chatApi, chatHref, counterpart, directChatApi, directChatHref, threadHas, type ChatFilter, type ChatScope, type ChatUnread, type ContactRole, type Conversation } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { useChat } from "@/store/chat-store";
 import { useRequests } from "@/store/requests-store";
@@ -28,9 +28,17 @@ const SCOPES: { value: ChatScope; label: string }[] = [
   { value: "everyone", label: "All IT" },
 ];
 
+/** Who the super admin is looking for: everyone, or just one side of the directory. */
+type PeerFilter = "all" | Exclude<ContactRole, "admin">;
+
+const PEERS: { value: PeerFilter; label: string }[] = [
+  { value: "all", label: "Everyone" },
+  { value: "team_lead", label: "Team leads" },
+  { value: "it", label: "IT" },
+];
+
 export function MessagesView({ requestChats = false }: { requestChats?: boolean }) {
-  const { session } = useSession();
-  const direct = !requestChats && session.user.role !== "admin";
+  const direct = !requestChats;
   return <Inbox key={direct ? "direct" : "requests"} direct={direct} />;
 }
 
@@ -48,6 +56,7 @@ function Inbox({ direct }: { direct: boolean }) {
   // IT account not linked to a staff entry falls back to everything.
   const [scope, setScope] = useState<ChatScope>(session.user.role === "it" ? "mine" : "everyone");
   const [hasStaff, setHasStaff] = useState(false);
+  const [peer, setPeer] = useState<PeerFilter>("all");
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
   const [list, setList] = useState<(ChatUnread & { items: Conversation[] }) | null>(null);
@@ -124,6 +133,12 @@ function Inbox({ direct }: { direct: boolean }) {
   );
 
   const title = direct ? "Messages" : "Request chats";
+  // The super admin's directory mixes team leads and IT, so it can be narrowed to one side.
+  const narrowable = direct && session.user.role === "admin";
+  const items = useMemo(
+    () => (narrowable && peer !== "all" ? list?.items.filter((t) => "contact" in t && t.contact.role === peer) : list?.items),
+    [list, narrowable, peer],
+  );
   return (
     <>
       <h1 className="sr-only">{title}</h1>
@@ -157,6 +172,15 @@ function Inbox({ direct }: { direct: boolean }) {
                 className="w-full [&>button]:flex-1 [&>button]:justify-center"
               />
             ) : null}
+            {narrowable ? (
+              <Segmented
+                label="Show"
+                value={peer}
+                onChange={setPeer}
+                options={PEERS}
+                className="w-full [&>button]:flex-1 [&>button]:justify-center"
+              />
+            ) : null}
             <SearchField value={query} onChange={setQuery} label="Search conversations" placeholder="Search by name or message" size="md" />
             {!direct ? <Segmented
               label="Show"
@@ -179,18 +203,22 @@ function Inbox({ direct }: { direct: boolean }) {
                   </Button>
                 </div>
               </div>
-            ) : list && list.items.length === 0 ? (
+            ) : list && items && items.length === 0 ? (
               debounced.trim() ? (
                 <EmptyState icon={SearchX} title="No conversations match" description="Try a name or words from a message." />
               ) : (
                 <EmptyState
                   icon={MessagesSquare}
                   title={
-                    direct && session.user.role === "team_lead" ? "No IT members available" : !direct && filter === "closed" ? "No resolved conversations" : scope === "mine" && hasStaff ? "Nothing assigned to you" : "No conversations yet"
+                    direct && session.user.role === "team_lead" ? "No IT members available" : narrowable ? "No one to message" : !direct && filter === "closed" ? "No resolved conversations" : scope === "mine" && hasStaff ? "Nothing assigned to you" : "No conversations yet"
                   }
                   description={
                     direct
-                      ? session.user.role === "it" ? "Messages from team leads will appear here for your linked IT staff entry." : undefined
+                      ? session.user.role === "it"
+                        ? "Messages from team leads will appear here for your linked IT staff entry."
+                        : narrowable
+                          ? peer === "all" ? "Team leads and IT members appear here as soon as they are added." : "Nobody in this group yet."
+                          : undefined
                       : filter === "closed"
                       ? "Conversations on resolved, cancelled or rejected requests show up here."
                       : scope === "mine" && hasStaff
@@ -201,7 +229,7 @@ function Inbox({ direct }: { direct: boolean }) {
               )
             ) : (
               <ul className="p-2" aria-label="Conversations">
-                {list?.items.map((t) => {
+                {items?.map((t) => {
                   const id = "contact" in t ? t.contact.id : t.request.id;
                   const key = "contact" in t ? id : t.request.requesterId ?? id;
                   return (
@@ -223,7 +251,13 @@ function Inbox({ direct }: { direct: boolean }) {
             <EmptyState
               icon={MessagesSquare}
               title="Pick a conversation"
-              description={direct && session.user.role === "team_lead" ? "Choose an IT member to start or continue a chat." : undefined}
+              description={
+                direct && session.user.role === "team_lead"
+                  ? "Choose an IT member to start or continue a chat."
+                  : narrowable
+                    ? "Choose a team lead or IT member to start or continue a chat."
+                    : undefined
+              }
               className="h-full"
             />
           )}

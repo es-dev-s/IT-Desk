@@ -56,8 +56,11 @@ export const chatThreadSchema = threadFields.extend({
 });
 export type ChatThread = z.infer<typeof chatThreadSchema>;
 
+export const CONTACT_ROLES = ["it", "team_lead", "admin"] as const;
+export type ContactRole = (typeof CONTACT_ROLES)[number];
+
 const directThreadSchema = threadFields.extend({
-  contact: z.object({ id: z.string().min(1), name: z.string(), title: z.string(), available: z.boolean() }),
+  contact: z.object({ id: z.string().min(1), name: z.string(), title: z.string(), role: z.enum(CONTACT_ROLES).catch("it"), available: z.boolean() }),
   lastActivityAt: iso.nullable(),
 });
 export type DirectThread = z.infer<typeof directThreadSchema>;
@@ -136,8 +139,9 @@ export const directChatApi = {
 /** Who the conversation is with, from the viewer's side. */
 export function counterpart(t: Conversation): { name: string; subtitle: string; unassigned: boolean } {
   if ("contact" in t) {
-    const { name, title } = t.contact;
-    return { name, subtitle: title || (t.side === "requester" ? "IT" : "Team lead"), unassigned: false };
+    const { name, title, role } = t.contact;
+    const subtitle = role === "team_lead" ? (title ? `Team lead · ${title}` : "Team lead") : title || (role === "admin" ? "Super admin" : "IT");
+    return { name, subtitle, unassigned: false };
   }
   const r = t.request;
   if (t.side === "requester") {

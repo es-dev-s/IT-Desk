@@ -14,26 +14,48 @@ import (
 
 var errDirectChatNotFound = domain.NotFound("Conversation not found.")
 
-// Leads address an IT directory entry, including entries that have no login
-// yet. IT accounts see only conversations with their own linked entry.
-// A team lead's team membership never gives them access to another lead's chat.
+// Leads and admins address an IT directory entry, including entries that have
+// no login yet. An admin also addresses every active team lead, so the whole
+// directory is listed before anyone has written. IT accounts see only
+// conversations with their own linked entry, and a team lead sees an admin only
+// once that admin has written to them. A team lead's team membership never
+// gives them access to another lead's chat.
+//
+// An admin <-> lead chat has no IT staff entry: admin_id names the admin and
+// lead_id the lead, with the admin on the "it" side. In an admin <-> IT chat the
+// admin sits in lead_id, on the "requester" side.
 const directContacts = `SELECT s.id AS peer_id, s.name, s.title, s.active AS can_post,
 		(s.active AND COALESCE(u.role = 'it' AND u.status = 'active' AND u.password_hash IS NOT NULL, false)) AS available,
-		$1 AS lead_id, s.id AS staff_id, c.id AS chat_id, 'requester' AS side,
-		c.lead_read_at AS read_at, c.it_read_at AS other_read_at
+		$1 AS lead_id, s.id AS staff_id, NULL::text AS admin_id, c.id AS chat_id, 'requester' AS side,
+		c.lead_read_at AS read_at, c.it_read_at AS other_read_at, 'it' AS peer_role
 	FROM it_staff s
 	LEFT JOIN users u ON u.id = s.user_id
 	LEFT JOIN it_direct_chats c ON c.staff_id = s.id AND c.lead_id = $1
-	WHERE $2 = 'team_lead' AND (s.active OR c.id IS NOT NULL)
+	WHERE $2 IN ('team_lead', 'admin') AND (s.active OR c.id IS NOT NULL)
 	UNION ALL
-	SELECT u.id, u.name, COALESCE(t.name, 'Team lead'), u.status = 'active',
+	SELECT l.id, l.name, COALESCE(t.name, 'Team lead'), l.status = 'active',
+		(l.status = 'active' AND l.password_hash IS NOT NULL),
+		l.id, NULL::text, $1, c.id, 'it', c.it_read_at, c.lead_read_at, 'team_lead'
+	FROM users l
+	LEFT JOIN teams t ON t.id = l.team_id
+	LEFT JOIN it_direct_chats c ON c.lead_id = l.id AND c.admin_id = $1
+	WHERE $2 = 'admin' AND l.role = 'team_lead' AND (l.status = 'active' OR c.id IS NOT NULL)
+	UNION ALL
+	SELECT u.id, u.name, COALESCE(t.name, CASE WHEN u.role = 'admin' THEN 'Super admin' ELSE 'Team lead' END), u.status = 'active',
 		(u.status = 'active' AND u.password_hash IS NOT NULL),
-		u.id, s.id, c.id, 'it', c.it_read_at, c.lead_read_at
+		u.id, s.id, NULL::text, c.id, 'it', c.it_read_at, c.lead_read_at, u.role
 	FROM it_staff s
 	JOIN it_direct_chats c ON c.staff_id = s.id
-	JOIN users u ON u.id = c.lead_id AND u.role = 'team_lead'
+	JOIN users u ON u.id = c.lead_id AND u.role IN ('team_lead', 'admin')
 	LEFT JOIN teams t ON t.id = u.team_id
-	WHERE $2 = 'it' AND s.user_id = $1 AND s.active`
+	WHERE $2 = 'it' AND s.user_id = $1 AND s.active
+	UNION ALL
+	SELECT a.id, a.name, 'Super admin', a.status = 'active',
+		(a.status = 'active' AND a.password_hash IS NOT NULL),
+		$1, NULL::text, a.id, c.id, 'requester', c.lead_read_at, c.it_read_at, 'admin'
+	FROM it_direct_chats c
+	JOIN users a ON a.id = c.admin_id
+	WHERE $2 = 'team_lead' AND c.lead_id = $1`
 
 const directMessageSelect = `SELECT m.id, '', m.side, m.staff_id, m.staff_name, m.author_id, m.author_name, m.author_role,
 	false, m.body, m.created_at, '' FROM it_request_messages m`
@@ -41,16 +63,17 @@ const directMessageSelect = `SELECT m.id, '', m.side, m.staff_id, m.staff_name, 
 const directUnreadCondition = `m.side <> p.side AND m.created_at > COALESCE(p.read_at, '-infinity')`
 
 type directContact struct {
-	canPost               bool
-	leadID, staffID, side string
-	chatID                *string
+	canPost          bool
+	leadID, side     string
+	staffID, adminID *string
+	chatID           *string
 }
 
 func findDirectContact(ctx context.Context, q querier, actor Actor, peerID string) (directContact, error) {
 	var p directContact
-	err := q.QueryRow(ctx, `SELECT p.can_post, p.lead_id, p.staff_id, p.side, p.chat_id FROM (`+directContacts+`) p WHERE p.peer_id = $3`,
+	err := q.QueryRow(ctx, `SELECT p.can_post, p.lead_id, p.staff_id, p.admin_id, p.side, p.chat_id FROM (`+directContacts+`) p WHERE p.peer_id = $3`,
 		actor.User.ID, actor.User.Role, peerID).
-		Scan(&p.canPost, &p.leadID, &p.staffID, &p.side, &p.chatID)
+		Scan(&p.canPost, &p.leadID, &p.staffID, &p.adminID, &p.side, &p.chatID)
 	if errors.Is(err, pgx.ErrNoRows) {
 		err = errDirectChatNotFound
 	}
@@ -58,7 +81,7 @@ func findDirectContact(ctx context.Context, q querier, actor Actor, peerID strin
 }
 
 func directThreads(ctx context.Context, q querier, actor Actor, peerID, search string) ([]domain.DirectChatThread, error) {
-	rows, err := q.Query(ctx, `SELECT p.peer_id, p.name, p.title, p.can_post, p.available, p.side, p.other_read_at,
+	rows, err := q.Query(ctx, `SELECT p.peer_id, p.name, p.title, p.can_post, p.available, p.side, p.other_read_at, p.peer_role,
 			stats.total, stats.unread, last.id, last.created_at
 		FROM (`+directContacts+`) p
 		CROSS JOIN LATERAL (
@@ -86,7 +109,7 @@ func directThreads(ctx context.Context, q querier, actor Actor, peerID, search s
 		var lastID *string
 		var lastAt, otherRead *time.Time
 		if err := rows.Scan(&t.Contact.ID, &t.Contact.Name, &t.Contact.Title, &canPost, &t.Contact.Available,
-			&t.Side, &otherRead, &t.MessageCount, &t.Unread, &lastID, &lastAt); err != nil {
+			&t.Side, &otherRead, &t.Contact.Role, &t.MessageCount, &t.Unread, &lastID, &lastAt); err != nil {
 			return nil, err
 		}
 		t.CanPostAs = []string{}
@@ -235,23 +258,32 @@ func (s *Store) PostDirectChatMessage(ctx context.Context, actor Actor, peerID, 
 			return domain.Forbidden("chat_view_only", "This contact is inactive.")
 		}
 		if peer.chatID == nil {
-			if _, err := tx.Exec(ctx, `INSERT INTO it_direct_chats (id, lead_id, staff_id) VALUES ($1, $2, $3)
-				ON CONFLICT (lead_id, staff_id) DO NOTHING`, NewID("dm"), peer.leadID, peer.staffID); err != nil {
+			if _, err := tx.Exec(ctx, `INSERT INTO it_direct_chats (id, lead_id, staff_id, admin_id) VALUES ($1, $2, $3, $4)
+				ON CONFLICT DO NOTHING`, NewID("dm"), peer.leadID, peer.staffID, peer.adminID); err != nil {
 				return err
 			}
 		}
 		var chatID string
-		if err := tx.QueryRow(ctx, `SELECT id FROM it_direct_chats WHERE lead_id = $1 AND staff_id = $2 FOR UPDATE`, peer.leadID, peer.staffID).Scan(&chatID); err != nil {
+		if err := tx.QueryRow(ctx, `SELECT id FROM it_direct_chats
+			WHERE lead_id = $1 AND staff_id IS NOT DISTINCT FROM $2::text AND admin_id IS NOT DISTINCT FROM $3::text FOR UPDATE`,
+			peer.leadID, peer.staffID, peer.adminID).Scan(&chatID); err != nil {
 			return err
 		}
+		// IT-side messages show the staff member they are from; an admin writing
+		// to a lead has no staff entry and is shown by their own name.
 		var staffID, staffName *string
 		if peer.side == domain.ChatSideIT {
-			staffID = &peer.staffID
-			var name string
-			if err := tx.QueryRow(ctx, `SELECT name FROM it_staff WHERE id = $1`, peer.staffID).Scan(&name); err != nil {
-				return err
+			if peer.staffID != nil {
+				staffID = peer.staffID
+				var name string
+				if err := tx.QueryRow(ctx, `SELECT name FROM it_staff WHERE id = $1`, *peer.staffID).Scan(&name); err != nil {
+					return err
+				}
+				staffName = &name
+			} else {
+				name := actor.User.Name
+				staffName = &name
 			}
-			staffName = &name
 		}
 		messageID, now := NewID("msg"), s.Now()
 		if _, err := tx.Exec(ctx, `INSERT INTO it_request_messages (id, direct_chat_id, side, author_id, author_name, author_role, staff_id, staff_name, body, created_at)

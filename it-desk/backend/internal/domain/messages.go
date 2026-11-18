@@ -218,6 +218,7 @@ type DirectChatContact struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
 	Title     string `json:"title"`
+	Role      string `json:"role"`      // "it", "team_lead" or "admin"
 	Available bool   `json:"available"` // the contact has an enabled login
 }
 
