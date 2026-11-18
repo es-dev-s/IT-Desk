@@ -26,7 +26,11 @@ type CleanSummary struct {
 // floors, floor_cells: layout and team zones) are never touched.
 var cleanOrder = []string{
 	"notifications",
+	"chat_reads",
+	"chat_message_files",
+	"chat_messages",
 	"it_request_chat_reads",
+	"it_request_message_files",
 	"it_request_messages",
 	"it_request_events",
 	"it_request_items",

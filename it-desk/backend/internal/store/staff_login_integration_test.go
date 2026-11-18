@@ -10,7 +10,7 @@ import (
 
 // IT staff with their own login: an admin links a directory entry to an IT
 // account; that person then sees what is routed to them, replies as
-// themselves, and their unread badge covers their own and unrouted chats.
+// themselves.
 func TestITStaffLoginLinkAndAssignedChats(t *testing.T) {
 	st, lead := setup(t)
 	ctx := context.Background()
@@ -47,57 +47,15 @@ func TestITStaffLoginLinkAndAssignedChats(t *testing.T) {
 		}
 	}
 
-	item := []domain.ITRequestItem{{Kind: "laptop", Quantity: 1}}
-	rMine, _ := st.CreateITRequest(ctx, lead, domain.ITRequestInput{Items: item, Notes: "For Abash", Priority: "normal", StaffID: mine})
-	rOther, _ := st.CreateITRequest(ctx, lead, domain.ITRequestInput{Items: item, Notes: "For Akash", Priority: "normal", StaffID: other})
-	rNone, err := st.CreateITRequest(ctx, lead, domain.ITRequestInput{Items: item, Notes: "Anyone", Priority: "normal"})
-	if err != nil {
+	// Linked: they see their own conversations and reply as themselves.
+	if _, err := st.PostChatMessage(ctx, lead, lead.User.ID, mine, "Hello", nil); err != nil {
 		t.Fatal(err)
 	}
-	for _, id := range []string{rMine.ID, rOther.ID, rNone.ID} {
-		if _, err := st.PostChatMessage(ctx, lead, id, "Hello IT", "", nil); err != nil {
-			t.Fatal(err)
-		}
+	if l, _ := st.Chats(ctx, it, ChatFilter{}); len(l.Items) != 1 || l.MyStaffID == nil || *l.MyStaffID != mine {
+		t.Fatalf("linked list: %+v", l)
 	}
-
-	// "Assigned to me".
-	list, err := st.Chats(ctx, it, ChatFilter{Assigned: "me"})
-	if err != nil || len(list.Items) != 1 || len(list.Items[0].Requests) != 3 || list.MyStaffID == nil || *list.MyStaffID != mine {
-		t.Fatalf("assigned to me: %+v %v", list, err)
-	}
-	if all, _ := st.Chats(ctx, it, ChatFilter{}); len(all.Items) != 1 {
-		t.Fatalf("one lead, one conversation, linked IT still sees all of it: %d", len(all.Items))
-	}
-	if none, _ := st.Chats(ctx, it, ChatFilter{Assigned: "none"}); len(none.Items) != 1 || none.Items[0].Unread != 3 {
-		t.Fatalf("unassigned filter: %+v", none.Items)
-	}
-	if adm, _ := st.Chats(ctx, admin, ChatFilter{Assigned: "me"}); len(adm.Items) != 0 || adm.MyStaffID != nil {
-		t.Fatalf("admin without a staff entry: %+v", adm)
-	}
-	if _, err := st.Chats(ctx, it, ChatFilter{Assigned: "bogus"}); err == nil {
-		t.Fatal("bad assigned filter accepted")
-	}
-
-	// Unread: theirs + unrouted for the linked person; nothing for an admin looking on.
-	if u, _ := st.ChatUnread(ctx, it); u.UnreadChats != 1 || u.Unread != 2 {
-		t.Fatalf("linked IT unread: %+v", u)
-	}
-	if u, _ := st.ChatUnread(ctx, admin); u.UnreadChats != 0 || u.Unread != 0 {
-		t.Fatalf("admin unread: %+v", u)
-	}
-
-	// Replying as themselves, no "on behalf".
-	m, err := st.PostChatMessage(ctx, it, rMine.ID, "On it.", "", nil)
-	if err != nil || m.Side != "it" || m.SenderName != "Abash Thapa" || m.OnBehalf || !m.Mine || m.StaffID == nil || *m.StaffID != mine {
+	if m, err := st.PostChatMessage(ctx, it, lead.User.ID, mine, "On it.", nil); err != nil || m.OnBehalf || m.SenderName != "Abash Thapa" {
 		t.Fatalf("linked reply: %+v %v", m, err)
-	}
-	th, _ := st.ChatMessages(ctx, lead, rMine.ID, "")
-	if got := th.Messages[len(th.Messages)-1]; got.SenderName != "Abash Thapa" || got.OnBehalf || got.Mine {
-		t.Fatalf("requester view: %+v", got)
-	}
-	// An admin can't reply on Abash's ticket as him (or at all).
-	if _, err := st.PostChatMessage(ctx, admin, rMine.ID, "Cc admin", "it", nil); !errors.Is(err, errChatViewOnly) {
-		t.Fatalf("admin on behalf: %v, want view only", err)
 	}
 
 	// Unlink.
@@ -105,7 +63,7 @@ func TestITStaffLoginLinkAndAssignedChats(t *testing.T) {
 	if err != nil || un.HasLogin || un.Login != nil {
 		t.Fatalf("unlink: %+v %v", un, err)
 	}
-	if l, _ := st.Chats(ctx, it, ChatFilter{Assigned: "me"}); len(l.Items) != 0 || l.MyStaffID != nil {
+	if l, _ := st.Chats(ctx, it, ChatFilter{}); l.MyStaffID != nil {
 		t.Fatalf("after unlink: %+v", l)
 	}
 	var n int

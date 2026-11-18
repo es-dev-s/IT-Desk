@@ -6,21 +6,31 @@ import (
 )
 
 type chatMsg struct {
-	ID         string  `json:"id"`
-	Side       string  `json:"side"`
-	SenderName string  `json:"senderName"`
-	StaffID    *string `json:"staffId"`
-	AuthorName string  `json:"authorName"`
-	OnBehalf   bool    `json:"onBehalf"`
-	Mine       bool    `json:"mine"`
-	Body       string  `json:"body"`
+	ID          string `json:"id"`
+	LeadID      string `json:"leadId"`
+	StaffID     string `json:"staffId"`
+	Side        string `json:"side"`
+	SenderName  string `json:"senderName"`
+	AuthorName  string `json:"authorName"`
+	OnBehalf    bool   `json:"onBehalf"`
+	Mine        bool   `json:"mine"`
+	Body        string `json:"body"`
+	Attachments []struct {
+		URL string `json:"url"`
+	} `json:"attachments"`
 }
 
 type chatThread struct {
-	Request      reqView  `json:"request"`
-	Requests     []reqView `json:"requests"`
+	Lead struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"lead"`
+	Staff struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"staff"`
 	Side         string   `json:"side"`
-	CanPostAs    []string `json:"canPostAs"`
+	CanPost      bool     `json:"canPost"`
 	MessageCount int      `json:"messageCount"`
 	Unread       int      `json:"unread"`
 	LastMessage  *chatMsg `json:"lastMessage"`
@@ -38,133 +48,104 @@ func chatUnread(t *testing.T, c *client) (int, int) {
 	return u.Unread, u.UnreadChats
 }
 
-func TestRequestChatHTTP(t *testing.T) {
+// 1x1 transparent PNG.
+const tinyPNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+
+func TestDirectChatHTTP(t *testing.T) {
 	ts, _ := liveServer(t)
 	lead := newClient(t, ts).mustLogin("lead@example.com")
+	// Another lead of the same team: conversations are per lead, not per team.
+	lead2 := newClient(t, ts).mustLogin("lead3@example.com")
 	admin := newClient(t, ts).mustLogin("admin@example.com")
 	it := newClient(t, ts).mustLogin("it@example.com")
+	conv := "/api/v1/chats/lead_test/its_manish_yadav"
 
-	items := []map[string]any{{"kind": "laptop", "quantity": 1}}
-	mine := decodeReq(t, lead.do("POST", "/api/v1/it-requests", map[string]any{"items": items, "notes": "New joiner laptop", "staffId": "its_manish_yadav"}), 201, "lead request")
-	other := decodeReq(t, admin.do("POST", "/api/v1/it-requests", map[string]any{"items": items, "notes": "Payments laptop", "teamId": "t2"}), 201, "t2 request")
+	// The lead's list: every IT member, by name, no request attached.
+	r := lead.do("GET", "/api/v1/chats", nil)
+	var list struct {
+		Items  []chatThread `json:"items"`
+		Unread int          `json:"unread"`
+	}
+	_ = json.Unmarshal(r.Data, &list)
+	if r.Status != 200 || len(list.Items) != 5 || list.Items[0].Staff.Name != "Manish Kumar Yadav" || !list.Items[0].CanPost || list.Items[0].Side != "lead" {
+		t.Fatalf("lead chats: %d %+v", r.Status, list)
+	}
 
-	// Another team's conversation is invisible to the lead.
+	// Another lead's conversation is invisible.
 	for _, r := range []resp{
-		lead.do("GET", "/api/v1/it-requests/"+other.ID+"/messages", nil),
-		lead.do("POST", "/api/v1/it-requests/"+other.ID+"/messages", map[string]any{"body": "hi"}),
-		lead.do("POST", "/api/v1/it-requests/"+other.ID+"/messages/read", map[string]any{}),
+		lead2.do("GET", conv+"/messages", nil),
+		lead2.do("POST", conv+"/messages", map[string]any{"body": "hi"}),
+		lead2.do("POST", conv+"/read", map[string]any{}),
 	} {
 		if r.Status != 404 {
-			t.Errorf("lead on another team's chat: %d", r.Status)
+			t.Errorf("another lead's conversation: %d", r.Status)
 		}
 	}
-
-	// Validation and side rules.
-	if r := lead.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", map[string]any{"body": "   "}); r.Status != 422 || r.Error.Fields["body"] == "" {
+	if r := lead.do("POST", conv+"/messages", map[string]any{"body": "   "}); r.Status != 422 || r.Error.Fields["body"] == "" {
 		t.Errorf("blank message: %d %v", r.Status, r.Error.Fields)
 	}
-	if r := lead.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", map[string]any{"body": "x", "as": "it"}); r.Status != 403 {
-		t.Errorf("lead as IT: %d", r.Status)
-	}
-	if r := admin.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", map[string]any{"body": "x", "as": "boss"}); r.Status != 422 {
-		t.Errorf("unknown side: %d", r.Status)
-	}
 
-	// Lead → IT.
-	r := lead.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", map[string]any{"body": "Hi Manish, any update?"})
+	// Lead → Manish, with a screenshot.
+	r = lead.do("POST", conv+"/messages", map[string]any{"body": "Hi Manish, quick question", "images": []map[string]any{{"name": "s.png", "data": tinyPNG}}})
 	if r.Status != 201 {
-		t.Fatalf("lead message: %d %v", r.Status, r.Error.Fields)
+		t.Fatalf("lead message: %d %v", r.Status, r.Error)
 	}
 	var m1 chatMsg
 	_ = json.Unmarshal(r.Data, &m1)
-	if m1.Side != "requester" || !m1.Mine || m1.SenderName != "Lead One" {
+	if m1.Side != "lead" || !m1.Mine || m1.SenderName != "Lead One" || len(m1.Attachments) != 1 {
 		t.Fatalf("lead message: %+v", m1)
+	}
+	if f := lead.do("GET", m1.Attachments[0].URL, nil); f.Status != 200 {
+		t.Errorf("attachment: %d", f.Status)
+	}
+	if f := lead2.do("GET", m1.Attachments[0].URL, nil); f.Status != 404 {
+		t.Errorf("attachment for another lead: %d", f.Status)
 	}
 	if n, c := chatUnread(t, it); n != 1 || c != 1 {
 		t.Errorf("IT unread = %d/%d, want 1/1", n, c)
 	}
 
-	// IT → lead, shown as Manish.
-	r = it.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", map[string]any{"body": "Ready tomorrow at 10."})
+	// IT → lead in the same conversation, shown as Manish.
+	r = it.do("POST", conv+"/messages", map[string]any{"body": "Go ahead."})
 	var m2 chatMsg
 	_ = json.Unmarshal(r.Data, &m2)
 	if r.Status != 201 || m2.Side != "it" || m2.SenderName != "Manish Kumar Yadav" || !m2.OnBehalf || m2.AuthorName != "Ivan Tech" {
 		t.Fatalf("IT reply: %d %+v", r.Status, m2)
 	}
-	if n, _ := chatUnread(t, it); n != 0 {
-		t.Errorf("IT unread after replying = %d", n)
-	}
 	if n, _ := chatUnread(t, lead); n != 1 {
 		t.Errorf("lead unread = %d, want 1", n)
 	}
 
-	// Lead's list: only their team's request, with the reply as last message.
-	r = lead.do("GET", "/api/v1/chats?status=active", nil)
-	var list struct {
-		Items  []chatThread `json:"items"`
-		Unread int         `json:"unread"`
-	}
-	_ = json.Unmarshal(r.Data, &list)
-	if r.Status != 200 || len(list.Items) != 1 || !hasReq(list.Items[0].Requests, mine.ID) || list.Items[0].Unread != 1 ||
-		list.Items[0].LastMessage == nil || list.Items[0].LastMessage.ID != m2.ID || list.Unread != 1 ||
-		list.Items[0].Side != "requester" || len(list.Items[0].CanPostAs) != 1 {
-		t.Fatalf("lead chats: %d %+v", r.Status, list)
-	}
-	if r := lead.do("GET", "/api/v1/chats?status=nope", nil); r.Status != 422 {
-		t.Errorf("bad filter: %d", r.Status)
-	}
-
 	// Polling and read state.
-	r = lead.do("GET", "/api/v1/it-requests/"+mine.ID+"/messages?after="+m1.ID, nil)
+	r = lead.do("GET", conv+"/messages?after="+m1.ID, nil)
 	var page struct {
 		Thread   chatThread `json:"thread"`
 		Messages []chatMsg  `json:"messages"`
 	}
 	_ = json.Unmarshal(r.Data, &page)
-	if r.Status != 200 || len(page.Messages) != 1 || page.Messages[0].ID != m2.ID || page.Thread.OtherReadAt == nil {
+	if r.Status != 200 || len(page.Messages) != 1 || page.Messages[0].ID != m2.ID || page.Thread.OtherReadAt == nil || page.Thread.Staff.Name != "Manish Kumar Yadav" {
 		t.Fatalf("poll: %d %+v", r.Status, page)
 	}
-	if r := lead.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages/read", map[string]any{}); r.Status != 200 {
+	if r := lead.do("POST", conv+"/read", map[string]any{}); r.Status != 200 {
 		t.Fatalf("read: %d", r.Status)
 	}
 	if n, _ := chatUnread(t, lead); n != 0 {
 		t.Errorf("lead unread after read = %d", n)
 	}
 
-	// Admin sees both teams, but can only write on the request they raised themselves.
+	// Admins read but never write.
 	r = admin.do("GET", "/api/v1/chats", nil)
 	_ = json.Unmarshal(r.Data, &list)
-	if len(list.Items) != 2 {
+	if len(list.Items) != 1 || list.Items[0].CanPost || list.Items[0].Lead.Name != "Lead One" {
 		t.Fatalf("admin chats: %+v", list.Items)
 	}
-	for _, it := range list.Items {
-		want := 0
-		if hasReq(it.Requests, other.ID) {
-			want = 1
-		}
-		if len(it.CanPostAs) != want || (want == 1 && it.CanPostAs[0] != "requester") || (want == 0 && it.Unread != 0) {
-			t.Errorf("admin thread %s: canPostAs=%v unread=%d", it.Requests[0].ID, it.CanPostAs, it.Unread)
-		}
-	}
-	for _, as := range []string{"", "it", "requester"} {
-		body := map[string]any{"body": "Stepping in"}
-		if as != "" {
-			body["as"] = as
-		}
-		if r := admin.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", body); r.Status != 403 || r.Error.Code != "chat_view_only" {
-			t.Errorf("admin post as %q on a lead's request: %d %s, want 403 chat_view_only", as, r.Status, r.Error.Code)
-		}
-	}
-	if r := admin.do("POST", "/api/v1/it-requests/"+other.ID+"/messages", map[string]any{"body": "Any update?"}); r.Status != 201 {
-		t.Errorf("admin post on own request: %d %s", r.Status, r.Error.Code)
-	}
-	if r := admin.do("POST", "/api/v1/it-requests/"+other.ID+"/messages", map[string]any{"body": "x", "as": "it"}); r.Status != 403 || r.Error.Code != "chat_side" {
-		t.Errorf("admin as IT on own request: %d %s, want 403 chat_side", r.Status, r.Error.Code)
+	if r := admin.do("POST", conv+"/messages", map[string]any{"body": "Stepping in"}); r.Status != 403 || r.Error.Code != "chat_view_only" {
+		t.Errorf("admin post: %d %s, want 403 chat_view_only", r.Status, r.Error.Code)
 	}
 }
 
-// An admin links a directory entry to an IT account; that person then filters
-// to their own conversations and replies as themselves.
+// An admin links a directory entry to an IT account; that person then sees
+// their own conversations and replies as themselves.
 func TestStaffLoginLinkHTTP(t *testing.T) {
 	ts, _ := liveServer(t)
 	lead := newClient(t, ts).mustLogin("lead@example.com")
@@ -177,57 +158,31 @@ func TestStaffLoginLinkHTTP(t *testing.T) {
 	if r := admin.do("PATCH", "/api/v1/admin/it-staff/its_ujjal_dahal", map[string]any{"userId": "usr_admin"}); r.Status != 422 || r.Error.Fields["userId"] == "" {
 		t.Fatalf("link a non-IT account: %d %v", r.Status, r.Error.Fields)
 	}
-	r := admin.do("PATCH", "/api/v1/admin/it-staff/its_ujjal_dahal", map[string]any{"userId": "usr_it"})
-	var linked struct {
-		HasLogin bool `json:"hasLogin"`
-		Login    *struct {
-			UserID string `json:"userId"`
-			Email  string `json:"email"`
-		} `json:"login"`
-	}
-	_ = json.Unmarshal(r.Data, &linked)
-	if r.Status != 200 || !linked.HasLogin || linked.Login == nil || linked.Login.Email != "it@example.com" {
-		t.Fatalf("link: %d %+v", r.Status, linked)
+	if r := admin.do("PATCH", "/api/v1/admin/it-staff/its_ujjal_dahal", map[string]any{"userId": "usr_it"}); r.Status != 200 {
+		t.Fatalf("link: %d", r.Status)
 	}
 
-	items := []map[string]any{{"kind": "mouse", "quantity": 1}}
-	mine := decodeReq(t, lead.do("POST", "/api/v1/it-requests", map[string]any{"items": items, "notes": "Second screen", "staffId": "its_ujjal_dahal"}), 201, "routed request")
-	decodeReq(t, lead.do("POST", "/api/v1/it-requests", map[string]any{"items": items, "notes": "For Nabin", "staffId": "its_nabin_baraili"}), 201, "other request")
-
-	r = it.do("GET", "/api/v1/chats?assigned=me", nil)
+	for _, staff := range []string{"its_ujjal_dahal", "its_nabin_baraili"} {
+		if r := lead.do("POST", "/api/v1/chats/lead_test/"+staff+"/messages", map[string]any{"body": "Hello"}); r.Status != 201 {
+			t.Fatalf("lead → %s: %d", staff, r.Status)
+		}
+	}
+	r := it.do("GET", "/api/v1/chats", nil)
 	var list struct {
 		Items     []chatThread `json:"items"`
 		MyStaffID *string      `json:"myStaffId"`
 	}
 	_ = json.Unmarshal(r.Data, &list)
-	if r.Status != 200 || len(list.Items) != 1 || !hasReq(list.Items[0].Requests, mine.ID) || list.MyStaffID == nil || *list.MyStaffID != "its_ujjal_dahal" {
-		t.Fatalf("assigned to me: %d %+v", r.Status, list)
+	if r.Status != 200 || len(list.Items) != 1 || list.Items[0].Staff.ID != "its_ujjal_dahal" || list.MyStaffID == nil {
+		t.Fatalf("linked IT list: %d %+v", r.Status, list)
 	}
-
-	r = it.do("POST", "/api/v1/it-requests/"+mine.ID+"/messages", map[string]any{"body": "Bringing it over."})
+	if r := it.do("GET", "/api/v1/chats/lead_test/its_nabin_baraili/messages", nil); r.Status != 404 {
+		t.Errorf("someone else's conversation: %d", r.Status)
+	}
+	r = it.do("POST", "/api/v1/chats/lead_test/its_ujjal_dahal/messages", map[string]any{"body": "Bringing it over."})
 	var m chatMsg
 	_ = json.Unmarshal(r.Data, &m)
 	if r.Status != 201 || m.SenderName != "Ujjal Dahal" || m.OnBehalf || !m.Mine {
 		t.Fatalf("linked reply: %d %+v", r.Status, m)
 	}
-	r = lead.do("GET", "/api/v1/it-requests/"+mine.ID+"/messages", nil)
-	var th struct {
-		Messages []chatMsg `json:"messages"`
-	}
-	_ = json.Unmarshal(r.Data, &th)
-	if len(th.Messages) != 1 || th.Messages[0].SenderName != "Ujjal Dahal" || th.Messages[0].OnBehalf {
-		t.Fatalf("requester sees: %+v", th.Messages)
-	}
-	if n, _ := chatUnread(t, lead); n != 1 {
-		t.Errorf("lead unread = %d, want 1", n)
-	}
-}
-
-func hasReq(rs []reqView, id string) bool {
-	for _, r := range rs {
-		if r.ID == id {
-			return true
-		}
-	}
-	return false
 }

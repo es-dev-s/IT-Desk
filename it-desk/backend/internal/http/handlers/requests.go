@@ -205,18 +205,19 @@ func (s *Server) patchITStaff(w http.ResponseWriter, r *http.Request, a store.Ac
 	ok(w, http.StatusOK, st)
 }
 
-// Request chat (one conversation per request).
+// Direct messages: one conversation per team lead and IT staff member.
 //
-//	GET  /api/v1/chats                          conversations in scope (?status=active|closed&assigned=me|none&q=)
-//	GET  /api/v1/chats/unread                   nav badge totals
-//	GET  /api/v1/it-requests/{id}/messages      header + messages (?after=<message id> for polling)
-//	POST /api/v1/it-requests/{id}/messages      send {body, as?}
-//	POST /api/v1/it-requests/{id}/messages/read mark read for the caller's side
+//	GET  /api/v1/chats                                       conversations in view (?q=)
+//	GET  /api/v1/chats/unread                                nav badge totals
+//	GET  /api/v1/chats/{leadId}/{staffId}/messages           header + messages (?after=<message id> for polling)
+//	POST /api/v1/chats/{leadId}/{staffId}/messages           send {body, images?}
+//	POST /api/v1/chats/{leadId}/{staffId}/read               mark read for the caller's side
+//	GET  /api/v1/chats/{leadId}/{staffId}/messages/{messageId}/files/{fileId}
 
 func (s *Server) getChats(w http.ResponseWriter, r *http.Request, a store.Actor) {
 	q := r.URL.Query()
 	limit, _ := strconv.Atoi(q.Get("limit"))
-	list, err := s.store.Chats(r.Context(), a, store.ChatFilter{Status: q.Get("status"), Assigned: q.Get("assigned"), Query: q.Get("q"), Limit: limit})
+	list, err := s.store.Chats(r.Context(), a, store.ChatFilter{Query: q.Get("q"), Limit: limit})
 	if err != nil {
 		fail(w, r, s.log, err)
 		return
@@ -234,7 +235,7 @@ func (s *Server) getChatUnread(w http.ResponseWriter, r *http.Request, a store.A
 }
 
 func (s *Server) getChatMessages(w http.ResponseWriter, r *http.Request, a store.Actor) {
-	m, err := s.store.ChatMessages(r.Context(), a, r.PathValue("id"), r.URL.Query().Get("after"))
+	m, err := s.store.ChatMessages(r.Context(), a, r.PathValue("leadId"), r.PathValue("staffId"), r.URL.Query().Get("after"))
 	if err != nil {
 		fail(w, r, s.log, err)
 		return
@@ -245,7 +246,6 @@ func (s *Server) getChatMessages(w http.ResponseWriter, r *http.Request, a store
 func (s *Server) postChatMessage(w http.ResponseWriter, r *http.Request, a store.Actor) {
 	var in struct {
 		Body   string `json:"body"`
-		As     string `json:"as"`
 		Images []struct {
 			Name string `json:"name"`
 			Data string `json:"data"`
@@ -264,7 +264,7 @@ func (s *Server) postChatMessage(w http.ResponseWriter, r *http.Request, a store
 		}
 		files = append(files, domain.ChatFileIn{Name: img.Name, Data: raw})
 	}
-	m, err := s.store.PostChatMessage(r.Context(), a, r.PathValue("id"), in.Body, in.As, files)
+	m, err := s.store.PostChatMessage(r.Context(), a, r.PathValue("leadId"), r.PathValue("staffId"), in.Body, files)
 	if err != nil {
 		fail(w, r, s.log, err)
 		return
@@ -285,7 +285,7 @@ func decodeChatImage(data string) ([]byte, *domain.Error) {
 }
 
 func (s *Server) getChatFile(w http.ResponseWriter, r *http.Request, a store.Actor) {
-	name, ctype, data, err := s.store.ChatFile(r.Context(), a, r.PathValue("id"), r.PathValue("messageId"), r.PathValue("fileId"))
+	name, ctype, data, err := s.store.ChatFile(r.Context(), a, r.PathValue("leadId"), r.PathValue("staffId"), r.PathValue("messageId"), r.PathValue("fileId"))
 	if err != nil {
 		fail(w, r, s.log, err)
 		return
@@ -303,7 +303,7 @@ func (s *Server) getChatFile(w http.ResponseWriter, r *http.Request, a store.Act
 }
 
 func (s *Server) postChatRead(w http.ResponseWriter, r *http.Request, a store.Actor) {
-	u, err := s.store.MarkChatRead(r.Context(), a, r.PathValue("id"))
+	u, err := s.store.MarkChatRead(r.Context(), a, r.PathValue("leadId"), r.PathValue("staffId"))
 	if err != nil {
 		fail(w, r, s.log, err)
 		return
