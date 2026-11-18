@@ -349,14 +349,17 @@ func loadSettings(ctx context.Context, q querier, userID string) (domain.Setting
 	return s, nil
 }
 
-func loadUnrosteredLeads(ctx context.Context, q querier) ([]domain.UnrosteredLead, error) {
+// loadUnrosteredLeads lists active leads with no roster record. onlyUserID
+// narrows it to one account (a lead only ever sees themselves).
+func loadUnrosteredLeads(ctx context.Context, q querier, onlyUserID string) ([]domain.UnrosteredLead, error) {
 	rows, err := q.Query(ctx, `SELECT u.id, u.name, u.team_id, u.title, u.email
 		FROM users u
 		WHERE u.role = 'team_lead' AND u.status = 'active' AND u.team_id IS NOT NULL
+		AND ($1 = '' OR u.id = $1)
 		AND NOT EXISTS (
 			SELECT 1 FROM members m WHERE m.team_id = u.team_id AND lower(m.email) = lower(u.email)
 		)
-		ORDER BY u.name, u.id`)
+		ORDER BY u.name, u.id`, onlyUserID)
 	if err != nil {
 		return nil, err
 	}
@@ -388,6 +391,9 @@ func (s *Store) Workspace(ctx context.Context, actor Actor, teamID string) (doma
 			if w.Members, err = loadMembers(ctx, tx, "team_id = $1", []any{scope}, false); err != nil {
 				return err
 			}
+			if w.UnrosteredLeads, err = loadUnrosteredLeads(ctx, tx, actor.User.ID); err != nil {
+				return err
+			}
 			if w.Transfers, _, err = loadTransfers(ctx, tx, TransferFilter{TeamID: scope}); err != nil {
 				return err
 			}
@@ -402,7 +408,7 @@ func (s *Store) Workspace(ctx context.Context, actor Actor, teamID string) (doma
 				return err
 			}
 			if actor.User.Role == "admin" {
-				if w.UnrosteredLeads, err = loadUnrosteredLeads(ctx, tx); err != nil {
+				if w.UnrosteredLeads, err = loadUnrosteredLeads(ctx, tx, ""); err != nil {
 					return err
 				}
 				if w.Exits, err = loadExits(ctx, tx, ""); err != nil {

@@ -109,7 +109,8 @@ export function SeatPanel({
     const roster = memberIds
       .map((id) => members[id])
       .filter((m) => m?.status === "active" && (isAdmin || m.teamId === myTeam));
-    const people = isAdmin ? [...roster, ...unrosteredLeads] : roster;
+    // Admin sees every unseated lead; a lead only ever receives their own entry.
+    const people = [...roster, ...unrosteredLeads];
     return people
       .filter((m) => !t || m.name.toLowerCase().includes(t) || (teams[m.teamId]?.name ?? "").toLowerCase().includes(t))
       .sort(
