@@ -7,11 +7,21 @@ import { useShallow } from "zustand/react/shallow";
 import { SeatPicker } from "@/components/transfer/seat-picker";
 import { Button } from "@/components/ui/button";
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/modal";
-import type { UnrosteredLead } from "@/lib/schemas";
+import { useSession } from "@/components/auth/session-provider";
+import type { Member, UnrosteredLead } from "@/lib/schemas";
 import { useSeatIndex } from "@/store/selectors";
 import { useWorkspace, useWorkspaceApi } from "@/store/workspace-provider";
 
-export function LeadSeatDialog({ lead, onClose }: { lead: UnrosteredLead; onClose: () => void }) {
+/**
+ * Seat a team lead: an unrostered lead gets a roster record on first seating;
+ * a rostered lead is moved. Admins may pick any free seat, a lead only seats
+ * themselves in their own team's zone (free zoneless seats join it).
+ */
+export function LeadSeatDialog({ lead, onClose }: { lead: UnrosteredLead | Member; onClose: () => void }) {
+  const { session } = useSession();
+  const isAdmin = session.user.role === "admin";
+  const rostered = "status" in lead;
+  const currentSeatId = rostered ? (lead.seatId ?? null) : null;
   const workspace = useWorkspaceApi();
   const rules = useWorkspace(useShallow(({ currentTeamId, teams, members, memberIds, floors }) => ({ currentTeamId, teams, members, memberIds, floors })));
   const seatIndex = useSeatIndex();
@@ -24,9 +34,11 @@ export function LeadSeatDialog({ lead, onClose }: { lead: UnrosteredLead; onClos
     if (!seat || saving) return;
     setSaving(true);
     setError("");
-    const result = await workspace.getState().assignLeadSeat(lead.id, seat.id);
+    const result = rostered
+      ? await workspace.getState().assignSeat(lead.id, seat.id)
+      : await workspace.getState().assignLeadSeat(lead.id, seat.id);
     if (result.ok) {
-      toast.success(`${lead.name} is now on Seat ${seat.code}`);
+      toast.success(isAdmin ? `${lead.name} is now on Seat ${seat.code}` : `You moved to Seat ${seat.code}`);
       onClose();
       return;
     }
@@ -39,7 +51,7 @@ export function LeadSeatDialog({ lead, onClose }: { lead: UnrosteredLead; onClos
     <Modal
       open
       onOpenChange={(open) => { if (!open && !saving) onClose(); }}
-      title={`Assign a seat to ${lead.name}`}
+      title={rostered ? `Change ${lead.name}'s seat` : `Assign a seat to ${lead.name}`}
       description={rules.teams[lead.teamId]?.name}
       className="max-w-[640px]"
     >
@@ -47,9 +59,10 @@ export function LeadSeatDialog({ lead, onClose }: { lead: UnrosteredLead; onClos
         <SeatPicker
           rules={rules}
           destId={lead.teamId}
-          anyZone
-          internal={false}
-          movers={[{ id: lead.id, name: lead.name, seatId: null, hue: 220, isLead: true }]}
+          anyZone={isAdmin}
+          claimNoZone={!isAdmin}
+          internal={rostered}
+          movers={[{ id: lead.id, name: lead.name, seatId: currentSeatId, hue: rostered ? lead.hue : 220, isLead: true }]}
           seats={seat ? { [lead.id]: seat.id } : {}}
           activeId={lead.id}
           onPick={(id) => {
@@ -65,7 +78,7 @@ export function LeadSeatDialog({ lead, onClose }: { lead: UnrosteredLead; onClos
         <Button onClick={onClose} disabled={saving}>Cancel</Button>
         <Button variant="primary" onClick={() => void assign()} disabled={!seat || saving}>
           {saving ? <Loader2 className="animate-spin" aria-hidden /> : null}
-          Assign seat
+          {rostered ? "Move seat" : "Assign seat"}
         </Button>
       </ModalFooter>
     </Modal>

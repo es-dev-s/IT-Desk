@@ -1,7 +1,7 @@
 "use client";
 
 import { LeadBadge } from "@/components/floors/lead-badge";
-import type { RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import type { Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { cn, pluralize } from "@/lib/utils";
 import { useTeamsById } from "@/store/selectors";
 import { Avatar } from "@/components/ui/avatar";
@@ -22,7 +22,7 @@ export function MemberList({
   members: RosterEntry[];
   selected: Record<string, true>;
   onToggle: (id: string) => void;
-  onAssignLeadSeat?: (lead: UnrosteredLead) => void;
+  onAssignLeadSeat?: (lead: UnrosteredLead | Member) => void;
 }) {
   const { open } = useMemberDetailLink();
   const teams = useTeamsById();

@@ -491,7 +491,7 @@ export function createWorkspaceStore(initial: { permissions?: readonly string[] 
       },
 
       assignLeadSeat: async (userId, seatId) => {
-        if (!allowed("seats.assign") || get().user.role !== "admin") return DENIED;
+        if (!allowed("seats.assign")) return DENIED;
         begin();
         try {
           const member = await floorsApi.assignLeadSeat(userId, seatId);

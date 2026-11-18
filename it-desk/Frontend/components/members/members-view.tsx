@@ -4,7 +4,7 @@ import { Check, LayoutGrid, Map as MapIcon, Minus, Rows3, SearchX, UserPlus, Use
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { compareSeats } from "@/lib/constants";
-import type { ItStatus, RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import type { ItStatus, Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { useCurrentTeam, useTeamMembers, useTeamsById, useTransfers } from "@/store/selectors";
 import { useUI, type MemberSort, type MembersView as View } from "@/store/ui-store";
 import { useWorkspace } from "@/store/workspace-provider";
@@ -64,9 +64,9 @@ export function MembersView() {
   const selectable = can("transfers.create") || can("exits.create");
   const onToggle = selectable ? toggle : ignore;
   const canManage = can("members.manage");
-  const canSeatLead = isAdmin && can("seats.assign");
+  const canSeatLead = can("seats.assign");
   const openMemberDialog = useUI((s) => s.openMemberDialog);
-  const [leadToSeat, setLeadToSeat] = useState<UnrosteredLead | null>(null);
+  const [leadToSeat, setLeadToSeat] = useState<UnrosteredLead | Member | null>(null);
   const [toolbarRef, toolbarWidth] = useElementWidth<HTMLDivElement>();
 
   const transfers = useTransfers();
@@ -81,8 +81,8 @@ export function MembersView() {
   const subGroups = useMemo(() => [...new Set(all.map((m) => m.subGroup))].sort((a, b) => a.localeCompare(b)), [all]);
   const subGroup = subGroups.includes(f.subGroup) ? f.subGroup : "all";
   const roster = useMemo(
-    () => isAdmin ? [...all, ...unrosteredLeads.filter((lead) => !team || lead.teamId === team.id)] : all,
-    [all, isAdmin, team, unrosteredLeads],
+    () => [...all, ...unrosteredLeads.filter((lead) => !team || lead.teamId === team.id)],
+    [all, team, unrosteredLeads],
   );
 
   const counts = useMemo(() => {

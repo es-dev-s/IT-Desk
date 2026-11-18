@@ -238,8 +238,13 @@ func (s *Store) createMember(ctx context.Context, tx pgx.Tx, actor Actor, in dom
 }
 
 // AssignUnrosteredLeadSeat creates and seats a lead's roster record atomically.
+// An admin can seat any lead; a team lead can only seat themselves, inside
+// their own zone (or on a free seat that has no zone yet).
 func (s *Store) AssignUnrosteredLeadSeat(ctx context.Context, actor Actor, userID, seatID string) (domain.Member, error) {
-	if actor.User.Role != "admin" {
+	switch {
+	case actor.User.Role == "admin":
+	case actor.User.Role == "team_lead" && actor.User.ID == userID:
+	default:
 		return domain.Member{}, domain.Forbidden("forbidden", "Only an admin can seat a lead who isn't on the roster.")
 	}
 	seatID = domain.NormalizeSeat(seatID)

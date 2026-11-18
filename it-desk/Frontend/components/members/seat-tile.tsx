@@ -4,7 +4,7 @@ import { LeadBadge } from "@/components/floors/lead-badge";
 import { Check, ChevronRight, Laptop } from "lucide-react";
 import { useMemberDetailLink } from "@/lib/member-detail-link";
 import { memo } from "react";
-import type { ItStatus, RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import type { ItStatus, Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 import { IT_STATUS_LABEL, ItStatusGlyph } from "@/components/ui/status";
@@ -38,7 +38,7 @@ export const SeatTile = memo(function SeatTile({
   /** IT status of an open transfer that involves this member, if any. */
   pending?: ItStatus;
   onToggle: (id: string) => void;
-  onAssignLeadSeat?: (lead: UnrosteredLead) => void;
+  onAssignLeadSeat?: (lead: UnrosteredLead | Member) => void;
 }) {
   const member = "status" in entry ? entry : null;
   const isLead = member?.isLead ?? true;

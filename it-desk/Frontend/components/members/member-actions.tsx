@@ -4,14 +4,14 @@ import * as CM from "@radix-ui/react-context-menu";
 import * as DM from "@radix-ui/react-dropdown-menu";
 import { Armchair, CircleHelp, Ellipsis, Building2, PanelRightOpen, PencilLine, UserX } from "lucide-react";
 import { useMemberDetailLink } from "@/lib/member-detail-link";
-import type { RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import type { Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { useUI } from "@/store/ui-store";
 import { useSession } from "@/components/auth/session-provider";
 import { menuContentClass, menuItemClass, menuItemDangerClass, menuLabelClass, menuSeparatorClass } from "@/components/ui/menu";
 
 type Action = { id: string; label: string; icon: React.ComponentType; danger?: boolean; run: () => void };
-type MemberActionProps = { entry: RosterEntry; onAssignLeadSeat?: (lead: UnrosteredLead) => void };
+type MemberActionProps = { entry: RosterEntry; onAssignLeadSeat?: (lead: UnrosteredLead | Member) => void };
 
 /** One action list for both the right-click menu and the ⋯ menu. Acts on the selection when the member is in it. */
 function useMemberActions({ entry, onAssignLeadSeat }: MemberActionProps) {
@@ -38,6 +38,10 @@ function useMemberActions({ entry, onAssignLeadSeat }: MemberActionProps) {
     can("members.manage") && ids.length === 1
       ? [{ id: "edit", label: "Edit details", icon: PencilLine, run: () => openMemberDialog(member.id) }]
       : [];
+  // Admins can't raise transfers, so a seated lead's own seat is changed here.
+  const leadSeat: Action[] = active && member.isLead && onAssignLeadSeat && !can("transfers.create")
+    ? [{ id: "lead-seat", label: member.seatId ? "Change seat" : "Assign seat", icon: Armchair, run: () => onAssignLeadSeat(member) }]
+    : [];
   const moves: Action[] = active && can("transfers.create")
     ? [
         { id: "seat", label: "Move to another seat", icon: Armchair, run: () => openTransfer(ids, "internal") },
@@ -51,7 +55,7 @@ function useMemberActions({ entry, onAssignLeadSeat }: MemberActionProps) {
       ]
     : [];
   const actions: (Action | "sep")[] = [];
-  for (const group of [view, edits, moves, exits]) {
+  for (const group of [view, edits, leadSeat, moves, exits]) {
     if (!group.length) continue;
     if (actions.length) actions.push("sep");
     actions.push(...group);

@@ -18,7 +18,7 @@ package handlers
 //	POST   /api/v1/zones/move                 move a team's zone (any floor)         floors.manage
 //	POST   /api/v1/zone-changes/{id}/undo     undo a zone change in the window       floors.manage
 //	PUT    /api/v1/members/{id}/seat          seat a person                          seats.assign
-//	POST   /api/v1/admin/users/{id}/seat      roster and seat a team lead           users.manage
+//	POST   /api/v1/admin/users/{id}/seat      roster and seat a team lead           seats.assign (admin: any lead; lead: self)
 
 import (
 	"net/http"
@@ -47,7 +47,7 @@ func (s *Server) floorRoutes(read, write route) {
 	write("POST /api/v1/zones/move", auth.PermManageFloors, s.moveZone)
 	write("POST /api/v1/zone-changes/{id}/undo", auth.PermManageFloors, s.undoZoneChange)
 	write("PUT /api/v1/members/{id}/seat", auth.PermAssignSeat, s.putSeat)
-	write("POST /api/v1/admin/users/{id}/seat", auth.PermManageUsers, s.postLeadSeat)
+	write("POST /api/v1/admin/users/{id}/seat", auth.PermAssignSeat, s.postLeadSeat)
 }
 
 func respond(w http.ResponseWriter, r *http.Request, s *Server, status int, v any, err error) {
