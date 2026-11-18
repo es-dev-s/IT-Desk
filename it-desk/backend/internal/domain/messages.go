@@ -130,15 +130,14 @@ func cleanImageName(name, ct string) string {
 	return name
 }
 
-// RequestMessage is one chat message. For IT-side messages SenderName is the
-// staff member the request is routed to ("IT team" when nobody is); the
-// account that actually wrote it is always AuthorName.
+// RequestMessage is one chat message. RequestID and Ticket are set for
+// request conversations. AuthorName identifies the account that wrote it.
 type RequestMessage struct {
-	ID         string  `json:"id"`
-	RequestID  string  `json:"requestId"`
+	ID        string `json:"id"`
+	RequestID string `json:"requestId,omitempty"`
 	// Ticket is the REQ id of the request this message belongs to: one
 	// conversation spans all of a requester's requests.
-	Ticket     string  `json:"ticket"`
+	Ticket     string  `json:"ticket,omitempty"`
 	Side       string  `json:"side"`
 	SenderName string  `json:"senderName"`
 	StaffID    *string `json:"staffId"`
@@ -147,8 +146,8 @@ type RequestMessage struct {
 	AuthorName string  `json:"authorName"`
 	AuthorRole string  `json:"authorRole"`
 	// OnBehalf: written by an account standing in for the staff member shown.
-	OnBehalf  bool   `json:"onBehalf"`
-	Mine      bool   `json:"mine"`
+	OnBehalf    bool             `json:"onBehalf"`
+	Mine        bool             `json:"mine"`
 	Body        string           `json:"body"`
 	Attachments []ChatAttachment `json:"attachments"`
 	CreatedAt   Time             `json:"createdAt"`
@@ -194,9 +193,9 @@ type ChatThread struct {
 type ChatList struct {
 	Items []ChatThread `json:"items"`
 	// MyStaffID: the caller's own directory entry (IT staff with a login).
-	MyStaffID   *string      `json:"myStaffId"`
-	Unread      int          `json:"unread"`      // unread messages across every listed thread
-	UnreadChats int          `json:"unreadChats"` // threads with at least one unread
+	MyStaffID   *string `json:"myStaffId"`
+	Unread      int     `json:"unread"`      // unread messages across every listed thread
+	UnreadChats int     `json:"unreadChats"` // threads with at least one unread
 }
 
 type ChatMessages struct {
@@ -213,4 +212,33 @@ type ChatMessages struct {
 type ChatUnread struct {
 	Unread      int `json:"unread"`
 	UnreadChats int `json:"unreadChats"`
+}
+
+type DirectChatContact struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Title     string `json:"title"`
+	Available bool   `json:"available"` // the contact has an enabled login
+}
+
+type DirectChatThread struct {
+	Contact        DirectChatContact `json:"contact"`
+	Side           string            `json:"side"`
+	CanPostAs      []string          `json:"canPostAs"`
+	MessageCount   int               `json:"messageCount"`
+	Unread         int               `json:"unread"`
+	LastMessage    *RequestMessage   `json:"lastMessage"`
+	LastActivityAt *Time             `json:"lastActivityAt"`
+	OtherReadAt    *Time             `json:"otherReadAt"`
+}
+
+type DirectChatList struct {
+	ChatUnread
+	Items []DirectChatThread `json:"items"`
+}
+
+type DirectChatMessages struct {
+	Thread   DirectChatThread `json:"thread"`
+	Messages []RequestMessage `json:"messages"`
+	HasMore  bool             `json:"hasMore"`
 }

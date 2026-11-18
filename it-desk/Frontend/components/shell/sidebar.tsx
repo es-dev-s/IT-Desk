@@ -81,7 +81,8 @@ export function SidebarContent() {
   const requestCounts = useRequests((s) => s.counts);
   // IT: requests nobody has picked up yet. Others: their requests still with IT.
   const requestBadge = requestCounts ? (role === "it" ? requestCounts.unassigned : requestCounts.open + requestCounts.inProgress) : 0;
-  const chatUnread = useChat((s) => s.unread?.unread ?? 0);
+  const chatUnread = useChat((s) => (role === "admin" ? s.requestUnread : s.directUnread)?.unread ?? 0);
+  const requestChatUnread = useChat((s) => s.requestUnread?.unread ?? 0);
   const closeMobile = useUI((s) => s.setMobileNavOpen);
   const items = navFor(session.permissions);
 
@@ -137,6 +138,9 @@ export function SidebarContent() {
                 >
                   <Icon className={cn("size-4", active ? "text-accent" : "text-neutral-400")} aria-hidden />
                   {item.label}
+                  {isRequests && role !== "admin" && requestChatUnread > 0 ? (
+                    <span className={cn("size-1.5 shrink-0 rounded-full bg-accent", badge === 0 && "ml-auto")} role="img" aria-label="Unread request messages" />
+                  ) : null}
                   {badge > 0 ? (
                     <span className="tnum ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-accent-muted px-1.5 text-[11px] font-semibold text-accent-ink" aria-label={isRequests ? `${badge} ${role === "it" ? "unassigned" : "active"} requests` : isMessages ? `${badge} unread ${badge === 1 ? "message" : "messages"}` : `${badge} open device moves`}>
                       {badge}

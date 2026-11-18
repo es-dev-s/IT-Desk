@@ -62,7 +62,14 @@ export const itTaskReportSchema = z.object({
 export type ITTaskReport = z.infer<typeof itTaskReportSchema>;
 
 export type MemberReportFilter = { teamId?: string; q?: string };
-export type TaskReportFilter = { teamId?: string; itMember?: string; status?: "all" | "completed" | "open"; q?: string };
+export type TaskReportFilter = {
+  teamId?: string;
+  itMember?: string;
+  status?: "all" | "completed" | "open";
+  q?: string;
+  startDate?: string;
+  endDate?: string;
+};
 
 function query(f: Record<string, string | undefined>) {
   const p = new URLSearchParams();
@@ -79,9 +86,10 @@ export const reportsApi = {
   itTasks: (f: TaskReportFilter, signal?: AbortSignal) => request(`/reports/it-tasks${query(f)}`, { schema: itTaskReportSchema, signal }),
 };
 
-/** Excel download of exactly what the filters show. Dates are written in the viewer's timezone. */
+/** Excel download of the filtered rows. IT task dates use the app timezone. */
 export function exportHref(report: "members" | "it-tasks", f: Record<string, string | undefined>) {
-  return `${API_BASE_URL}/api/v1/reports/${report}${query({ ...f, format: "xlsx", utcOffset: String(-new Date().getTimezoneOffset()) })}`;
+  const utcOffset = report === "members" ? String(-new Date().getTimezoneOffset()) : undefined;
+  return `${API_BASE_URL}/api/v1/reports/${report}${query({ ...f, format: "xlsx", utcOffset })}`;
 }
 
 /** "Name (ID)", or just the name when no employee id is on file. */

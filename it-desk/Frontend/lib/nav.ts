@@ -13,7 +13,7 @@ export const NAV_ITEMS = [
   { href: "/floors", label: "Floors", icon: MapIcon, permission: "floor.view", description: "Floor plans, team zones and seats" },
   { href: "/transfers", label: "Transfers", icon: ArrowLeftRight, permission: "transfers.view", description: "Moves and their IT status" },
   { href: "/requests", label: "Requests", icon: LifeBuoy, permission: "requests.view", description: "Equipment and support asks to IT" },
-  { href: "/messages", label: "Messages", icon: MessagesSquare, permission: "requests.comment", description: "Chat with IT about a request" },
+  { href: "/messages", label: "Messages", icon: MessagesSquare, permission: "requests.comment", description: "Open conversations" },
   {
     href: "/reports",
     label: "Reports",
@@ -67,6 +67,7 @@ function subPages(pathname: string, href: string): Crumb[] {
     isActivePath(pathname, c.href),
   );
   if (child) return [{ label: child.label }];
+  if (pathname === "/requests/chat") return [{ label: "Request chats" }];
   if (href !== "/floors" || pathname === "/floors") return [];
   if (pathname === "/floors/manage") return [{ label: "Manage" }];
   if (/^\/floors\/[^/]+\/edit$/.test(pathname)) return [{ label: "Manage", href: "/floors/manage" }, { label: "Edit layout" }];

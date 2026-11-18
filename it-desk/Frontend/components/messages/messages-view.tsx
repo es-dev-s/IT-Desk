@@ -4,8 +4,7 @@ import { MessagesSquare, Plus, SearchX } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
-import { CHAT_POLL_MS, chatApi, chatHref, counterpart, threadHas, type ChatFilter, type ChatList, type ChatScope, type ChatThread, type ChatUnread } from "@/lib/chat";
-import { isClosed, requestSummary } from "@/lib/requests";
+import { CHAT_POLL_MS, chatApi, chatHref, counterpart, directChatApi, directChatHref, threadHas, type ChatFilter, type ChatScope, type ChatUnread, type Conversation } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { useChat } from "@/store/chat-store";
 import { useRequests } from "@/store/requests-store";
@@ -29,19 +28,18 @@ const SCOPES: { value: ChatScope; label: string }[] = [
   { value: "everyone", label: "All IT" },
 ];
 
-/**
- * Messages: every IT request has a conversation between the requester's side
- * and the IT member it is routed to. Two panes on wide screens; on phones the
- * list, then the thread with a back button. The selected request lives in the
- * URL (?r=), so other pages can deep-link into a conversation.
- */
-export function MessagesView() {
+export function MessagesView({ requestChats = false }: { requestChats?: boolean }) {
+  const { session } = useSession();
+  const direct = !requestChats && session.user.role !== "admin";
+  return <Inbox key={direct ? "direct" : "requests"} direct={direct} />;
+}
+
+function Inbox({ direct }: { direct: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const selectedId = params.get("r");
+  const selectedId = params.get(direct ? "person" : "r");
   const { can, session } = useSession();
-  const canCreate = can("requests.create");
   const openDialog = useRequests((s) => s.openDialog);
   const setUnread = useChat((s) => s.setUnread);
 
@@ -52,7 +50,7 @@ export function MessagesView() {
   const [hasStaff, setHasStaff] = useState(false);
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
-  const [list, setList] = useState<ChatList | null>(null);
+  const [list, setList] = useState<(ChatUnread & { items: Conversation[] }) | null>(null);
   const [error, setError] = useState<string | null>(null);
   const seq = useRef(0);
 
@@ -72,13 +70,17 @@ export function MessagesView() {
     const load = async () => {
       const n = ++seq.current;
       try {
-        const res = await chatApi.list({ status: filter, scope, q: debounced }, ctrl.signal);
+        const res = direct
+          ? await directChatApi.list(debounced, ctrl.signal)
+          : await chatApi.list({ status: filter, scope, q: debounced }, ctrl.signal);
         if (!alive || n !== seq.current) return;
-        setHasStaff(Boolean(res.myStaffId));
-        if (!res.myStaffId && scope === "mine") return setScope("everyone");
+        if ("myStaffId" in res) {
+          setHasStaff(Boolean(res.myStaffId));
+          if (!res.myStaffId && scope === "mine") return setScope("everyone");
+        }
         setList(res);
         setError(null);
-        setUnread({ unread: res.unread, unreadChats: res.unreadChats });
+        setUnread({ unread: res.unread, unreadChats: res.unreadChats }, direct);
       } catch (err) {
         if (!alive || ctrl.signal.aborted || n !== seq.current) return;
         setError(err instanceof ApiError ? err.message : "Couldn’t load conversations.");
@@ -96,18 +98,19 @@ export function MessagesView() {
       window.clearInterval(id);
       document.removeEventListener("visibilitychange", onTick);
     };
-  }, [filter, scope, debounced, setUnread, tick]);
+  }, [direct, filter, scope, debounced, setUnread, tick]);
 
-  const select = (id: string | null) => router.replace(id ? chatHref(id) : pathname, { scroll: false });
+  const select = (id: string | null) =>
+    router.replace(id ? (direct ? directChatHref(id) : chatHref(id)) : pathname, { scroll: false });
 
   const seed = useMemo(() => list?.items.find((t) => threadHas(t, selectedId)) ?? null, [list, selectedId]);
 
   // The thread pane read or wrote: reflect it in the list and the nav badge at once.
   const onThread = useCallback(
-    (t: ChatThread, unread?: ChatUnread) => {
+    (t: Conversation, unread?: ChatUnread) => {
       setList((cur) => {
         if (!cur) return cur;
-        const i = cur.items.findIndex((x) => threadHas(x, t.request.id));
+        const i = cur.items.findIndex((x) => threadHas(x, "contact" in t ? t.contact.id : t.request.id));
         if (i < 0) return cur;
         const items = [...cur.items];
         const moved = items[i].lastMessage?.id !== t.lastMessage?.id;
@@ -115,14 +118,15 @@ export function MessagesView() {
         if (moved && i > 0) items.unshift(items.splice(i, 1)[0]);
         return { ...cur, items, ...(unread ?? {}) };
       });
-      if (unread) setUnread(unread);
+      if (unread) setUnread(unread, direct);
     },
-    [setUnread],
+    [direct, setUnread],
   );
 
+  const title = direct ? "Messages" : "Request chats";
   return (
     <>
-      <h1 className="sr-only">Messages</h1>
+      <h1 className="sr-only">{title}</h1>
       <div
         className="flex h-[calc(100dvh-7.5rem)] min-h-[520px] overflow-hidden rounded-2xl border border-line bg-white shadow-card max-sm:-mx-4 max-sm:-mt-6 max-sm:h-[calc(100dvh-3.5rem)] max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0"
         data-testid="messages"
@@ -134,11 +138,11 @@ export function MessagesView() {
         >
           <div className="shrink-0 space-y-3 border-b border-line px-4 pb-3 pt-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-neutral-900">Messages</h2>
+              <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-neutral-900">{title}</h2>
               {list && list.unread > 0 ? (
                 <span className="tnum rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent-ink">{list.unread} unread</span>
               ) : null}
-              {canCreate ? (
+              {!direct && can("requests.create") ? (
                 <Button size="icon-sm" variant="ghost" className="ml-auto" aria-label="New request" title="New request" onClick={() => openDialog()}>
                   <Plus aria-hidden />
                 </Button>
@@ -153,14 +157,14 @@ export function MessagesView() {
                 className="w-full [&>button]:flex-1 [&>button]:justify-center"
               />
             ) : null}
-            <SearchField value={query} onChange={setQuery} label="Search conversations" placeholder="Search by ticket, person or message" size="md" />
-            <Segmented
+            <SearchField value={query} onChange={setQuery} label="Search conversations" placeholder="Search by name or message" size="md" />
+            {!direct ? <Segmented
               label="Show"
               value={filter}
               onChange={setFilter}
               options={FILTERS}
               className="w-full [&>button]:flex-1 [&>button]:justify-center"
-            />
+            /> : null}
           </div>
 
           <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto" data-testid="chat-list">
@@ -177,39 +181,35 @@ export function MessagesView() {
               </div>
             ) : list && list.items.length === 0 ? (
               debounced.trim() ? (
-                <EmptyState icon={SearchX} title="No conversations match" description="Try a ticket number, a name or words from a message." />
+                <EmptyState icon={SearchX} title="No conversations match" description="Try a name or words from a message." />
               ) : (
                 <EmptyState
                   icon={MessagesSquare}
                   title={
-                    filter === "closed" ? "No resolved conversations" : scope === "mine" && hasStaff ? "Nothing assigned to you" : "No conversations yet"
+                    direct && session.user.role === "team_lead" ? "No IT members available" : !direct && filter === "closed" ? "No resolved conversations" : scope === "mine" && hasStaff ? "Nothing assigned to you" : "No conversations yet"
                   }
                   description={
-                    filter === "closed"
+                    direct
+                      ? session.user.role === "it" ? "Messages from team leads will appear here for your linked IT staff entry." : undefined
+                      : filter === "closed"
                       ? "Conversations on resolved, cancelled or rejected requests show up here."
                       : scope === "mine" && hasStaff
                         ? "Requests routed to you show up here. Switch to All IT to see unassigned ones."
-                        : canCreate
-                        ? "All your requests to IT show up in one conversation with the people handling them."
                         : "Conversations appear here as soon as a request comes in."
-                  }
-                  action={
-                    canCreate && filter !== "closed" ? (
-                      <Button variant="primary" size="sm" onClick={() => openDialog()}>
-                        <Plus aria-hidden />
-                        New request
-                      </Button>
-                    ) : null
                   }
                 />
               )
             ) : (
               <ul className="p-2" aria-label="Conversations">
-                {list?.items.map((t) => (
-                  <li key={t.request.requesterId ?? t.request.id}>
-                    <ConversationRow thread={t} active={threadHas(t, selectedId)} onSelect={() => select(t.request.id)} />
-                  </li>
-                ))}
+                {list?.items.map((t) => {
+                  const id = "contact" in t ? t.contact.id : t.request.id;
+                  const key = "contact" in t ? id : t.request.requesterId ?? id;
+                  return (
+                    <li key={key}>
+                      <ConversationRow thread={t} active={threadHas(t, selectedId)} onSelect={() => select(id)} />
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -218,12 +218,12 @@ export function MessagesView() {
         {/* Thread */}
         <section aria-label="Conversation" className={cn("flex min-w-0 flex-1 flex-col bg-subtle/40", !selectedId && "max-md:hidden")}>
           {selectedId ? (
-            <ThreadPane key={selectedId} id={selectedId} seed={seed} onBack={() => select(null)} onThread={onThread} />
+            <ThreadPane key={selectedId} id={selectedId} direct={direct} seed={seed} onBack={() => select(null)} onThread={onThread} />
           ) : (
             <EmptyState
               icon={MessagesSquare}
               title="Pick a conversation"
-              description="Choose a request on the left to message the IT member handling it. Everything stays attached to the ticket."
+              description={direct && session.user.role === "team_lead" ? "Choose an IT member to start or continue a chat." : undefined}
               className="h-full"
             />
           )}
@@ -233,16 +233,13 @@ export function MessagesView() {
   );
 }
 
-function ConversationRow({ thread: t, active, onSelect }: { thread: ChatThread; active: boolean; onSelect: () => void }) {
-  const r = t.request;
+function ConversationRow({ thread: t, active, onSelect }: { thread: Conversation; active: boolean; onSelect: () => void }) {
   const c = counterpart(t);
   const last = t.lastMessage;
   const unread = t.unread > 0;
-  const closed = t.requests.every((x) => isClosed(x.status));
-  const multi = t.requests.length > 1;
   const preview = last
     ? `${last.side === t.side ? (last.mine ? "You: " : `${last.side === "it" ? last.senderName : last.authorName}: `) : ""}${(last.body || (last.attachments?.length ? "Photo" : "")).replace(/\s+/g, " ")}`
-    : "No messages yet — say hello";
+    : "No messages yet";
   return (
     <button
       type="button"
@@ -255,18 +252,12 @@ function ConversationRow({ thread: t, active, onSelect }: { thread: ChatThread; 
       data-testid="chat-row"
       data-unread={unread || undefined}
     >
-      <CounterpartAvatar thread={t} className={cn(closed && "opacity-60")} />
+      <CounterpartAvatar thread={t} />
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline gap-2">
           <span className={cn("truncate text-[13.5px] leading-5", unread ? "font-semibold text-neutral-900" : "font-medium text-neutral-800")}>{c.name}</span>
           {c.unassigned && t.side === "requester" ? <span className="shrink-0 text-[11px] text-neutral-400">Unassigned</span> : null}
-          <span className={cn("tnum ml-auto shrink-0 text-[11px]", unread ? "font-medium text-accent-ink" : "text-neutral-400")}>{listTime(t.lastActivityAt)}</span>
-        </span>
-        <span className="mt-0.5 flex items-center gap-1.5 text-xs text-neutral-500">
-          <span className="tnum shrink-0 font-mono text-[11px] font-medium text-neutral-600">{multi ? `${t.requests.length} requests` : r.ticket}</span>
-          <span aria-hidden className="text-neutral-300">·</span>
-          <span className="truncate">{multi ? t.requests.map((x) => x.ticket).join(", ") : requestSummary(r)}</span>
-          {closed ? <span className="ml-auto shrink-0 rounded-full bg-neutral-100 px-1.5 py-px text-[10.5px] font-medium text-neutral-500">Closed</span> : null}
+          {t.lastActivityAt ? <span className={cn("tnum ml-auto shrink-0 text-[11px]", unread ? "font-medium text-accent-ink" : "text-neutral-400")}>{listTime(t.lastActivityAt)}</span> : null}
         </span>
         <span className="mt-1 flex items-center gap-2">
           <span className={cn("min-w-0 flex-1 truncate text-[13px] leading-5", unread ? "font-medium text-neutral-800" : last ? "text-neutral-500" : "italic text-neutral-400")}>{preview}</span>

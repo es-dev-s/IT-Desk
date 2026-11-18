@@ -29,7 +29,7 @@ type ChatFilter struct {
 	// Assigned: "" (all), "me" (routed to the caller's own staff entry) or "none".
 	Assigned string
 	Query    string
-	Limit  int
+	Limit    int
 }
 
 // viewerSideSQL is domain.ChatSideFor in SQL; $1 = role, $2 = user id.
@@ -485,25 +485,15 @@ func (s *Store) ChatMessages(ctx context.Context, actor Actor, id, after string)
 // own directory entry, else the one the request is routed to.
 func (s *Store) PostChatMessage(ctx context.Context, actor Actor, id, body, as string, files []domain.ChatFileIn) (domain.RequestMessage, error) {
 	var out domain.RequestMessage
-	body = strings.TrimSpace(body)
-	if body == "" && len(files) == 0 {
-		return out, domain.Invalid("Please fix the highlighted fields.", map[string]string{"body": fmt.Sprintf("Write a message (up to %d characters)", domain.MaxMessageBody)})
-	}
-	if body != "" {
-		var ok bool
-		body, ok = domain.NormalizeMessage(body)
-		if !ok {
-			return out, domain.Invalid("Please fix the highlighted fields.", map[string]string{"body": fmt.Sprintf("Write a message (up to %d characters)", domain.MaxMessageBody)})
-		}
-	}
-	if err := domain.ValidateChatFiles(files); err != nil {
+	body, err := validateChatMessage(body, files)
+	if err != nil {
 		return out, err
 	}
 	as = strings.TrimSpace(as)
 	if as != "" && !domain.IsChatSide(as) {
 		return out, domain.Invalid("Please fix the highlighted fields.", map[string]string{"as": "Choose requester or it"})
 	}
-	err := s.withTx(ctx, writeTx, func(tx pgx.Tx) error {
+	err = s.withTx(ctx, writeTx, func(tx pgx.Tx) error {
 		r, err := lockRequest(ctx, tx, actor, id, nil)
 		if err != nil {
 			return err
@@ -540,11 +530,8 @@ func (s *Store) PostChatMessage(ctx context.Context, actor Actor, id, body, as s
 			msgID, id, side, actor.User.ID, actor.User.Name, actor.User.Role, staffID, staffName, body, now); err != nil {
 			return err
 		}
-		for _, f := range files {
-			if _, err := tx.Exec(ctx, `INSERT INTO it_request_message_files (id, message_id, name, content_type, data) VALUES ($1,$2,$3,$4,$5)`,
-				NewID("img"), msgID, f.Name, f.ContentType, f.Data); err != nil {
-				return err
-			}
+		if err := insertChatFiles(ctx, tx, msgID, files); err != nil {
+			return err
 		}
 		// Writing means you have read the conversation up to here.
 		if err := markRead(ctx, tx, id, side, now); err != nil {
@@ -566,6 +553,27 @@ func (s *Store) PostChatMessage(ctx context.Context, actor Actor, id, body, as s
 		return nil
 	})
 	return out, err
+}
+
+func validateChatMessage(body string, files []domain.ChatFileIn) (string, error) {
+	clean, valid := domain.NormalizeMessage(body)
+	if !valid && (clean != "" || len(files) == 0) {
+		return "", domain.Invalid("Please fix the highlighted fields.", map[string]string{"body": fmt.Sprintf("Write a message (up to %d characters)", domain.MaxMessageBody)})
+	}
+	if err := domain.ValidateChatFiles(files); err != nil {
+		return "", err
+	}
+	return clean, nil
+}
+
+func insertChatFiles(ctx context.Context, q querier, messageID string, files []domain.ChatFileIn) error {
+	for _, f := range files {
+		if _, err := q.Exec(ctx, `INSERT INTO it_request_message_files (id, message_id, name, content_type, data) VALUES ($1,$2,$3,$4,$5)`,
+			NewID("img"), messageID, f.Name, f.ContentType, f.Data); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func markRead(ctx context.Context, q querier, id, side string, at time.Time) error {
@@ -642,7 +650,11 @@ func loadAttachments(ctx context.Context, q querier, msgs []domain.RequestMessag
 		if !ok {
 			continue
 		}
-		a.URL = "/api/v1/it-requests/" + msgs[i].RequestID + "/messages/" + messageID + "/files/" + a.ID
+		if msgs[i].RequestID == "" {
+			a.URL = "/api/v1/direct-chats/files/" + messageID + "/" + a.ID
+		} else {
+			a.URL = "/api/v1/it-requests/" + msgs[i].RequestID + "/messages/" + messageID + "/files/" + a.ID
+		}
 		msgs[i].Attachments = append(msgs[i].Attachments, a)
 	}
 	return msgs, rows.Err()

@@ -207,6 +207,7 @@ func TestPolicyMatrixOverHTTP(t *testing.T) {
 		{"POST", "/api/v1/zones/move", map[string]any{"dryRun": true}, []string{"admin"}},
 		{"POST", "/api/v1/zone-changes/nope/undo", nil, []string{"admin"}},
 		{"PUT", "/api/v1/members/nope/seat", map[string]any{}, []string{"admin", "team_lead"}},
+		{"POST", "/api/v1/admin/users/nope/seat", map[string]string{"seatId": "A-3"}, []string{"admin"}},
 		{"GET", "/api/v1/exits", nil, []string{"admin", "team_lead"}},
 		{"GET", "/api/v1/overview", nil, []string{"admin", "team_lead"}},
 		{"GET", "/api/v1/activity", nil, []string{"admin"}},

@@ -2,14 +2,14 @@
 
 import { UsersRound } from "lucide-react";
 import { staffHue } from "@/lib/it-staff";
-import { counterpart, type ChatThread } from "@/lib/chat";
+import { counterpart, type Conversation } from "@/lib/chat";
 import { dayKey, formatShortDate, formatTime } from "@/lib/format";
 import { nowMs } from "@/lib/clock";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 
 /** The person (or the IT team) on the other side of a conversation. */
-export function CounterpartAvatar({ thread, size = "md", className }: { thread: ChatThread; size?: "sm" | "md" | "lg"; className?: string }) {
+export function CounterpartAvatar({ thread, size = "md", className }: { thread: Conversation; size?: "sm" | "md" | "lg"; className?: string }) {
   const c = counterpart(thread);
   if (c.unassigned && thread.side === "requester") {
     const box = size === "lg" ? "size-11" : size === "md" ? "size-9" : "size-8";

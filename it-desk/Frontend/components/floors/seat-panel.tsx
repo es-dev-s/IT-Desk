@@ -5,7 +5,7 @@ import { useMemberDetailLink } from "@/lib/member-detail-link";
 import { ArrowRightLeft, ChevronRight, Laptop, Loader2, UserMinus, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import type { Floor, FloorElement, Member } from "@/lib/schemas";
+import type { Floor, FloorElement, RosterEntry } from "@/lib/schemas";
 import { NO_TEAM_COLOR } from "@/lib/team-colors";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/components/auth/session-provider";
@@ -24,6 +24,8 @@ export type MoveState = {
   fromSeatId: string;
   place: (seat: FloorElement) => Promise<void>;
 };
+
+const currentSeat = (person: RosterEntry) => "seatId" in person ? person.seatId : null;
 
 /**
  * Details for one seat: who sits there (with lead badge and devices) and what
@@ -60,6 +62,7 @@ export function SeatPanel({
   const index = useSeatIndex();
   const members = useWorkspace((s) => s.members);
   const memberIds = useWorkspace((s) => s.memberIds);
+  const unrosteredLeads = useWorkspace((s) => s.unrosteredLeads);
   const { open: openDetail } = useMemberDetailLink();
   const [busy, setBusy] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -70,9 +73,12 @@ export function SeatPanel({
   const mayMove = canSeat && Boolean(o?.memberId) && (isAdmin || o?.teamId === myTeam);
   const maySeatHere = canSeat && !o && (isAdmin || (seat.teamId !== null && seat.teamId === myTeam));
 
-  const assign = async (memberId: string, seatId: string | null, label: string) => {
-    setBusy(memberId);
-    const res = await api.getState().assignSeat(memberId, seatId);
+  const assign = async (personId: string, seatId: string | null, label: string, accountOnly = false) => {
+    setBusy(personId);
+    const state = api.getState();
+    const res = accountOnly && seatId
+      ? await state.assignLeadSeat(personId, seatId)
+      : await state.assignSeat(personId, seatId);
     setBusy(null);
     if (!res.ok) {
       toast.error(res.error);
@@ -98,20 +104,22 @@ export function SeatPanel({
   };
 
   const candidates = useMemo(() => {
-    if (!maySeatHere) return [] as Member[];
+    if (!maySeatHere) return [];
     const t = query.trim().toLowerCase();
-    return memberIds
+    const roster = memberIds
       .map((id) => members[id])
-      .filter((m): m is Member => Boolean(m) && m.status === "active" && (isAdmin || m.teamId === myTeam))
+      .filter((m) => m?.status === "active" && (isAdmin || m.teamId === myTeam));
+    const people = isAdmin ? [...roster, ...unrosteredLeads] : roster;
+    return people
       .filter((m) => !t || m.name.toLowerCase().includes(t) || (teams[m.teamId]?.name ?? "").toLowerCase().includes(t))
       .sort(
         (a, b) =>
-          Number(Boolean(a.seatId)) - Number(Boolean(b.seatId)) ||
+          Number(Boolean(currentSeat(a))) - Number(Boolean(currentSeat(b))) ||
           Number(b.teamId === seat.teamId) - Number(a.teamId === seat.teamId) ||
           a.name.localeCompare(b.name),
       )
       .slice(0, 60);
-  }, [maySeatHere, query, memberIds, members, isAdmin, myTeam, teams, seat.teamId]);
+  }, [maySeatHere, query, memberIds, members, isAdmin, myTeam, teams, seat.teamId, unrosteredLeads]);
 
   return (
     <div className="space-y-4" data-testid="seat-panel" data-seat={seat.code}>
@@ -209,20 +217,23 @@ export function SeatPanel({
           {candidates.length ? (
             <ul className="scrollbar-thin -mx-1 max-h-80 space-y-0.5 overflow-y-auto px-1">
               {candidates.map((m) => {
-                const now = m.seatId ? index.get(m.seatId) : undefined;
+                const seatId = currentSeat(m);
+                const now = seatId ? index.get(seatId) : undefined;
+                const member = "status" in m ? m : null;
+                const isLead = member?.isLead ?? true;
                 const outside = seat.teamId !== null && m.teamId !== seat.teamId;
                 return (
                   <li key={m.id}>
                     <button
                       type="button"
                       disabled={busy !== null}
-                      onClick={() => void assign(m.id, seat.id, `${m.name} is now on Seat ${seat.code}`).then((ok) => ok && onClose())}
+                      onClick={() => void assign(m.id, seat.id, `${m.name} is now on Seat ${seat.code}`, !member).then((ok) => ok && onClose())}
                       data-testid="seat-candidate"
                       className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] hover:bg-neutral-50 disabled:opacity-50"
                     >
                       <span className="relative shrink-0">
-                        <Avatar name={m.name} hue={m.hue} size="sm" className={m.isLead ? "ring-2 ring-amber-400" : undefined} />
-                        {m.isLead ? <LeadBadge compact className="absolute -right-1 -top-1 scale-75" /> : null}
+                        <Avatar name={m.name} hue={member?.hue} size="sm" className={isLead ? "ring-2 ring-amber-400" : undefined} />
+                        {isLead ? <LeadBadge compact className="absolute -right-1 -top-1 scale-75" /> : null}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-medium text-neutral-900">{m.name}</span>

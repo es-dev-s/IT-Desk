@@ -1,12 +1,13 @@
 "use client";
 
 import { Check, LayoutGrid, Map as MapIcon, Minus, Rows3, SearchX, UserPlus, UsersRound } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { compareSeats } from "@/lib/constants";
-import type { ItStatus, Member } from "@/lib/schemas";
-import { useCurrentTeam, useTeamMembers, useTransfers } from "@/store/selectors";
+import type { ItStatus, RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import { useCurrentTeam, useTeamMembers, useTeamsById, useTransfers } from "@/store/selectors";
 import { useUI, type MemberSort, type MembersView as View } from "@/store/ui-store";
+import { useWorkspace } from "@/store/workspace-provider";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchField } from "@/components/ui/search-field";
@@ -17,6 +18,8 @@ import { Tip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { BulkBar } from "./bulk-bar";
 import { useSession } from "@/components/auth/session-provider";
+import { TeamSwitcher } from "@/components/auth/team-switcher";
+import { LeadSeatDialog } from "./lead-seat-dialog";
 import { MemberList } from "./member-list";
 import { SeatMap } from "./seat-map";
 import { SeatTile } from "./seat-tile";
@@ -30,24 +33,40 @@ const statusOptions = [
 
 const ignore = () => {};
 
-const matchesQuery = (m: Member, q: string) =>
-  !q || `${m.name} ${m.seat ?? ""} ${m.subGroup} ${m.email} ${m.employeeId}`.toLowerCase().includes(q);
+const matchesQuery = (entry: RosterEntry, q: string) => {
+  if (!q) return true;
+  const searchable = "status" in entry
+    ? `${entry.name} ${entry.seat ?? ""} ${entry.subGroup} ${entry.email} ${entry.employeeId}`
+    : `${entry.name} ${entry.title} ${entry.email}`;
+  return searchable.toLowerCase().includes(q);
+};
+
+const isLead = (entry: RosterEntry) => "status" in entry ? entry.isLead : true;
 
 export function MembersView() {
   const team = useCurrentTeam();
   const all = useTeamMembers();
+  const teams = useTeamsById();
+  const unrosteredLeads = useWorkspace((s) => s.unrosteredLeads);
+  const selectedTeamId = useWorkspace((s) => s.requestedTeamId ?? s.currentTeamId);
+  const selectTeam = useWorkspace((s) => s.selectTeam);
   const f = useUI(useShallow((s) => s.members));
   const setMembers = useUI((s) => s.setMembers);
   const toggle = useUI((s) => s.toggleSelected);
   const setSelection = useUI((s) => s.setSelection);
   const clear = useUI((s) => s.clearSelection);
   const reset = useUI((s) => s.resetMemberFilters);
-  const { can } = useSession();
-  // Admins see the floor read-only: no selection, no bulk bar.
+  const { can, session } = useSession();
+  const isAdmin = session.user.role === "admin";
+  const defaultStatus = isAdmin && team ? "all" : "active";
+  const status = f.status ?? defaultStatus;
+  // Bulk selection is for transfers and exits.
   const selectable = can("transfers.create") || can("exits.create");
   const onToggle = selectable ? toggle : ignore;
   const canManage = can("members.manage");
+  const canSeatLead = isAdmin && can("seats.assign");
   const openMemberDialog = useUI((s) => s.openMemberDialog);
+  const [leadToSeat, setLeadToSeat] = useState<UnrosteredLead | null>(null);
   const [toolbarRef, toolbarWidth] = useElementWidth<HTMLDivElement>();
 
   const transfers = useTransfers();
@@ -60,37 +79,55 @@ export function MembersView() {
 
   /** Sub-groups come from the roster itself (no hard-coded list). */
   const subGroups = useMemo(() => [...new Set(all.map((m) => m.subGroup))].sort((a, b) => a.localeCompare(b)), [all]);
+  const subGroup = subGroups.includes(f.subGroup) ? f.subGroup : "all";
+  const roster = useMemo(
+    () => isAdmin ? [...all, ...unrosteredLeads.filter((lead) => !team || lead.teamId === team.id)] : all,
+    [all, isAdmin, team, unrosteredLeads],
+  );
 
   const counts = useMemo(() => {
-    const c = { all: all.length, active: 0, resigned: 0, unknown: 0 };
-    for (const m of all) c[m.status] += 1;
+    const c = { all: roster.length, active: 0, resigned: 0, unknown: 0 };
+    for (const entry of roster) c["status" in entry ? entry.status : "active"] += 1;
     return c;
-  }, [all]);
+  }, [roster]);
 
   const filtered = useMemo(() => {
     const q = f.query.trim().toLowerCase();
-    return all
-      .filter((m) => (f.status === "all" || m.status === f.status) && (f.subGroup === "all" || m.subGroup === f.subGroup) && matchesQuery(m, q))
-      .sort((a, b) => (f.sort === "name" ? a.name.localeCompare(b.name) : compareSeats(a.seat, b.seat) || a.name.localeCompare(b.name)));
-  }, [all, f.query, f.status, f.subGroup, f.sort]);
+    return roster
+      .filter((entry) => {
+        const entryStatus = "status" in entry ? entry.status : "active";
+        const matchesGroup = subGroup === "all" || ("subGroup" in entry && entry.subGroup === subGroup);
+        return (status === "all" || entryStatus === status) && matchesGroup && matchesQuery(entry, q);
+      })
+      .sort((a, b) => {
+        const leadsFirst = Number(isLead(b)) - Number(isLead(a));
+        const bySeat = f.sort === "seat" ? compareSeats("seat" in a ? a.seat : null, "seat" in b ? b.seat : null) : 0;
+        return leadsFirst || bySeat || a.name.localeCompare(b.name);
+      });
+  }, [roster, f.query, f.sort, status, subGroup]);
 
   const active = useMemo(() => all.filter((m) => m.status === "active"), [all]);
   const mapMatches = useMemo(() => {
     const q = f.query.trim().toLowerCase();
-    return new Set(active.filter((m) => (f.subGroup === "all" || m.subGroup === f.subGroup) && matchesQuery(m, q)).map((m) => m.id));
-  }, [active, f.query, f.subGroup]);
+    return new Set(active.filter((m) => (subGroup === "all" || m.subGroup === subGroup) && matchesQuery(m, q)).map((m) => m.id));
+  }, [active, f.query, subGroup]);
 
   const selectedIds = Object.keys(f.selected).filter((id) => active.some((m) => m.id === id));
-  const scope = f.view === "map" ? active.filter((m) => mapMatches.has(m.id)) : filtered.filter((m) => m.status === "active");
+  const scope = f.view === "map" ? active.filter((m) => mapMatches.has(m.id)) : filtered.filter((m) => "status" in m && m.status === "active");
   const allChecked = scope.length > 0 && scope.every((m) => f.selected[m.id]);
   const someChecked = !allChecked && scope.some((m) => f.selected[m.id]);
   const visible = filtered.slice(0, f.visible);
 
   const isMap = f.view === "map";
-  const statusOff = !isMap && f.status !== "active";
-  const groupOff = f.subGroup !== "all";
+  const teamOff = isAdmin && selectedTeamId !== "";
+  const statusOff = !isMap && status !== defaultStatus;
+  const groupOff = subGroup !== "all";
   const sortOff = !isMap && f.sort !== "seat";
+  const filterCount = Number(teamOff) + Number(groupOff) + Number(sortOff);
   const statusInline = (toolbarWidth ?? 0) >= 920;
+  const clearTeam = () => {
+    if (teamOff) void selectTeam("");
+  };
 
   return (
     <>
@@ -111,7 +148,7 @@ export function MembersView() {
             size="md"
             className="hidden @min-[920px]:inline-flex"
             label="Status"
-            value={f.status}
+            value={status}
             onChange={(status) => setMembers({ status })}
             options={statusOptions.map((o) => ({ ...o, count: counts[o.value] }))}
           />
@@ -119,21 +156,29 @@ export function MembersView() {
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <FiltersPopover
             labelClassName="@max-[480px]:sr-only"
-            canReset={statusOff || groupOff || sortOff}
-            onReset={() => setMembers({ status: "active", subGroup: "all", sort: "seat" })}
+            canReset={statusOff || filterCount > 0}
+            onReset={() => {
+              setMembers({ status: null, subGroup: "all", sort: "seat" });
+              clearTeam();
+            }}
             tiers={[
-              { value: +statusOff + +groupOff + +sortOff, className: "grid @min-[920px]:hidden" },
-              { value: +groupOff + +sortOff, className: "hidden @min-[920px]:grid" },
+              { value: Number(statusOff) + filterCount, className: "grid @min-[920px]:hidden" },
+              { value: filterCount, className: "hidden @min-[920px]:grid" },
             ]}
           >
+            {isAdmin ? (
+              <FilterRow label="Team">
+                <TeamSwitcher className="min-w-0" size="md" label="Filter members by team" testId="member-team-filter" singleChevron />
+              </FilterRow>
+            ) : null}
             {isMap || statusInline ? null : (
               <FilterRow label="Status">
                 <SelectField
                   size="md"
                   className="w-full"
                   label="Status"
-                  value={f.status}
-                  onValueChange={(status) => setMembers({ status: status as typeof f.status })}
+                  value={status}
+                  onValueChange={(status) => setMembers({ status: status as NonNullable<typeof f.status> })}
                   options={statusOptions.map((o) => ({ value: o.value, label: `${o.label} · ${counts[o.value]}` }))}
                 />
               </FilterRow>
@@ -143,7 +188,7 @@ export function MembersView() {
                 size="md"
                 className="w-full"
                 label="Sub-group"
-                value={f.subGroup}
+                value={subGroup}
                 onValueChange={(subGroup) => setMembers({ subGroup })}
                 options={[{ value: "all", label: "All groups" }, ...subGroups.map((g) => ({ value: g, label: g }))]}
               />
@@ -218,7 +263,7 @@ export function MembersView() {
 
       {f.view === "map" ? (
         <SeatMap teamId={team?.id ?? ""} members={active} matches={mapMatches} selected={f.selected} onToggle={onToggle} />
-      ) : all.length === 0 ? (
+      ) : roster.length === 0 ? (
         <div className="rounded-card border border-line bg-white" data-testid="members-empty-team">
           <EmptyState
             icon={UsersRound}
@@ -250,7 +295,10 @@ export function MembersView() {
             title="No members match"
             description="Try a different name or seat, or clear the filters."
             action={
-              <Button size="sm" onClick={reset}>
+              <Button size="sm" onClick={() => {
+                reset();
+                clearTeam();
+              }}>
                 Clear filters
               </Button>
             }
@@ -261,18 +309,26 @@ export function MembersView() {
           {visible.map((m) => (
             <li key={m.id}>
               <SeatTile
-                member={m}
+                entry={m}
+                teamName={teams[m.teamId]?.name}
                 selected={Boolean(f.selected[m.id])}
                 selecting={selectedIds.length > 0}
                 pending={pending.get(m.id)}
                 onToggle={onToggle}
                 selectable={selectable}
+                onAssignLeadSeat={canSeatLead ? setLeadToSeat : undefined}
               />
             </li>
           ))}
         </ul>
       ) : (
-        <MemberList members={visible} selected={f.selected} onToggle={onToggle} selectable={selectable} />
+        <MemberList
+          members={visible}
+          selected={f.selected}
+          onToggle={onToggle}
+          selectable={selectable}
+          onAssignLeadSeat={canSeatLead ? setLeadToSeat : undefined}
+        />
       )}
 
       {f.view !== "map" && filtered.length > visible.length ? (
@@ -285,6 +341,7 @@ export function MembersView() {
       ) : null}
 
       <BulkBar ids={selectedIds} />
+      {canSeatLead && leadToSeat ? <LeadSeatDialog lead={leadToSeat} onClose={() => setLeadToSeat(null)} /> : null}
     </>
   );
 }

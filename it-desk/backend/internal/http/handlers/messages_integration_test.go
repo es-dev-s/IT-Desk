@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"testing"
+
+	"itdesk/backend/internal/domain"
 )
 
 type chatMsg struct {
@@ -17,14 +19,14 @@ type chatMsg struct {
 }
 
 type chatThread struct {
-	Request      reqView  `json:"request"`
+	Request      reqView   `json:"request"`
 	Requests     []reqView `json:"requests"`
-	Side         string   `json:"side"`
-	CanPostAs    []string `json:"canPostAs"`
-	MessageCount int      `json:"messageCount"`
-	Unread       int      `json:"unread"`
-	LastMessage  *chatMsg `json:"lastMessage"`
-	OtherReadAt  *string  `json:"otherReadAt"`
+	Side         string    `json:"side"`
+	CanPostAs    []string  `json:"canPostAs"`
+	MessageCount int       `json:"messageCount"`
+	Unread       int       `json:"unread"`
+	LastMessage  *chatMsg  `json:"lastMessage"`
+	OtherReadAt  *string   `json:"otherReadAt"`
 }
 
 func chatUnread(t *testing.T, c *client) (int, int) {
@@ -102,7 +104,7 @@ func TestRequestChatHTTP(t *testing.T) {
 	r = lead.do("GET", "/api/v1/chats?status=active", nil)
 	var list struct {
 		Items  []chatThread `json:"items"`
-		Unread int         `json:"unread"`
+		Unread int          `json:"unread"`
 	}
 	_ = json.Unmarshal(r.Data, &list)
 	if r.Status != 200 || len(list.Items) != 1 || !hasReq(list.Items[0].Requests, mine.ID) || list.Items[0].Unread != 1 ||
@@ -221,6 +223,104 @@ func TestStaffLoginLinkHTTP(t *testing.T) {
 	if n, _ := chatUnread(t, lead); n != 1 {
 		t.Errorf("lead unread = %d, want 1", n)
 	}
+}
+
+func TestDirectChatHTTP(t *testing.T) {
+	ts, _ := liveServer(t)
+	lead := newClient(t, ts).mustLogin("lead@example.com")
+	otherLead := newClient(t, ts).mustLogin("lead3@example.com")
+	admin := newClient(t, ts).mustLogin("admin@example.com")
+	it := newClient(t, ts).mustLogin("it@example.com")
+
+	const (
+		inbox     = "/api/v1/direct-chats"
+		ujjal     = inbox + "/its_ujjal_dahal/messages"
+		nabin     = inbox + "/its_nabin_baraili/messages"
+		leadChat  = inbox + "/lead_test/messages"
+		otherChat = inbox + "/lead_three/messages"
+	)
+
+	contacts := decodeChatResponse[domain.DirectChatList](t, lead.do("GET", inbox, nil), 200)
+	byID := make(map[string]domain.DirectChatThread)
+	for _, item := range contacts.Items {
+		byID[item.Contact.ID] = item
+	}
+	n, u := byID["its_nabin_baraili"], byID["its_ujjal_dahal"]
+	if len(byID) != 5 || n.Contact.Name != "Nabin Baraili" || u.Contact.Name != "Ujjal Dahal" ||
+		n.Contact.Available || len(n.CanPostAs) != 1 || n.LastMessage != nil {
+		t.Fatalf("expected all five directory entries before any requests or messages: %+v", contacts)
+	}
+
+	first := decodeChatResponse[domain.RequestMessage](t, lead.do("POST", ujjal, map[string]any{
+		"body":   "Can you check the monitor?",
+		"images": []map[string]string{{"name": "screen.png", "data": "iVBORw0KGgo="}},
+	}), 201)
+	decodeChatResponse[domain.RequestMessage](t, lead.do("POST", nabin, map[string]any{"body": "Can you check stock?"}), 201)
+	if first.Ticket != "" || first.RequestID != "" || len(first.Attachments) != 1 || !first.Mine {
+		t.Fatalf("direct message must be independent of requests: %+v", first)
+	}
+	file := first.Attachments[0].URL
+	if r := it.do("GET", file, nil); r.Status != 404 {
+		t.Fatalf("unlinked IT was able to access the attachment: %d", r.Status)
+	}
+	decodeChatResponse[domain.ITStaff](t, admin.do("PATCH", "/api/v1/admin/it-staff/its_ujjal_dahal", map[string]any{"userId": "usr_it"}), 200)
+	if r := it.do("GET", file, nil); r.Status != 200 || r.Header.Get("Content-Type") != "image/png" {
+		t.Fatalf("linked IT cannot access the attachment: %d", r.Status)
+	}
+	for _, viewer := range []*client{otherLead, admin} {
+		if r := viewer.do("GET", file, nil); r.Status != 404 {
+			t.Fatalf("nonparticipant accessed the attachment: %d", r.Status)
+		}
+	}
+	if r := it.do("POST", otherChat, map[string]any{"body": "Wrong lead"}); r.Status != 404 {
+		t.Fatalf("another lead's conversation should be inaccessible: %d", r.Status)
+	}
+	empty := decodeChatResponse[domain.DirectChatMessages](t, otherLead.do("GET", ujjal, nil), 200)
+	if len(empty.Messages) != 0 {
+		t.Fatalf("same-team lead can see the other lead's messages: %+v", empty.Messages)
+	}
+
+	incoming := decodeChatResponse[domain.DirectChatList](t, it.do("GET", inbox, nil), 200)
+	if incoming.Unread != 1 || incoming.UnreadChats != 1 || len(incoming.Items) != 1 ||
+		incoming.Items[0].Contact.Name != "Lead One" || incoming.Items[0].LastMessage == nil || incoming.Items[0].LastMessage.ID != first.ID {
+		t.Fatalf("IT inbox includes only its own messages: %+v", incoming)
+	}
+	reply := decodeChatResponse[domain.RequestMessage](t, it.do("POST", leadChat, map[string]any{"body": "I’ll check it now."}), 201)
+	if reply.SenderName != "Ujjal Dahal" || reply.OnBehalf || reply.Side != "it" {
+		t.Fatalf("reply should be attributed to the linked IT member: %+v", reply)
+	}
+	page := decodeChatResponse[domain.DirectChatMessages](t, lead.do("GET", ujjal+"?after="+first.ID, nil), 200)
+	if !page.Thread.Contact.Available || page.Thread.MessageCount != 2 || page.Thread.Unread != 1 ||
+		len(page.Messages) != 1 || page.Messages[0].ID != reply.ID {
+		t.Fatalf("reply should appear in the original thread: %+v", page)
+	}
+	otherPage := decodeChatResponse[domain.DirectChatMessages](t, lead.do("GET", nabin, nil), 200)
+	if len(otherPage.Messages) != 1 || otherPage.Messages[0].Body != "Can you check stock?" {
+		t.Fatalf("other IT member should have a separate thread: %+v", otherPage.Messages)
+	}
+	filtered := decodeChatResponse[domain.DirectChatList](t, lead.do("GET", inbox+"?q=monitor", nil), 200)
+	if len(filtered.Items) != 1 || filtered.Items[0].Contact.ID != "its_ujjal_dahal" ||
+		filtered.Items[0].LastMessage == nil || filtered.Items[0].LastMessage.ID != reply.ID {
+		t.Fatalf("search should show the matching chat and its latest preview: %+v", filtered)
+	}
+	if u := decodeChatResponse[domain.ChatUnread](t, lead.do("POST", ujjal+"/read", map[string]any{}), 200); u.Unread != 0 {
+		t.Fatalf("read should clear the lead's direct unread count: %+v", u)
+	}
+	if n, _ := chatUnread(t, lead); n != 0 {
+		t.Fatalf("direct messages changed the request unread count: %d", n)
+	}
+}
+
+func decodeChatResponse[T any](t *testing.T, r resp, status int) T {
+	t.Helper()
+	if r.Status != status {
+		t.Fatalf("chat status %d, want %d (%s: %s)", r.Status, status, r.Error.Code, r.Error.Message)
+	}
+	var v T
+	if err := json.Unmarshal(r.Data, &v); err != nil {
+		t.Fatal(err)
+	}
+	return v
 }
 
 func hasReq(rs []reqView, id string) bool {

@@ -4,22 +4,32 @@ import * as CM from "@radix-ui/react-context-menu";
 import * as DM from "@radix-ui/react-dropdown-menu";
 import { Armchair, CircleHelp, Ellipsis, Building2, PanelRightOpen, PencilLine, UserX } from "lucide-react";
 import { useMemberDetailLink } from "@/lib/member-detail-link";
-import type { Member } from "@/lib/schemas";
+import type { RosterEntry, UnrosteredLead } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { useUI } from "@/store/ui-store";
 import { useSession } from "@/components/auth/session-provider";
 import { menuContentClass, menuItemClass, menuItemDangerClass, menuLabelClass, menuSeparatorClass } from "@/components/ui/menu";
 
 type Action = { id: string; label: string; icon: React.ComponentType; danger?: boolean; run: () => void };
+type MemberActionProps = { entry: RosterEntry; onAssignLeadSeat?: (lead: UnrosteredLead) => void };
 
 /** One action list for both the right-click menu and the ⋯ menu. Acts on the selection when the member is in it. */
-function useMemberActions(member: Member) {
+function useMemberActions({ entry, onAssignLeadSeat }: MemberActionProps) {
   const selected = useUI((s) => s.members.selected);
   const openTransfer = useUI((s) => s.openTransfer);
   const openExit = useUI((s) => s.openExit);
   const openMemberDialog = useUI((s) => s.openMemberDialog);
   const { can } = useSession();
   const { open: openDetail } = useMemberDetailLink();
+  const view: Action[] = [{ id: "view", label: "View details", icon: PanelRightOpen, run: () => openDetail(entry.id) }];
+  if (!("status" in entry)) {
+    const actions: (Action | "sep")[] = [...view];
+    if (onAssignLeadSeat) {
+      actions.push("sep", { id: "seat", label: "Assign seat", icon: Armchair, run: () => onAssignLeadSeat(entry) });
+    }
+    return { actions, heading: entry.name };
+  }
+  const member = entry;
   const active = member.status === "active";
   const selectedIds = Object.keys(selected);
   const ids = selected[member.id] && selectedIds.length > 1 ? selectedIds : [member.id];
@@ -40,22 +50,20 @@ function useMemberActions(member: Member) {
         { id: "unknown", label: "Mark as unknown", icon: CircleHelp, run: () => openExit("unknown", ids) },
       ]
     : [];
-  const view: Action[] = [{ id: "view", label: "View details", icon: PanelRightOpen, run: () => openDetail(member.id) }];
   const actions: (Action | "sep")[] = [];
   for (const group of [view, edits, moves, exits]) {
     if (!group.length) continue;
     if (actions.length) actions.push("sep");
     actions.push(...group);
   }
-  const disabled = actions.length === 0;
-  return { actions, heading, disabled };
+  return { actions, heading };
 }
 
-export function MemberContextMenu({ member, children }: { member: Member; children: React.ReactNode }) {
-  const { actions, heading, disabled } = useMemberActions(member);
+export function MemberContextMenu({ children, ...props }: MemberActionProps & { children: React.ReactNode }) {
+  const { actions, heading } = useMemberActions(props);
   return (
     <CM.Root>
-      <CM.Trigger asChild disabled={disabled}>
+      <CM.Trigger asChild>
         {children}
       </CM.Trigger>
       <CM.Portal>
@@ -77,13 +85,12 @@ export function MemberContextMenu({ member, children }: { member: Member; childr
   );
 }
 
-export function MemberMenuButton({ member, className }: { member: Member; className?: string }) {
-  const { actions, heading, disabled } = useMemberActions(member);
-  if (disabled) return null;
+export function MemberMenuButton({ className, ...props }: MemberActionProps & { className?: string }) {
+  const { actions, heading } = useMemberActions(props);
   return (
     <DM.Root modal={false}>
       <DM.Trigger
-        aria-label={`Actions for ${member.name}`}
+        aria-label={`Actions for ${props.entry.name}`}
         onClick={(e) => e.stopPropagation()}
         className={cn(
           "grid size-7 place-items-center rounded-md text-neutral-400 outline-none transition-[background-color,color,opacity] duration-150 hover:bg-neutral-900/[0.05] hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-accent/35 data-[state=open]:bg-neutral-900/[0.05] data-[state=open]:text-neutral-800 data-[state=open]:opacity-100",

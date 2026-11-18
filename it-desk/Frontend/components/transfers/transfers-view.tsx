@@ -3,12 +3,13 @@
 import { ArrowLeftRight, Inbox } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ACTIVITY_PAGE_SIZE } from "@/lib/constants";
-import { formatShortDate } from "@/lib/format";
+import { dayKey, formatDate, formatShortDate } from "@/lib/format";
 import type { Direction } from "@/lib/schemas";
 import { useExits, useTransfers } from "@/store/selectors";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { inputClass } from "@/components/ui/field";
 import { SearchField } from "@/components/ui/search-field";
 import { Segmented } from "@/components/ui/segmented";
 import { SelectField } from "@/components/ui/select";
@@ -32,31 +33,48 @@ const statusOptions = [
   { value: "completed", label: "Completed" },
 ];
 
+const emptyRange = { startDate: "", endDate: "" };
+const formatDay = (day: string) => formatDate(`${day}T00:00:00Z`);
+
 export function TransfersView() {
   const transfers = useTransfers();
   const exits = useExits();
   const [direction, setDirection] = useState<"all" | Direction>("all");
   const [status, setStatus] = useState("all");
   const [query, setQuery] = useState("");
+  const [draftRange, setDraftRange] = useState(emptyRange);
+  const [range, setRange] = useState(emptyRange);
   const [visible, setVisible] = useState(ACTIVITY_PAGE_SIZE);
   const [toolbarRef, toolbarWidth] = useElementWidth<HTMLDivElement>();
   const changeDirection = (d: "all" | Direction) => { setDirection(d); setVisible(ACTIVITY_PAGE_SIZE); };
   const changeStatus = (v: string) => { setStatus(v); setVisible(ACTIVITY_PAGE_SIZE); };
+  const clearDates = () => { setDraftRange(emptyRange); setRange(emptyRange); setVisible(ACTIVITY_PAGE_SIZE); };
+  const rangeReversed = Boolean(draftRange.startDate && draftRange.endDate && draftRange.startDate > draftRange.endDate);
+  const canApply = Boolean(draftRange.startDate && draftRange.endDate && !rangeReversed &&
+    (draftRange.startDate !== range.startDate || draftRange.endDate !== range.endDate));
+
+  const datedTransfers = useMemo(() => {
+    if (!range.startDate) return transfers;
+    return transfers.filter((t) => {
+      const day = dayKey(Date.parse(t.createdAt));
+      return day >= range.startDate && day <= range.endDate;
+    });
+  }, [transfers, range]);
 
   const counts = useMemo(() => {
-    const c = { all: transfers.length, in: 0, out: 0, internal: 0 };
-    for (const t of transfers) c[t.direction] += 1;
+    const c = { all: datedTransfers.length, in: 0, out: 0, internal: 0 };
+    for (const t of datedTransfers) c[t.direction] += 1;
     return c;
-  }, [transfers]);
+  }, [datedTransfers]);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return transfers
+    return datedTransfers
       .filter((t) => direction === "all" || t.direction === direction)
       .filter((t) => (status === "all" ? true : status === "open" ? t.itStatus !== "completed" : t.itStatus === status))
       .filter((t) => !q || `${t.ticket} ${t.moves.map((m) => `${m.memberName} ${m.fromSeat} ${m.toSeat}`).join(" ")}`.toLowerCase().includes(q))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }, [transfers, direction, status, query]);
+  }, [datedTransfers, direction, status, query]);
 
   return (
     <>
@@ -116,6 +134,58 @@ export function TransfersView() {
         </div>
       </Toolbar>
 
+      <form
+        aria-label="Date range filter"
+        className="mb-4 space-y-2"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!canApply) return;
+          setRange(draftRange);
+          setVisible(ACTIVITY_PAGE_SIZE);
+        }}
+      >
+        <div className="flex flex-wrap items-end gap-2">
+          <label className="grid gap-1 text-xs font-medium text-neutral-600">
+            Start date
+            <input
+              type="date"
+              className={inputClass}
+              required
+              min="0001-01-01"
+              max="9999-12-31"
+              value={draftRange.startDate}
+              onChange={(event) => setDraftRange({ ...draftRange, startDate: event.target.value })}
+            />
+          </label>
+          <label className="grid gap-1 text-xs font-medium text-neutral-600">
+            End date
+            <input
+              type="date"
+              className={inputClass}
+              required
+              min="0001-01-01"
+              max="9999-12-31"
+              aria-invalid={rangeReversed || undefined}
+              aria-describedby={rangeReversed ? "transfer-date-range-error" : undefined}
+              value={draftRange.endDate}
+              onChange={(event) => setDraftRange({ ...draftRange, endDate: event.target.value })}
+            />
+          </label>
+          <Button type="submit" variant="primary" disabled={!canApply}>Apply dates</Button>
+          {draftRange.startDate || draftRange.endDate || range.startDate ? (
+            <Button variant="ghost" onClick={clearDates}>Clear dates</Button>
+          ) : null}
+        </div>
+        {rangeReversed ? (
+          <p id="transfer-date-range-error" role="alert" className="text-xs text-red-600">End date must be on or after the start date.</p>
+        ) : null}
+        <p className="text-xs text-neutral-500" aria-live="polite">
+          {range.startDate
+            ? `Showing transfers created from ${formatDay(range.startDate)} to ${formatDay(range.endDate)} (Nepal Time).`
+            : "Filter by the date the transfer was created (Nepal Time)."}
+        </p>
+      </form>
+
       <Card className="overflow-hidden">
         {rows.length ? (
           <TransferTable transfers={rows.slice(0, visible)} className="[&_thead_tr]:border-t-0" />
@@ -130,9 +200,9 @@ export function TransfersView() {
             <EmptyState
               icon={Inbox}
               title="No transfers match"
-              description="Try another type or status, or clear the search."
+              description="Try a different date range, type, status, or search."
               action={
-                <Button size="sm" onClick={() => { changeDirection("all"); changeStatus("all"); setQuery(""); }}>
+                <Button size="sm" onClick={() => { changeDirection("all"); changeStatus("all"); setQuery(""); clearDates(); }}>
                   Clear filters
                 </Button>
               }

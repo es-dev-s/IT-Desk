@@ -1,11 +1,15 @@
 "use client";
 
+import { Printer } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatDate } from "@/lib/format";
 import { exportHref, reportsApi, TASK_STATUS_LABEL, type ITTaskRow, type TaskReportFilter } from "@/lib/reports";
 import { cn } from "@/lib/utils";
 import { useTeams } from "@/store/selectors";
 import { useSession } from "@/components/auth/session-provider";
+import { TeamCombobox } from "@/components/teams/team-combobox";
+import { Button } from "@/components/ui/button";
+import { inputClass } from "@/components/ui/field";
 import { SearchField } from "@/components/ui/search-field";
 import { SelectField } from "@/components/ui/select";
 import { Blank, ExportButton, ReportTable, useDebounced, useReport, type Column } from "./report-ui";
@@ -15,6 +19,10 @@ const STATUS_OPTIONS = [
   { value: "completed", label: "Completed" },
   { value: "open", label: "Not completed" },
 ];
+
+const ALL_TEAMS = [{ value: "all", label: "All teams" }];
+const EMPTY_RANGE = { startDate: "", endDate: "" };
+const formatDay = (day: string) => formatDate(`${day}T00:00:00Z`);
 
 /**
  * Tasks assigned to IT members: when each was assigned and completed, who it
@@ -29,13 +37,23 @@ export function ITTaskReport() {
   const [itMember, setItMember] = useState("all");
   const [status, setStatus] = useState<NonNullable<TaskReportFilter["status"]>>("all");
   const [search, setSearch] = useState("");
+  const [draft, setDraft] = useState(EMPTY_RANGE);
+  const [range, setRange] = useState(EMPTY_RANGE);
   const q = useDebounced(search);
   const filter = useMemo<TaskReportFilter>(
-    () => ({ teamId: role === "team_lead" ? undefined : teamId, itMember: role === "it" ? undefined : itMember, status, q }),
-    [role, teamId, itMember, status, q],
+    () => ({
+      teamId: role === "team_lead" ? undefined : teamId,
+      itMember: role === "it" ? undefined : itMember,
+      status,
+      q,
+      ...range,
+    }),
+    [role, teamId, itMember, status, q, range],
   );
-  const { data, error, loading, retry } = useReport(JSON.stringify(filter), (signal) => reportsApi.itTasks(filter, signal));
-  const staff = data?.staff ?? [];
+  const { data: latest, currentData: data, error, loading, retry } = useReport(JSON.stringify(filter), (signal) => reportsApi.itTasks(filter, signal));
+  const staff = latest?.staff ?? [];
+  const rangeLabel = range.startDate ? `${formatDay(range.startDate)} to ${formatDay(range.endDate)}` : "All dates";
+  const count = data ? `${data.rows.length} ${data.rows.length === 1 ? "task" : "tasks"} · ${data.completed} completed` : "";
 
   const columns = useMemo<Column<ITTaskRow>[]>(() => {
     const cols: Column<ITTaskRow>[] = [
@@ -62,18 +80,21 @@ export function ITTaskReport() {
   }, [role]);
 
   return (
-    <div className="space-y-4" data-testid="it-task-report">
-      <h1 className="sr-only">IT task report</h1>
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="it-task-report space-y-4" data-testid="it-task-report">
+      <h1 className="sr-only print:not-sr-only print:text-lg print:font-semibold">IT task report</h1>
+      <div className="flex flex-wrap items-center gap-2 print:hidden">
         <SearchField value={search} onChange={setSearch} label="Search tasks" placeholder="Search a member, device or request" size="md" className="w-full sm:w-80" />
         {role === "team_lead" ? null : (
-          <SelectField
+          <TeamCombobox
             label="Team"
             prefix="Team"
-            size="md"
+            variant="toolbar"
+            className="max-w-full"
             value={teamId}
-            onValueChange={setTeamId}
-            options={[{ value: "all", label: "All teams" }, ...teams.map((t) => ({ value: t.id, label: t.name }))]}
+            onChange={setTeamId}
+            teams={teams}
+            extras={ALL_TEAMS}
+            testId="task-report-team-filter"
           />
         )}
         {role === "it" ? null : (
@@ -88,11 +109,68 @@ export function ITTaskReport() {
         )}
         <SelectField label="Status" size="md" value={status} onValueChange={(v) => setStatus(v as typeof status)} options={STATUS_OPTIONS} />
         <p className="tnum ml-auto text-xs text-neutral-500" data-testid="report-count" aria-live="polite">
-          {data ? `${data.rows.length} ${data.rows.length === 1 ? "task" : "tasks"} · ${data.completed} completed` : "Loading…"}
+          {count || (loading ? "Loading…" : "Report unavailable")}
         </p>
+        <Button onClick={() => window.print()} disabled={!data}>
+          <Printer aria-hidden /> Print
+        </Button>
         <ExportButton href={exportHref("it-tasks", filter)} disabled={!data || data.rows.length === 0} />
       </div>
-      {role === "it" ? <p className="text-xs text-neutral-500">Showing the tasks assigned to you.</p> : null}
+      <form
+        aria-label="Date range filter"
+        className="flex flex-wrap items-end gap-2 print:hidden"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setRange(draft);
+        }}
+      >
+        <label className="grid gap-1 text-xs font-medium text-neutral-600">
+          Start Date
+          <input
+            type="date"
+            className={inputClass}
+            required
+            min="0001-01-01"
+            max={draft.endDate || "9999-12-31"}
+            value={draft.startDate}
+            onChange={(event) => setDraft({ ...draft, startDate: event.target.value })}
+          />
+        </label>
+        <label className="grid gap-1 text-xs font-medium text-neutral-600">
+          End Date
+          <input
+            type="date"
+            className={inputClass}
+            required
+            min={draft.startDate || "0001-01-01"}
+            max="9999-12-31"
+            value={draft.endDate}
+            onChange={(event) => setDraft({ ...draft, endDate: event.target.value })}
+          />
+        </label>
+        <Button type="submit" variant="primary" disabled={draft.startDate === range.startDate && draft.endDate === range.endDate}>
+          Apply dates
+        </Button>
+        {range.startDate || draft.startDate || draft.endDate ? (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setDraft(EMPTY_RANGE);
+              setRange(EMPTY_RANGE);
+            }}
+          >
+            Clear dates
+          </Button>
+        ) : null}
+      </form>
+      <p className="text-xs text-neutral-500 print:hidden" aria-live="polite">
+        <span className="font-medium text-neutral-700">{rangeLabel}</span>
+        {" · Matches tasks assigned or completed in the range (Nepal Time)."}
+        {role === "it" ? " Showing the tasks assigned to you." : ""}
+      </p>
+      <p className="hidden text-xs text-neutral-700 print:block">
+        {rangeLabel} (Nepal Time){count ? ` · ${count}` : ""}
+      </p>
       <ReportTable
         label="IT task report"
         columns={columns}
@@ -102,7 +180,7 @@ export function ITTaskReport() {
         error={error}
         onRetry={retry}
         minWidth={980}
-        empty={q || status !== "all" || teamId !== "all" || itMember !== "all" ? "No task matches these filters." : role === "it" ? "No tasks are assigned to you yet." : "No tasks have been assigned to IT yet."}
+        empty={q || status !== "all" || teamId !== "all" || itMember !== "all" || range.startDate ? "No task matches these filters." : role === "it" ? "No tasks are assigned to you yet." : "No tasks have been assigned to IT yet."}
       />
     </div>
   );

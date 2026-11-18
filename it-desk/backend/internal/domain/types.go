@@ -88,6 +88,14 @@ type TeamLead struct {
 	Name string `json:"name"`
 }
 
+// UnrosteredLead is an active lead account without a matching member on its team.
+type UnrosteredLead struct {
+	TeamLead
+	TeamID string `json:"teamId"`
+	Title  string `json:"title"`
+	Email  string `json:"email"`
+}
+
 type Device struct {
 	ID       string `json:"id"`
 	Kind     string `json:"kind"`
@@ -197,12 +205,14 @@ type Settings struct {
 // transfers and exits; floors show everyone's seats (other teams' people
 // redacted for leads). CurrentTeamID is "" for the admin's org-wide view.
 type Workspace struct {
-	CurrentTeamID string       `json:"currentTeamId"`
-	User          User         `json:"user"`
-	Teams         []Team       `json:"teams"`
-	Members       []Member     `json:"members"`
-	Transfers     []Transfer   `json:"transfers"`
-	Exits         []ExitRecord `json:"exits"`
+	CurrentTeamID string   `json:"currentTeamId"`
+	User          User     `json:"user"`
+	Teams         []Team   `json:"teams"`
+	Members       []Member `json:"members"`
+	// Only admins receive lead accounts without a corresponding roster record.
+	UnrosteredLeads []UnrosteredLead `json:"unrosteredLeads,omitempty"`
+	Transfers       []Transfer       `json:"transfers"`
+	Exits           []ExitRecord     `json:"exits"`
 	// Floors are the published floors with occupancy (every role).
 	Floors            []Floor  `json:"floors"`
 	Settings          Settings `json:"settings"`
