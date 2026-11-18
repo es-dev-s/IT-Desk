@@ -290,6 +290,41 @@ func (s *Store) AssignUnrosteredLeadSeat(ctx context.Context, actor Actor, userI
 	return out, mapMemberWriteErr(err)
 }
 
+// ensureLeadRoster gives an active team-lead account a (seatless) roster record
+// on its team when its email isn't on any roster yet, so every lead can be
+// edited and seated like a member. Called inside account create/update/enable.
+func (s *Store) ensureLeadRoster(ctx context.Context, tx pgx.Tx, actor Actor, userID string) error {
+	var in domain.MemberInput
+	err := tx.QueryRow(ctx, `SELECT name, email, title, team_id FROM users
+		WHERE id = $1 AND role = 'team_lead' AND status = 'active' AND team_id IS NOT NULL`, userID).
+		Scan(&in.Name, &in.Email, &in.Designation, &in.TeamID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	var rostered bool
+	if err := tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM members WHERE lower(email) = lower($1))`, in.Email).Scan(&rostered); err != nil {
+		return err
+	}
+	if rostered {
+		return nil
+	}
+	in.Normalize()
+	if utf8.RuneCountInString(in.Designation) < 2 {
+		in.Designation = "Team Lead"
+	}
+	if len(in.Validate()) > 0 {
+		return nil // leave them unrostered; they can still seat themselves later
+	}
+	if err := lockMemberTeam(ctx, tx, in.TeamID); err != nil {
+		return err
+	}
+	_, err = s.createMember(ctx, tx, actor, in, false)
+	return err
+}
+
 // UpdateMember edits a person's details, desk and kit. Device rows keep
 // their id when the form sends it back; missing ones are removed.
 func (s *Store) UpdateMember(ctx context.Context, actor Actor, id string, in domain.MemberInput) (domain.Member, error) {

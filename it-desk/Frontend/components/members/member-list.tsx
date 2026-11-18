@@ -1,7 +1,7 @@
 "use client";
 
 import { LeadBadge } from "@/components/floors/lead-badge";
-import type { Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import type { RosterEntry } from "@/lib/schemas";
 import { cn, pluralize } from "@/lib/utils";
 import { useTeamsById } from "@/store/selectors";
 import { Avatar } from "@/components/ui/avatar";
@@ -15,14 +15,15 @@ export function MemberList({
   members,
   selected,
   onToggle,
-  onAssignLeadSeat,
+  selfId,
   selectable = true,
 }: {
   selectable?: boolean;
   members: RosterEntry[];
   selected: Record<string, true>;
   onToggle: (id: string) => void;
-  onAssignLeadSeat?: (lead: UnrosteredLead | Member) => void;
+  /** The signed-in team lead's own entry: never part of a bulk selection. */
+  selfId?: string;
 }) {
   const { open } = useMemberDetailLink();
   const teams = useTeamsById();
@@ -41,7 +42,8 @@ export function MemberList({
         {members.map((entry) => {
           const m = "status" in entry ? entry : null;
           const isLead = m?.isLead ?? true;
-          const active = m?.status === "active" && selectable;
+          const self = entry.id === selfId;
+          const active = m?.status === "active" && selectable && !self;
           const isSelected = Boolean(m && selected[m.id]);
           const designation = "title" in entry ? entry.title || "Team Lead" : entry.role;
           const teamName = teams[entry.teamId]?.name;
@@ -119,13 +121,13 @@ export function MemberList({
                   <ChevronRight className="size-3.5" aria-hidden />
                 </button>
                 <span className="w-7">
-                  <MemberMenuButton entry={entry} onAssignLeadSeat={onAssignLeadSeat} />
+                  <MemberMenuButton entry={entry} />
                 </span>
                 {isLead ? <LeadBadge compact className="self-start" /> : null}
               </span>
             </li>
           );
-          return <MemberContextMenu key={entry.id} entry={entry} onAssignLeadSeat={onAssignLeadSeat}>{row}</MemberContextMenu>;
+          return <MemberContextMenu key={entry.id} entry={entry}>{row}</MemberContextMenu>;
         })}
       </ul>
     </div>

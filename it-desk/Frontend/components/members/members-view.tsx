@@ -1,10 +1,11 @@
 "use client";
 
 import { Check, LayoutGrid, Map as MapIcon, Minus, Rows3, SearchX, UserPlus, UsersRound } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { compareSeats } from "@/lib/constants";
-import type { ItStatus, Member, RosterEntry, UnrosteredLead } from "@/lib/schemas";
+import { isSelfEntry } from "@/lib/roster-self";
+import type { ItStatus, RosterEntry } from "@/lib/schemas";
 import { useCurrentTeam, useTeamMembers, useTeamsById, useTransfers } from "@/store/selectors";
 import { useUI, type MemberSort, type MembersView as View } from "@/store/ui-store";
 import { useWorkspace } from "@/store/workspace-provider";
@@ -19,7 +20,6 @@ import { cn } from "@/lib/utils";
 import { BulkBar } from "./bulk-bar";
 import { useSession } from "@/components/auth/session-provider";
 import { TeamSwitcher } from "@/components/auth/team-switcher";
-import { LeadSeatDialog } from "./lead-seat-dialog";
 import { MemberList } from "./member-list";
 import { SeatMap } from "./seat-map";
 import { SeatTile } from "./seat-tile";
@@ -64,9 +64,7 @@ export function MembersView() {
   const selectable = can("transfers.create") || can("exits.create");
   const onToggle = selectable ? toggle : ignore;
   const canManage = can("members.manage");
-  const canSeatLead = can("seats.assign");
   const openMemberDialog = useUI((s) => s.openMemberDialog);
-  const [leadToSeat, setLeadToSeat] = useState<UnrosteredLead | Member | null>(null);
   const [toolbarRef, toolbarWidth] = useElementWidth<HTMLDivElement>();
 
   const transfers = useTransfers();
@@ -84,6 +82,8 @@ export function MembersView() {
     () => [...all, ...unrosteredLeads.filter((lead) => !team || lead.teamId === team.id)],
     [all, team, unrosteredLeads],
   );
+  /** A team lead's own card, pinned at the top of the roster. */
+  const selfId = useMemo(() => roster.find((entry) => isSelfEntry(entry, session.user))?.id, [roster, session.user]);
 
   const counts = useMemo(() => {
     const c = { all: roster.length, active: 0, resigned: 0, unknown: 0 };
@@ -100,11 +100,12 @@ export function MembersView() {
         return (status === "all" || entryStatus === status) && matchesGroup && matchesQuery(entry, q);
       })
       .sort((a, b) => {
+        const selfFirst = Number(b.id === selfId) - Number(a.id === selfId);
         const leadsFirst = Number(isLead(b)) - Number(isLead(a));
         const bySeat = f.sort === "seat" ? compareSeats("seat" in a ? a.seat : null, "seat" in b ? b.seat : null) : 0;
-        return leadsFirst || bySeat || a.name.localeCompare(b.name);
+        return selfFirst || leadsFirst || bySeat || a.name.localeCompare(b.name);
       });
-  }, [roster, f.query, f.sort, status, subGroup]);
+  }, [roster, f.query, f.sort, status, subGroup, selfId]);
 
   const active = useMemo(() => all.filter((m) => m.status === "active"), [all]);
   const mapMatches = useMemo(() => {
@@ -113,7 +114,8 @@ export function MembersView() {
   }, [active, f.query, subGroup]);
 
   const selectedIds = Object.keys(f.selected).filter((id) => active.some((m) => m.id === id));
-  const scope = f.view === "map" ? active.filter((m) => mapMatches.has(m.id)) : filtered.filter((m) => "status" in m && m.status === "active");
+  const scope = (f.view === "map" ? active.filter((m) => mapMatches.has(m.id)) : filtered.filter((m) => "status" in m && m.status === "active"))
+    .filter((m) => m.id !== selfId);
   const allChecked = scope.length > 0 && scope.every((m) => f.selected[m.id]);
   const someChecked = !allChecked && scope.some((m) => f.selected[m.id]);
   const visible = filtered.slice(0, f.visible);
@@ -316,7 +318,7 @@ export function MembersView() {
                 pending={pending.get(m.id)}
                 onToggle={onToggle}
                 selectable={selectable}
-                onAssignLeadSeat={canSeatLead ? setLeadToSeat : undefined}
+                self={m.id === selfId}
               />
             </li>
           ))}
@@ -327,7 +329,7 @@ export function MembersView() {
           selected={f.selected}
           onToggle={onToggle}
           selectable={selectable}
-          onAssignLeadSeat={canSeatLead ? setLeadToSeat : undefined}
+          selfId={selfId}
         />
       )}
 
@@ -341,7 +343,6 @@ export function MembersView() {
       ) : null}
 
       <BulkBar ids={selectedIds} />
-      {canSeatLead && leadToSeat ? <LeadSeatDialog lead={leadToSeat} onClose={() => setLeadToSeat(null)} /> : null}
     </>
   );
 }

@@ -9,6 +9,7 @@ import { ExitDialog } from "@/components/members/exit-dialog";
 import { TransferDetailSheet } from "@/components/transfers/transfer-detail-sheet";
 import { TransferSheet } from "@/components/transfer/transfer-sheet";
 import { MemberDialog } from "@/components/members/member-dialog";
+import { LeadSeatHost } from "@/components/members/lead-seat-dialog";
 import { MemberDetailSheet } from "@/components/members/member-detail-sheet";
 import { RequestDetailSheet } from "@/components/requests/request-detail-sheet";
 import { RequestDialog } from "@/components/requests/request-dialog";
@@ -76,6 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <CommandPalette />
       <TransferSheet />
       <MemberDialog />
+      <LeadSeatHost />
       <Suspense fallback={null}>
         <MemberDetailSheet />
       </Suspense>
