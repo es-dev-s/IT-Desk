@@ -311,6 +311,125 @@ func TestDirectChatHTTP(t *testing.T) {
 	}
 }
 
+// The admin sees every active team lead and IT staff entry before anyone has
+// written, can start a chat with any of them, and nobody else can read it.
+func TestAdminDirectChatHTTP(t *testing.T) {
+	ts, _ := liveServer(t)
+	admin := newClient(t, ts).mustLogin("admin@example.com")
+	lead := newClient(t, ts).mustLogin("lead@example.com")
+	otherLead := newClient(t, ts).mustLogin("lead3@example.com")
+	it := newClient(t, ts).mustLogin("it@example.com")
+
+	const (
+		inbox     = "/api/v1/direct-chats"
+		toLead    = inbox + "/lead_test/messages"
+		toUjjal   = inbox + "/its_ujjal_dahal/messages"
+		fromAdmin = inbox + "/usr_admin/messages"
+		fromLead  = inbox + "/lead_test/messages"
+	)
+
+	roles := func(l domain.DirectChatList) map[string]string {
+		out := map[string]string{}
+		for _, item := range l.Items {
+			out[item.Contact.ID] = item.Contact.Role
+		}
+		return out
+	}
+	list := decodeChatResponse[domain.DirectChatList](t, admin.do("GET", inbox, nil), 200)
+	got := roles(list)
+	if len(got) != 7 || got["lead_test"] != "team_lead" || got["lead_three"] != "team_lead" || got["its_ujjal_dahal"] != "it" {
+		t.Fatalf("admin should see all five IT entries and both leads by default: %v", got)
+	}
+	for _, item := range list.Items {
+		if item.LastMessage != nil || item.Unread != 0 || len(item.CanPostAs) != 1 {
+			t.Fatalf("a fresh directory entry is empty and writable: %+v", item)
+		}
+	}
+	if len(decodeChatResponse[domain.DirectChatList](t, lead.do("GET", inbox, nil), 200).Items) != 5 {
+		t.Fatal("a team lead must not see the admin until the admin writes to them")
+	}
+
+	first := decodeChatResponse[domain.RequestMessage](t, admin.do("POST", toLead, map[string]any{"body": "Hi, quick question."}), 201)
+	if !first.Mine || first.Side != "it" || first.SenderName != "Ada Admin" || first.OnBehalf {
+		t.Fatalf("admin message to a lead: %+v", first)
+	}
+	if r := admin.do("POST", toLead, map[string]any{"body": "Second"}); r.Status != 201 {
+		t.Fatalf("second message reuses the chat: %d %s", r.Status, r.Error.Code)
+	}
+
+	inc := decodeChatResponse[domain.DirectChatList](t, lead.do("GET", inbox, nil), 200)
+	var adminThread *domain.DirectChatThread
+	for i := range inc.Items {
+		if inc.Items[i].Contact.ID == "usr_admin" {
+			adminThread = &inc.Items[i]
+		}
+	}
+	if adminThread == nil || adminThread.Contact.Role != "admin" || adminThread.Unread != 2 || adminThread.Side != "requester" || inc.Unread != 2 {
+		t.Fatalf("lead should see the admin's conversation as unread: %+v", inc)
+	}
+	reply := decodeChatResponse[domain.RequestMessage](t, lead.do("POST", fromAdmin, map[string]any{"body": "Sure, go ahead."}), 201)
+	if reply.Side != "requester" || reply.SenderName != "Lead One" {
+		t.Fatalf("lead reply: %+v", reply)
+	}
+	page := decodeChatResponse[domain.DirectChatMessages](t, admin.do("GET", toLead, nil), 200)
+	if len(page.Messages) != 3 || page.Thread.Unread != 1 || page.Thread.MessageCount != 3 {
+		t.Fatalf("admin should see both sides of the conversation: %+v", page)
+	}
+	if u := decodeChatResponse[domain.ChatUnread](t, admin.do("POST", toLead+"/read", map[string]any{}), 200); u.Unread != 0 {
+		t.Fatalf("read should clear the admin's unread count: %+v", u)
+	}
+
+	// Nobody else is part of it.
+	if r := otherLead.do("GET", fromAdmin, nil); r.Status != 404 {
+		t.Fatalf("another lead opened the admin's chat: %d", r.Status)
+	}
+	if r := otherLead.do("GET", fromLead, nil); r.Status != 404 {
+		t.Fatalf("another lead opened a lead's chat with someone else: %d", r.Status)
+	}
+	for _, c := range []*client{otherLead, it} {
+		if got := decodeChatResponse[domain.DirectChatMessages](t, admin.do("GET", toLead, nil), 200); len(got.Messages) != 3 {
+			t.Fatal("history changed")
+		}
+		if r := c.do("GET", toLead, nil); r.Status == 200 && len(decodeChatResponse[domain.DirectChatMessages](t, r, 200).Messages) != 0 {
+			t.Fatalf("a nonparticipant read the admin/lead messages")
+		}
+	}
+	if r := admin.do("POST", inbox+"/usr_admin/messages", map[string]any{"body": "me"}); r.Status != 404 {
+		t.Fatalf("admin cannot message themselves: %d", r.Status)
+	}
+
+	// Admin to IT staff: unlinked entries can be written to, linked IT replies.
+	sent := decodeChatResponse[domain.RequestMessage](t, admin.do("POST", toUjjal, map[string]any{"body": "Status of the audit?"}), 201)
+	if sent.Side != "requester" || !sent.Mine {
+		t.Fatalf("admin to IT: %+v", sent)
+	}
+	if got := decodeChatResponse[domain.DirectChatList](t, it.do("GET", inbox, nil), 200); len(got.Items) != 0 {
+		t.Fatalf("unlinked IT should see nothing: %+v", got)
+	}
+	decodeChatResponse[domain.ITStaff](t, admin.do("PATCH", "/api/v1/admin/it-staff/its_ujjal_dahal", map[string]any{"userId": "usr_it"}), 200)
+	itList := decodeChatResponse[domain.DirectChatList](t, it.do("GET", inbox, nil), 200)
+	if len(itList.Items) != 1 || itList.Items[0].Contact.ID != "usr_admin" || itList.Items[0].Contact.Role != "admin" ||
+		itList.Items[0].Contact.Title != "Super admin" || itList.Items[0].Unread != 1 {
+		t.Fatalf("linked IT should see the admin's message: %+v", itList)
+	}
+	itReply := decodeChatResponse[domain.RequestMessage](t, it.do("POST", fromAdmin, map[string]any{"body": "Done yesterday."}), 201)
+	if itReply.Side != "it" || itReply.SenderName != "Ujjal Dahal" {
+		t.Fatalf("IT reply to the admin: %+v", itReply)
+	}
+	if got := decodeChatResponse[domain.DirectChatMessages](t, admin.do("GET", toUjjal, nil), 200); len(got.Messages) != 2 || got.Thread.Unread != 1 {
+		t.Fatalf("admin should receive the IT reply: %+v", got)
+	}
+
+	// A lead added later shows up without any action from them.
+	r := admin.do("POST", "/api/v1/admin/users", map[string]any{"email": "newlead@example.com", "name": "Nora Lead", "role": "team_lead", "teamId": "t2"})
+	if r.Status != 201 {
+		t.Fatalf("create lead: %d %s", r.Status, r.Error.Code)
+	}
+	if got := roles(decodeChatResponse[domain.DirectChatList](t, admin.do("GET", inbox, nil), 200)); len(got) != 8 {
+		t.Fatalf("a new team lead should be listed straight away: %v", got)
+	}
+}
+
 func decodeChatResponse[T any](t *testing.T, r resp, status int) T {
 	t.Helper()
 	if r.Status != status {
