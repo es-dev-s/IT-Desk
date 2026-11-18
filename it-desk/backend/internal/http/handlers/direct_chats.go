@@ -70,3 +70,21 @@ func (s *Server) getDirectChatFile(w http.ResponseWriter, r *http.Request, a sto
 	w.Header().Set("Cache-Control", "private, no-store")
 	writeChatFile(w, r, name, ctype, data)
 }
+
+func (s *Server) getObservedChats(w http.ResponseWriter, r *http.Request, a store.Actor) {
+	list, err := s.store.ObservedChats(r.Context(), a, r.URL.Query().Get("q"))
+	if err != nil {
+		fail(w, r, s.log, err)
+		return
+	}
+	ok(w, http.StatusOK, list)
+}
+
+func (s *Server) getObservedChatMessages(w http.ResponseWriter, r *http.Request, a store.Actor) {
+	m, err := s.store.ObservedChatMessages(r.Context(), a, r.PathValue("chatId"), r.URL.Query().Get("after"))
+	if err != nil {
+		fail(w, r, s.log, err)
+		return
+	}
+	ok(w, http.StatusOK, m)
+}

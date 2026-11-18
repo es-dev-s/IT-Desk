@@ -59,9 +59,14 @@ export type ChatThread = z.infer<typeof chatThreadSchema>;
 export const CONTACT_ROLES = ["it", "team_lead", "admin"] as const;
 export type ContactRole = (typeof CONTACT_ROLES)[number];
 
+const contactSchema = z.object({ id: z.string().min(1), name: z.string(), title: z.string(), role: z.enum(CONTACT_ROLES).catch("it"), available: z.boolean() });
+
 const directThreadSchema = threadFields.extend({
-  contact: z.object({ id: z.string().min(1), name: z.string(), title: z.string(), role: z.enum(CONTACT_ROLES).catch("it"), available: z.boolean() }),
+  /** For a chat the super admin is reading between two other people, `id` is the chat's own id. */
+  contact: contactSchema,
   lastActivityAt: iso.nullable(),
+  /** Only on a chat between two other people (super admin, read-only). */
+  participants: z.object({ requester: contactSchema, it: contactSchema }).nullish().transform((v) => v ?? null),
 });
 export type DirectThread = z.infer<typeof directThreadSchema>;
 export type Conversation = ChatThread | DirectThread;
@@ -136,8 +141,25 @@ export const directChatApi = {
     request(`${directMessagesPath(id)}${afterQuery(after)}`, { schema: directPageSchema, signal, retries: after ? 0 : 2 }),
 };
 
+/** Read-only: every direct chat between other people (super admin only). */
+export const observedChatApi = {
+  list: (query: string, signal?: AbortSignal) =>
+    request(`/direct-chats/all${query.trim() ? `?q=${rid(query.trim())}` : ""}`, { schema: directListSchema, signal, retries: 0 }),
+  messages: (id: string, after?: string, signal?: AbortSignal) =>
+    request(`/direct-chats/all/${rid(id)}/messages${afterQuery(after)}`, { schema: directPageSchema, signal, retries: after ? 0 : 2 }),
+  send: (): Promise<ChatMessage> => Promise.reject(new Error("These conversations are read-only.")),
+  read: (): Promise<ChatUnread> => Promise.resolve({ unread: 0, unreadChats: 0 }),
+};
+
+const roleLabel = (c: { role: ContactRole; title: string }) =>
+  c.role === "team_lead" ? (c.title && c.title !== "Team lead" ? `Team lead · ${c.title}` : "Team lead") : c.title || (c.role === "admin" ? "Super admin" : "IT");
+
 /** Who the conversation is with, from the viewer's side. */
 export function counterpart(t: Conversation): { name: string; subtitle: string; unassigned: boolean } {
+  if ("participants" in t && t.participants) {
+    const { requester, it } = t.participants;
+    return { name: `${requester.name} & ${it.name}`, subtitle: `${roleLabel(requester)} ↔ ${roleLabel(it)}`, unassigned: false };
+  }
   if ("contact" in t) {
     const { name, title, role } = t.contact;
     const subtitle = role === "team_lead" ? (title ? `Team lead · ${title}` : "Team lead") : title || (role === "admin" ? "Super admin" : "IT");
@@ -171,6 +193,9 @@ export const threadHas = (t: Conversation, id: string | null) => "contact" in t 
 export const requestChatsHref = "/requests/chat";
 export const chatHref = (requestId: string) => `${requestChatsHref}?r=${rid(requestId)}`;
 export const directChatHref = (peerId: string) => `/messages?person=${rid(peerId)}`;
+/** The super admin's read-only view of everyone else's direct chats. */
+export const observedChatsHref = "/messages?view=all";
+export const observedChatHref = (chatId: string) => `${observedChatsHref}&chat=${rid(chatId)}`;
 
 /** Same-origin (or configured API) URL for an attachment. Cookies go with the image request. */
 export function attachmentSrc(url: string, download = false) {

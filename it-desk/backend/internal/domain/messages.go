@@ -231,6 +231,16 @@ type DirectChatThread struct {
 	LastMessage    *RequestMessage   `json:"lastMessage"`
 	LastActivityAt *Time             `json:"lastActivityAt"`
 	OtherReadAt    *Time             `json:"otherReadAt"`
+	// Participants is set only on a chat the super admin is reading between two
+	// other people; Contact.ID is then the chat's own id.
+	Participants *DirectChatParticipants `json:"participants,omitempty"`
+}
+
+// DirectChatParticipants: the requester side (a team lead, or an admin writing
+// to IT) and the other side (an IT member, or the admin writing to a lead).
+type DirectChatParticipants struct {
+	Requester DirectChatContact `json:"requester"`
+	IT        DirectChatContact `json:"it"`
 }
 
 type DirectChatList struct {

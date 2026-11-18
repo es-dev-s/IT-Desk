@@ -267,10 +267,11 @@ func TestDirectChatHTTP(t *testing.T) {
 	if r := it.do("GET", file, nil); r.Status != 200 || r.Header.Get("Content-Type") != "image/png" {
 		t.Fatalf("linked IT cannot access the attachment: %d", r.Status)
 	}
-	for _, viewer := range []*client{otherLead, admin} {
-		if r := viewer.do("GET", file, nil); r.Status != 404 {
-			t.Fatalf("nonparticipant accessed the attachment: %d", r.Status)
-		}
+	if r := otherLead.do("GET", file, nil); r.Status != 404 {
+		t.Fatalf("nonparticipant accessed the attachment: %d", r.Status)
+	}
+	if r := admin.do("GET", file, nil); r.Status != 200 {
+		t.Fatalf("the super admin can read every direct chat's images: %d", r.Status)
 	}
 	if r := it.do("POST", otherChat, map[string]any{"body": "Wrong lead"}); r.Status != 404 {
 		t.Fatalf("another lead's conversation should be inaccessible: %d", r.Status)
@@ -449,4 +450,64 @@ func hasReq(rs []reqView, id string) bool {
 		}
 	}
 	return false
+}
+
+// The super admin reads every direct chat between other people, read-only,
+// without touching anyone's unread state. Nobody else can list them.
+func TestAdminReadsAllDirectChatsHTTP(t *testing.T) {
+	ts, _ := liveServer(t)
+	admin := newClient(t, ts).mustLogin("admin@example.com")
+	lead := newClient(t, ts).mustLogin("lead@example.com")
+	it := newClient(t, ts).mustLogin("it@example.com")
+	const all = "/api/v1/direct-chats/all"
+
+	if got := decodeChatResponse[domain.DirectChatList](t, admin.do("GET", all, nil), 200); len(got.Items) != 0 {
+		t.Fatalf("chats with no messages are not listed: %+v", got)
+	}
+	decodeChatResponse[domain.ITStaff](t, admin.do("PATCH", "/api/v1/admin/it-staff/its_ujjal_dahal", map[string]any{"userId": "usr_it"}), 200)
+	first := decodeChatResponse[domain.RequestMessage](t, lead.do("POST", "/api/v1/direct-chats/its_ujjal_dahal/messages", map[string]any{"body": "Printer jammed"}), 201)
+	reply := decodeChatResponse[domain.RequestMessage](t, it.do("POST", "/api/v1/direct-chats/lead_test/messages", map[string]any{"body": "On my way"}), 201)
+	// The admin's own chats stay in their own inbox, not here.
+	decodeChatResponse[domain.RequestMessage](t, admin.do("POST", "/api/v1/direct-chats/lead_test/messages", map[string]any{"body": "Hello"}), 201)
+
+	list := decodeChatResponse[domain.DirectChatList](t, admin.do("GET", all, nil), 200)
+	if len(list.Items) != 1 || list.Unread != 0 {
+		t.Fatalf("admin should see exactly the lead/IT chat: %+v", list)
+	}
+	th := list.Items[0]
+	if th.Participants == nil || th.Participants.Requester.Name != "Lead One" || th.Participants.IT.Name != "Ujjal Dahal" ||
+		len(th.CanPostAs) != 0 || th.Unread != 0 || th.MessageCount != 2 || th.LastMessage == nil || th.LastMessage.ID != reply.ID {
+		t.Fatalf("observed thread: %+v", th)
+	}
+	if got := decodeChatResponse[domain.DirectChatList](t, admin.do("GET", all+"?q=jammed", nil), 200); len(got.Items) != 1 {
+		t.Fatalf("search by message body: %+v", got)
+	}
+	if got := decodeChatResponse[domain.DirectChatList](t, admin.do("GET", all+"?q=nomatch", nil), 200); len(got.Items) != 0 {
+		t.Fatalf("search should filter: %+v", got)
+	}
+
+	page := decodeChatResponse[domain.DirectChatMessages](t, admin.do("GET", all+"/"+th.Contact.ID+"/messages", nil), 200)
+	if len(page.Messages) != 2 || page.Messages[0].ID != first.ID || page.Messages[1].ID != reply.ID || page.Messages[0].Mine {
+		t.Fatalf("admin should read both sides: %+v", page)
+	}
+	after := decodeChatResponse[domain.DirectChatMessages](t, admin.do("GET", all+"/"+th.Contact.ID+"/messages?after="+first.ID, nil), 200)
+	if len(after.Messages) != 1 || after.Messages[0].ID != reply.ID {
+		t.Fatalf("cursor paging: %+v", after)
+	}
+	// Reading never marks it read for the lead.
+	if u := decodeChatResponse[domain.ChatUnread](t, lead.do("GET", "/api/v1/direct-chats/unread", nil), 200); u.Unread != 2 {
+		t.Fatalf("lead still has the IT reply and the admin's message unread: %+v", u)
+	}
+
+	for _, c := range []*client{lead, it} {
+		if r := c.do("GET", all, nil); r.Status != 403 {
+			t.Fatalf("only the admin lists every chat: %d", r.Status)
+		}
+		if r := c.do("GET", all+"/"+th.Contact.ID+"/messages", nil); r.Status != 404 {
+			t.Fatalf("only the admin reads other people's chats: %d", r.Status)
+		}
+	}
+	if r := admin.do("GET", all+"/dm_missing/messages", nil); r.Status != 404 {
+		t.Fatalf("unknown chat: %d", r.Status)
+	}
 }

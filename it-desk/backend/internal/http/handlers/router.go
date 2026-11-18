@@ -114,6 +114,8 @@ func (s *Server) Handler() http.Handler {
 	read("GET /api/v1/direct-chats/unread", auth.PermCommentRequest, s.getDirectChatUnread)
 	read("GET /api/v1/direct-chats/{peerId}/messages", auth.PermCommentRequest, s.getDirectChatMessages)
 	read("GET /api/v1/direct-chats/files/{messageId}/{fileId}", auth.PermCommentRequest, s.getDirectChatFile)
+	read("GET /api/v1/direct-chats/all", auth.PermCommentRequest, s.getObservedChats)
+	read("GET /api/v1/direct-chats/all/{chatId}/messages", auth.PermCommentRequest, s.getObservedChatMessages)
 	write("POST /api/v1/direct-chats/{peerId}/messages", auth.PermCommentRequest, s.postDirectChatMessage)
 	write("POST /api/v1/direct-chats/{peerId}/messages/read", auth.PermCommentRequest, s.postDirectChatRead)
 	write("POST /api/v1/admin/it-staff", auth.PermManageUsers, s.postITStaff)

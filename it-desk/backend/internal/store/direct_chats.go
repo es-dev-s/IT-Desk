@@ -340,6 +340,8 @@ func (s *Store) MarkDirectChatRead(ctx context.Context, actor Actor, peerID stri
 	return out, err
 }
 
+// DirectChatFile: participants see their own chats' images; the super admin,
+// who can read every direct chat, sees any of them.
 func (s *Store) DirectChatFile(ctx context.Context, actor Actor, messageID, fileID string) (name, contentType string, data []byte, err error) {
 	pool, err := s.pool()
 	if err != nil {
@@ -348,8 +350,8 @@ func (s *Store) DirectChatFile(ctx context.Context, actor Actor, messageID, file
 	err = pool.QueryRow(ctx, `SELECT f.name, f.content_type, f.data
 		FROM it_request_message_files f
 		JOIN it_request_messages m ON m.id = f.message_id
-		JOIN (`+directContacts+`) p ON p.chat_id = m.direct_chat_id
-		WHERE f.id = $3 AND m.id = $4`, actor.User.ID, actor.User.Role, fileID, messageID).Scan(&name, &contentType, &data)
+		WHERE f.id = $3 AND m.id = $4 AND m.direct_chat_id IS NOT NULL
+			AND ($2 = 'admin' OR EXISTS (SELECT 1 FROM (`+directContacts+`) p WHERE p.chat_id = m.direct_chat_id))`, actor.User.ID, actor.User.Role, fileID, messageID).Scan(&name, &contentType, &data)
 	if errors.Is(err, pgx.ErrNoRows) {
 		err = domain.NotFound("That image is no longer available.")
 	}

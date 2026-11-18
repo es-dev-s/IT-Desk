@@ -4,7 +4,7 @@ import { MessagesSquare, Plus, SearchX } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
-import { CHAT_POLL_MS, chatApi, chatHref, counterpart, directChatApi, directChatHref, threadHas, type ChatFilter, type ChatScope, type ChatUnread, type ContactRole, type Conversation } from "@/lib/chat";
+import { CHAT_POLL_MS, chatApi, chatHref, counterpart, directChatApi, directChatHref, observedChatApi, observedChatHref, observedChatsHref, threadHas, type ChatFilter, type ChatScope, type ChatUnread, type ContactRole, type Conversation } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { useChat } from "@/store/chat-store";
 import { useRequests } from "@/store/requests-store";
@@ -37,16 +37,27 @@ const PEERS: { value: PeerFilter; label: string }[] = [
   { value: "it", label: "IT" },
 ];
 
+/** The super admin's own chats, or every chat between other people (read-only). */
+type AdminView = "mine" | "all";
+
+const ADMIN_VIEWS: { value: AdminView; label: string }[] = [
+  { value: "mine", label: "My chats" },
+  { value: "all", label: "All chats" },
+];
+
 export function MessagesView({ requestChats = false }: { requestChats?: boolean }) {
+  const params = useSearchParams();
+  const { session } = useSession();
   const direct = !requestChats;
-  return <Inbox key={direct ? "direct" : "requests"} direct={direct} />;
+  const observing = direct && session.user.role === "admin" && params.get("view") === "all";
+  return <Inbox key={observing ? "observed" : direct ? "direct" : "requests"} direct={direct} observing={observing} />;
 }
 
-function Inbox({ direct }: { direct: boolean }) {
+function Inbox({ direct, observing }: { direct: boolean; observing: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const selectedId = params.get(direct ? "person" : "r");
+  const selectedId = params.get(observing ? "chat" : direct ? "person" : "r");
   const { can, session } = useSession();
   const openDialog = useRequests((s) => s.openDialog);
   const setUnread = useChat((s) => s.setUnread);
@@ -79,7 +90,9 @@ function Inbox({ direct }: { direct: boolean }) {
     const load = async () => {
       const n = ++seq.current;
       try {
-        const res = direct
+        const res = observing
+          ? await observedChatApi.list(debounced, ctrl.signal)
+          : direct
           ? await directChatApi.list(debounced, ctrl.signal)
           : await chatApi.list({ status: filter, scope, q: debounced }, ctrl.signal);
         if (!alive || n !== seq.current) return;
@@ -89,7 +102,8 @@ function Inbox({ direct }: { direct: boolean }) {
         }
         setList(res);
         setError(null);
-        setUnread({ unread: res.unread, unreadChats: res.unreadChats }, direct);
+        // Other people's chats are never unread for the admin; leave the badge alone.
+        if (!observing) setUnread({ unread: res.unread, unreadChats: res.unreadChats }, direct);
       } catch (err) {
         if (!alive || ctrl.signal.aborted || n !== seq.current) return;
         setError(err instanceof ApiError ? err.message : "Couldn’t load conversations.");
@@ -107,10 +121,14 @@ function Inbox({ direct }: { direct: boolean }) {
       window.clearInterval(id);
       document.removeEventListener("visibilitychange", onTick);
     };
-  }, [direct, filter, scope, debounced, setUnread, tick]);
+  }, [direct, observing, filter, scope, debounced, setUnread, tick]);
 
   const select = (id: string | null) =>
-    router.replace(id ? (direct ? directChatHref(id) : chatHref(id)) : pathname, { scroll: false });
+    router.replace(
+      id ? (observing ? observedChatHref(id) : direct ? directChatHref(id) : chatHref(id)) : observing ? observedChatsHref : pathname,
+      { scroll: false },
+    );
+  const setAdminView = (v: AdminView) => router.replace(v === "all" ? observedChatsHref : pathname, { scroll: false });
 
   const seed = useMemo(() => list?.items.find((t) => threadHas(t, selectedId)) ?? null, [list, selectedId]);
 
@@ -127,14 +145,15 @@ function Inbox({ direct }: { direct: boolean }) {
         if (moved && i > 0) items.unshift(items.splice(i, 1)[0]);
         return { ...cur, items, ...(unread ?? {}) };
       });
-      if (unread) setUnread(unread, direct);
+      if (unread && !observing) setUnread(unread, direct);
     },
-    [direct, setUnread],
+    [direct, observing, setUnread],
   );
 
   const title = direct ? "Messages" : "Request chats";
   // The super admin's directory mixes team leads and IT, so it can be narrowed to one side.
-  const narrowable = direct && session.user.role === "admin";
+  const isAdmin = direct && session.user.role === "admin";
+  const narrowable = isAdmin && !observing;
   const items = useMemo(
     () => (narrowable && peer !== "all" ? list?.items.filter((t) => "contact" in t && t.contact.role === peer) : list?.items),
     [list, narrowable, peer],
@@ -154,7 +173,7 @@ function Inbox({ direct }: { direct: boolean }) {
           <div className="shrink-0 space-y-3 border-b border-line px-4 pb-3 pt-4">
             <div className="flex items-center gap-2">
               <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-neutral-900">{title}</h2>
-              {list && list.unread > 0 ? (
+              {list && list.unread > 0 && !observing ? (
                 <span className="tnum rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent-ink">{list.unread} unread</span>
               ) : null}
               {!direct && can("requests.create") ? (
@@ -163,6 +182,15 @@ function Inbox({ direct }: { direct: boolean }) {
                 </Button>
               ) : null}
             </div>
+            {isAdmin ? (
+              <Segmented
+                label="Whose chats"
+                value={observing ? "all" : "mine"}
+                onChange={setAdminView}
+                options={ADMIN_VIEWS}
+                className="w-full [&>button]:flex-1 [&>button]:justify-center"
+              />
+            ) : null}
             {hasStaff ? (
               <Segmented
                 label="Whose conversations"
@@ -207,7 +235,9 @@ function Inbox({ direct }: { direct: boolean }) {
               debounced.trim() ? (
                 <EmptyState icon={SearchX} title="No conversations match" description="Try a name or words from a message." />
               ) : (
-                <EmptyState
+                observing ? (
+                  <EmptyState icon={MessagesSquare} title="No chats yet" description="Chats between team leads and IT show up here once someone writes." />
+                ) : <EmptyState
                   icon={MessagesSquare}
                   title={
                     direct && session.user.role === "team_lead" ? "No IT members available" : narrowable ? "No one to message" : !direct && filter === "closed" ? "No resolved conversations" : scope === "mine" && hasStaff ? "Nothing assigned to you" : "No conversations yet"
@@ -246,13 +276,15 @@ function Inbox({ direct }: { direct: boolean }) {
         {/* Thread */}
         <section aria-label="Conversation" className={cn("flex min-w-0 flex-1 flex-col bg-subtle/40", !selectedId && "max-md:hidden")}>
           {selectedId ? (
-            <ThreadPane key={selectedId} id={selectedId} direct={direct} seed={seed} onBack={() => select(null)} onThread={onThread} />
+            <ThreadPane key={selectedId} id={selectedId} direct={direct} observing={observing} seed={seed} onBack={() => select(null)} onThread={onThread} />
           ) : (
             <EmptyState
               icon={MessagesSquare}
               title="Pick a conversation"
               description={
-                direct && session.user.role === "team_lead"
+                observing
+                  ? "Read any chat between team leads, IT and other admins. These are view only."
+                  : direct && session.user.role === "team_lead"
                   ? "Choose an IT member to start or continue a chat."
                   : narrowable
                     ? "Choose a team lead or IT member to start or continue a chat."
@@ -271,8 +303,10 @@ function ConversationRow({ thread: t, active, onSelect }: { thread: Conversation
   const c = counterpart(t);
   const last = t.lastMessage;
   const unread = t.unread > 0;
+  // Between two other people, always say who wrote it.
+  const observed = "participants" in t && t.participants !== null;
   const preview = last
-    ? `${last.side === t.side ? (last.mine ? "You: " : `${last.side === "it" ? last.senderName : last.authorName}: `) : ""}${(last.body || (last.attachments?.length ? "Photo" : "")).replace(/\s+/g, " ")}`
+    ? `${observed ? `${last.senderName}: ` : last.side === t.side ? (last.mine ? "You: " : `${last.side === "it" ? last.senderName : last.authorName}: `) : ""}${(last.body || (last.attachments?.length ? "Photo" : "")).replace(/\s+/g, " ")}`
     : "No messages yet";
   return (
     <button

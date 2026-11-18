@@ -3,7 +3,7 @@
 import { AlertCircle, ArrowDown, ArrowLeft, CheckCheck, Download, ExternalLink, Eye, ImagePlus, Info, Loader2, RotateCw, Send, UserPlus, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ApiError, newIdempotencyKey } from "@/lib/api";
-import { attachmentSrc, CHAT_LIMITS, CHAT_POLL_MS, chatApi, counterpart, defaultTarget, directChatApi, type ChatMessage, type ChatSide, type ChatUnread, type Conversation } from "@/lib/chat";
+import { attachmentSrc, CHAT_LIMITS, CHAT_POLL_MS, chatApi, counterpart, defaultTarget, directChatApi, observedChatApi, type ChatMessage, type ChatSide, type ChatUnread, type Conversation } from "@/lib/chat";
 import { dayKey, formatDate, formatDateTime, formatTime } from "@/lib/format";
 import { nowMs } from "@/lib/clock";
 import { isClosed, requestSummary, STATUS_LABEL } from "@/lib/requests";
@@ -25,17 +25,20 @@ const NEAR_BOTTOM_PX = 120;
 export function ThreadPane({
   id,
   direct,
+  observing = false,
   seed,
   onBack,
   onThread,
 }: {
   id: string;
   direct: boolean;
+  /** The super admin reading a chat between two other people (read-only). */
+  observing?: boolean;
   seed: Conversation | null;
   onBack: () => void;
   onThread: (t: Conversation, unread?: ChatUnread) => void;
 }) {
-  const api = direct ? directChatApi : chatApi;
+  const api = observing ? observedChatApi : direct ? directChatApi : chatApi;
   const { session } = useSession();
   const isStaffSide = session.user.role === "it" || session.user.role === "admin";
   const openDetail = useRequests((s) => s.openDetail);
@@ -450,7 +453,9 @@ export function ThreadPane({
           data-testid="chat-view-only"
         >
           <Eye className="size-4 shrink-0 text-neutral-400" aria-hidden />
-          {direct ? "This contact is inactive." : "View only. Admins can read conversations between team leads and IT but can’t reply in them."}
+          {observing
+            ? "View only. You can read chats between other people but can’t reply in them."
+            : direct ? "This contact is inactive." : "View only. Admins can read conversations between team leads and IT but can’t reply in them."}
         </p>
       ) : (
       <form
