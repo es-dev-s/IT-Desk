@@ -27,7 +27,9 @@ type CleanSummary struct {
 var cleanOrder = []string{
 	"notifications",
 	"it_request_chat_reads",
+	"it_request_message_files",
 	"it_request_messages",
+	"it_direct_chats",
 	"it_request_events",
 	"it_request_items",
 	"it_requests",

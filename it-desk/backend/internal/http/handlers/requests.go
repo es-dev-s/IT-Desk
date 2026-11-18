@@ -243,6 +243,20 @@ func (s *Server) getChatMessages(w http.ResponseWriter, r *http.Request, a store
 }
 
 func (s *Server) postChatMessage(w http.ResponseWriter, r *http.Request, a store.Actor) {
+	body, side, files, err := chatMessageInput(r)
+	if err != nil {
+		fail(w, r, s.log, err)
+		return
+	}
+	m, err := s.store.PostChatMessage(r.Context(), a, r.PathValue("id"), body, side, files)
+	if err != nil {
+		fail(w, r, s.log, err)
+		return
+	}
+	ok(w, http.StatusCreated, m)
+}
+
+func chatMessageInput(r *http.Request) (body, side string, files []domain.ChatFileIn, err error) {
 	var in struct {
 		Body   string `json:"body"`
 		As     string `json:"as"`
@@ -252,24 +266,17 @@ func (s *Server) postChatMessage(w http.ResponseWriter, r *http.Request, a store
 		} `json:"images"`
 	}
 	if err := decode(r, &in); err != nil {
-		fail(w, r, s.log, err)
-		return
+		return "", "", nil, err
 	}
-	files := make([]domain.ChatFileIn, 0, len(in.Images))
+	files = make([]domain.ChatFileIn, 0, len(in.Images))
 	for _, img := range in.Images {
 		raw, err := decodeChatImage(img.Data)
 		if err != nil {
-			fail(w, r, s.log, err)
-			return
+			return "", "", nil, err
 		}
 		files = append(files, domain.ChatFileIn{Name: img.Name, Data: raw})
 	}
-	m, err := s.store.PostChatMessage(r.Context(), a, r.PathValue("id"), in.Body, in.As, files)
-	if err != nil {
-		fail(w, r, s.log, err)
-		return
-	}
-	ok(w, http.StatusCreated, m)
+	return in.Body, in.As, files, nil
 }
 
 func decodeChatImage(data string) ([]byte, *domain.Error) {
@@ -290,9 +297,13 @@ func (s *Server) getChatFile(w http.ResponseWriter, r *http.Request, a store.Act
 		fail(w, r, s.log, err)
 		return
 	}
+	w.Header().Set("Cache-Control", "private, max-age=3600")
+	writeChatFile(w, r, name, ctype, data)
+}
+
+func writeChatFile(w http.ResponseWriter, r *http.Request, name, ctype string, data []byte) {
 	w.Header().Set("Content-Type", ctype)
 	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.Header().Set("Cache-Control", "private, max-age=3600")
 	disp := "inline"
 	if r.URL.Query().Get("download") == "1" {
 		disp = "attachment"

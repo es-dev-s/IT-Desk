@@ -3,7 +3,7 @@
 import { AlertCircle, ArrowDown, ArrowLeft, CheckCheck, Download, ExternalLink, Eye, ImagePlus, Info, Loader2, RotateCw, Send, UserPlus, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ApiError, newIdempotencyKey } from "@/lib/api";
-import { attachmentSrc, CHAT_LIMITS, CHAT_POLL_MS, chatApi, counterpart, defaultTarget, type ChatMessage, type ChatSide, type ChatThread, type ChatUnread } from "@/lib/chat";
+import { attachmentSrc, CHAT_LIMITS, CHAT_POLL_MS, chatApi, counterpart, defaultTarget, directChatApi, type ChatMessage, type ChatSide, type ChatUnread, type Conversation } from "@/lib/chat";
 import { dayKey, formatDate, formatDateTime, formatTime } from "@/lib/format";
 import { nowMs } from "@/lib/clock";
 import { isClosed, requestSummary, STATUS_LABEL } from "@/lib/requests";
@@ -17,26 +17,29 @@ import { CounterpartAvatar } from "./chat-ui";
 
 /** A message the viewer is sending: shown at once, confirmed or marked failed. */
 type PendingFile = { name: string; data: string; preview: string };
-type Pending = { key: string; requestId: string; body: string; files: PendingFile[]; createdAt: string; status: "sending" | "failed"; error?: string };
+type Pending = { key: string; conversationId: string; body: string; files: PendingFile[]; createdAt: string; status: "sending" | "failed"; error?: string };
 
 const GROUP_GAP_MS = 5 * 60_000;
 const NEAR_BOTTOM_PX = 120;
 
 export function ThreadPane({
   id,
+  direct,
   seed,
   onBack,
   onThread,
 }: {
   id: string;
-  seed: ChatThread | null;
+  direct: boolean;
+  seed: Conversation | null;
   onBack: () => void;
-  onThread: (t: ChatThread, unread?: ChatUnread) => void;
+  onThread: (t: Conversation, unread?: ChatUnread) => void;
 }) {
+  const api = direct ? directChatApi : chatApi;
   const { session } = useSession();
   const isStaffSide = session.user.role === "it" || session.user.role === "admin";
   const openDetail = useRequests((s) => s.openDetail);
-  const [thread, setThread] = useState<ChatThread | null>(seed);
+  const [thread, setThread] = useState<Conversation | null>(seed);
   const [messages, setMessages] = useState<ChatMessage[] | null>(null);
   const [pending, setPending] = useState<Pending[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -60,7 +63,7 @@ export function ThreadPane({
 
   // Latest values for async callbacks (kept in sync after each render).
   const messagesRef = useRef<ChatMessage[] | null>(null);
-  const threadRef = useRef<ChatThread | null>(seed);
+  const threadRef = useRef<Conversation | null>(seed);
   useLayoutEffect(() => {
     messagesRef.current = messages;
     threadRef.current = thread;
@@ -73,7 +76,6 @@ export function ThreadPane({
     if (!add.length) return;
     const next = [...cur, ...add].sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
     messagesRef.current = next;
-    lastId.current = next.at(-1)?.id;
     setMessages(next);
     const theirs = add.filter((m) => !m.mine).length;
     if (!nearBottom.current && theirs) setUnseenBelow((n) => n + theirs);
@@ -82,22 +84,38 @@ export function ThreadPane({
   // Initial load, then poll for anything newer while visible.
   useEffect(() => {
     let alive = true;
+    let fetching = false;
     const ctrl = new AbortController();
     const fetchPage = async (initial: boolean) => {
+      if (fetching) return;
+      fetching = true;
       try {
-        const page = await chatApi.messages(id, initial ? undefined : lastId.current, ctrl.signal);
+        const page = await api.messages(id, initial ? undefined : lastId.current, ctrl.signal);
         if (!alive) return;
         setThread(page.thread);
-        if (initial) {
+        if (messagesRef.current === null) {
           messagesRef.current = page.messages;
           setMessages(page.messages);
-          lastId.current = page.messages.at(-1)?.id;
         } else merge(page.messages);
+        // Advance only from server pages. A sent message can arrive before an
+        // earlier reply has been polled.
+        lastId.current = page.messages.at(-1)?.id ?? lastId.current;
         setLoadError(null);
         onThreadRef.current(page.thread);
       } catch (err) {
         if (!alive || ctrl.signal.aborted) return;
-        if (initial) setLoadError(err instanceof ApiError ? err.message : "Couldn’t load this conversation.");
+        if (direct && err instanceof ApiError && err.status === 404) {
+          threadRef.current = null;
+          messagesRef.current = null;
+          setThread(null);
+          setMessages(null);
+          lastId.current = undefined;
+        }
+        if (initial || (direct && err instanceof ApiError && err.status === 404)) {
+          setLoadError(err instanceof ApiError ? err.message : "Couldn’t load this conversation.");
+        }
+      } finally {
+        fetching = false;
       }
     };
     void fetchPage(true);
@@ -112,16 +130,18 @@ export function ThreadPane({
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", tick);
     };
-  }, [id, merge]);
+  }, [api, direct, id, merge]);
 
   // Mark read whenever something unread is on screen.
   useEffect(() => {
-    if (!thread || thread.unread === 0 || reading.current || document.visibilityState !== "visible") return;
+    if (!messages || !thread || thread.unread === 0 || reading.current || document.visibilityState !== "visible") return;
     reading.current = true;
-    chatApi
+    api
       .read(id)
       .then((u) => {
-        const t = { ...thread, unread: 0 };
+        const current = threadRef.current;
+        if (!current || current.lastMessage?.id !== thread.lastMessage?.id) return;
+        const t = { ...current, unread: 0 };
         setThread(t);
         onThreadRef.current(t, u);
       })
@@ -129,7 +149,7 @@ export function ThreadPane({
       .finally(() => {
         reading.current = false;
       });
-  }, [id, thread]);
+  }, [api, id, messages, thread]);
 
   // Stick to the bottom when the viewer is already there (or just sent something).
   useLayoutEffect(() => {
@@ -159,18 +179,20 @@ export function ThreadPane({
   // lead and IT can't write in it at all (the server refuses it too).
   const side: ChatSide = thread?.side ?? "requester";
   const viewOnly = thread !== null && thread.canPostAs.length === 0;
-  const targetId = thread ? (target && thread.requests.some((x) => x.id === target) ? target : defaultTarget(thread)) : id;
-  const multi = (thread?.requests.length ?? 0) > 1;
+  const requestThread = thread && "request" in thread ? thread : null;
+  const targetId = requestThread ? (target && requestThread.requests.some((x) => x.id === target) ? target : defaultTarget(requestThread)) : id;
+  const multi = (requestThread?.requests.length ?? 0) > 1;
 
   const deliver = async (p: Pending) => {
     setPending((cur) => cur.map((x) => (x.key === p.key ? { ...x, status: "sending", error: undefined } : x)));
     try {
-      const m = await chatApi.send(p.requestId, { body: p.body, images: p.files.map((f) => ({ name: f.name, data: f.data })) }, p.key);
+      const m = await api.send(p.conversationId, { body: p.body, images: p.files.map((f) => ({ name: f.name, data: f.data })) }, p.key);
       setPending((cur) => cur.filter((x) => x.key !== p.key));
       forceScroll.current = true;
       merge([m]);
       const t = threadRef.current;
-      if (t) {
+      const last = t?.lastMessage;
+      if (t && (!last || last.createdAt < m.createdAt || (last.createdAt === m.createdAt && last.id < m.id))) {
         const next = { ...t, lastMessage: m, lastActivityAt: m.createdAt, messageCount: t.messageCount + 1 };
         threadRef.current = next;
         setThread(next);
@@ -212,7 +234,7 @@ export function ThreadPane({
   const send = () => {
     const body = draft.trim();
     if ((!body && files.length === 0) || body.length > CHAT_LIMITS.maxBody || !thread || viewOnly) return;
-    const p: Pending = { key: newIdempotencyKey(), requestId: targetId, body, files, createdAt: new Date(nowMs()).toISOString(), status: "sending" };
+    const p: Pending = { key: newIdempotencyKey(), conversationId: targetId, body, files, createdAt: new Date(nowMs()).toISOString(), status: "sending" };
     setPending((cur) => [...cur, p]);
     setDraft("");
     setFiles([]);
@@ -245,14 +267,15 @@ export function ThreadPane({
   }
 
   const c = thread ? counterpart(thread) : null;
+  const waitingForLogin = thread && "contact" in thread && side === "requester" && !thread.contact.available && !viewOnly;
   // The request the header, banner and composer talk about: the one picked, else the latest open.
-  const r = thread ? (thread.requests.find((x) => x.id === targetId) ?? thread.request) : undefined;
+  const r = requestThread ? (requestThread.requests.find((x) => x.id === targetId) ?? requestThread.request) : undefined;
   const routedStaff = r?.staffName ?? null;
-  const placeholder = !thread
-    ? "Message"
-    : side === "it"
-      ? `Reply to ${r!.requesterName}${routedStaff ? ` as ${routedStaff}` : " as the IT team"}…`
-      : `Message ${routedStaff ?? "the IT team"}…`;
+  const placeholder = r
+    ? side === "it"
+      ? `Reply to ${r.requesterName}${routedStaff ? ` as ${routedStaff}` : " as the IT team"}…`
+      : `Message ${routedStaff ?? "the IT team"}…`
+    : c ? `Message ${c.name}…` : "Message";
   const overLimit = draft.trim().length > CHAT_LIMITS.maxBody;
 
   return (
@@ -262,7 +285,7 @@ export function ThreadPane({
         <Button size="icon-sm" variant="ghost" className="-ml-1 md:hidden" aria-label="Back to conversations" onClick={onBack}>
           <ArrowLeft aria-hidden />
         </Button>
-        {thread && c && r ? (
+        {thread && c ? (
           <>
             <CounterpartAvatar thread={thread} size="md" />
             <div className="min-w-0 flex-1">
@@ -273,15 +296,19 @@ export function ThreadPane({
                 {thread.side === "it" ? c.subtitle : c.unassigned ? "Unassigned · anyone in IT can reply" : c.subtitle}
               </p>
             </div>
-            <div className="hidden items-center gap-2.5 lg:flex">
-              <span className="tnum font-mono text-[12px] font-semibold text-neutral-700">{r.ticket}</span>
-              <RequestStatusPill status={r.status} />
-              <PriorityLabel priority={r.priority} />
-            </div>
-            <Button size="sm" onClick={() => openDetail(r.id)} data-testid="chat-open-request">
-              <ExternalLink aria-hidden />
-              <span className="max-sm:sr-only">View request</span>
-            </Button>
+            {r ? (
+              <>
+                <div className="hidden items-center gap-2.5 lg:flex">
+                  <span className="tnum font-mono text-[12px] font-semibold text-neutral-700">{r.ticket}</span>
+                  <RequestStatusPill status={r.status} />
+                  <PriorityLabel priority={r.priority} />
+                </div>
+                <Button size="sm" onClick={() => openDetail(r.id)} data-testid="chat-open-request">
+                  <ExternalLink aria-hidden />
+                  <span className="max-sm:sr-only">View request</span>
+                </Button>
+              </>
+            ) : null}
           </>
         ) : (
           <div className="flex flex-1 items-center gap-3">
@@ -295,7 +322,7 @@ export function ThreadPane({
       </header>
 
       {/* Context strip: what this conversation is about, and routing state */}
-      {thread && r ? (
+      {requestThread && r ? (
         <div className="shrink-0 border-b border-line bg-white/70 px-4 py-2 text-xs text-neutral-500 sm:px-5">
           <div className="flex items-center gap-2">
             <span className="tnum font-mono font-medium text-neutral-600 lg:hidden">{r.ticket}</span>
@@ -308,7 +335,7 @@ export function ThreadPane({
           </div>
           {multi ? (
             <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Requests in this conversation" data-testid="chat-requests">
-              {thread.requests.map((x) => (
+              {requestThread.requests.map((x) => (
                 <li key={x.id}>
                   <button
                     type="button"
@@ -348,6 +375,11 @@ export function ThreadPane({
           ) : null}
         </div>
       ) : null}
+      {waitingForLogin ? (
+        <p className="shrink-0 border-b border-line bg-amber-50 px-4 py-2 text-xs text-amber-900 sm:px-5">
+          {c?.name} can read and reply once their IT login is linked and enabled.
+        </p>
+      ) : null}
 
       {/* Messages */}
       <div className="relative min-h-0 flex-1">
@@ -365,9 +397,9 @@ export function ThreadPane({
           ) : messages.length === 0 && pending.length === 0 && thread && c ? (
             <EmptyThread
               name={c.name}
-              ticket={thread.request.ticket}
+              ticket={r?.ticket}
               itSide={thread.side === "it"}
-              onPick={(text) => {
+              onPick={viewOnly ? undefined : (text) => {
                 setDraft(text);
                 inputRef.current?.focus();
               }}
@@ -389,7 +421,6 @@ export function ThreadPane({
                     first={row.first}
                     last={row.last}
                     showVia={isStaffSide}
-                    ticket={multi ? row.m.ticket : null}
                     seen={row.index === lastMineIndex && seenAt !== null && seenAt >= row.m.createdAt}
                   />
                 ),
@@ -419,7 +450,7 @@ export function ThreadPane({
           data-testid="chat-view-only"
         >
           <Eye className="size-4 shrink-0 text-neutral-400" aria-hidden />
-          View only. Admins can read conversations between team leads and IT but can’t reply in them.
+          {direct ? "This contact is inactive." : "View only. Admins can read conversations between team leads and IT but can’t reply in them."}
         </p>
       ) : (
       <form
@@ -515,9 +546,9 @@ export function ThreadPane({
           <span className="max-sm:hidden">
             <kbd className="font-sans font-medium text-neutral-500">Enter</kbd> to send · <kbd className="font-sans font-medium text-neutral-500">Shift + Enter</kbd> for a new line
           </span>
-          {side === "it" && thread ? (
+          {side === "it" && r ? (
             <span className="truncate">
-              Shown to {r!.requesterName} as {routedStaff ?? "the IT team"}
+              Shown to {r.requesterName} as {routedStaff ?? "the IT team"}
               {" · sent by you"}
             </span>
           ) : null}
@@ -562,7 +593,7 @@ function buildRows(messages: ChatMessage[], viewerSide: ChatSide): Row[] {
   return out;
 }
 
-function Bubble({ m, own, first, last, showVia, seen, ticket }: { m: ChatMessage; own: boolean; first: boolean; last: boolean; showVia: boolean; seen: boolean; ticket: string | null }) {
+function Bubble({ m, own, first, last, showVia, seen }: { m: ChatMessage; own: boolean; first: boolean; last: boolean; showVia: boolean; seen: boolean }) {
   // Your own IT-side messages: say who the requester sees them from.
   const name = m.mine ? (m.side === "it" && m.onBehalf ? `You · as ${m.senderName}` : "You") : m.senderName;
   return (
@@ -570,11 +601,6 @@ function Bubble({ m, own, first, last, showVia, seen, ticket }: { m: ChatMessage
       {first ? (
         <span className={cn("mb-1 flex items-baseline gap-1.5 px-1 text-[11px]", own && "flex-row-reverse")}>
           <span className="font-semibold text-neutral-700">{name}</span>
-          {ticket ? (
-            <span className="tnum rounded bg-neutral-100 px-1 font-mono text-[10.5px] font-medium text-neutral-600" data-testid="chat-message-ticket">
-              {ticket}
-            </span>
-          ) : null}
           {m.side === "it" && showVia && m.onBehalf && !m.mine ? <span className="text-neutral-400">via {m.authorName}</span> : null}
           <time className="tnum text-neutral-400" dateTime={m.createdAt} title={formatDateTime(m.createdAt)}>
             {formatTime(m.createdAt)}
@@ -661,7 +687,7 @@ function PendingBubble({ p, onRetry, onDiscard }: { p: Pending; onRetry: () => v
   );
 }
 
-function EmptyThread({ name, ticket, itSide, onPick }: { name: string; ticket: string; itSide: boolean; onPick: (text: string) => void }) {
+function EmptyThread({ name, ticket, itSide, onPick }: { name: string; ticket?: string; itSide: boolean; onPick?: (text: string) => void }) {
   const ideas = itSide
     ? ["Hi! I’m looking into this now.", "Could you share a photo or the error message?", "Is now a good time to come by your desk?"]
     : ["Hi! Any update on this?", "When could I collect it?", "It’s getting urgent — could you take a look today?"];
@@ -670,11 +696,13 @@ function EmptyThread({ name, ticket, itSide, onPick }: { name: string; ticket: s
       <span className="grid size-12 place-items-center rounded-2xl bg-white text-accent shadow-xs ring-1 ring-line">
         <Send className="size-5" aria-hidden />
       </span>
-      <p className="mt-4 text-[15px] font-semibold tracking-[-0.01em] text-neutral-900">Start the conversation</p>
-      <p className="mt-1.5 text-[13px] leading-5 text-neutral-500 text-pretty">
-        {itSide ? `Message ${name} about ${ticket}. They’ll see it in Messages.` : `Message ${name} about ${ticket}. Everything stays attached to the ticket.`}
-      </p>
-      <div className="mt-5 flex flex-wrap justify-center gap-2">
+      <p className="mt-4 text-[15px] font-semibold tracking-[-0.01em] text-neutral-900">{onPick ? "Start the conversation" : "No messages yet"}</p>
+      {onPick ? (
+        <p className="mt-1.5 text-[13px] leading-5 text-neutral-500 text-pretty">
+          Message {name}{ticket ? ` about ${ticket}` : ""}.
+        </p>
+      ) : null}
+      {onPick && ticket ? <div className="mt-5 flex flex-wrap justify-center gap-2">
         {ideas.map((t) => (
           <button
             key={t}
@@ -685,7 +713,7 @@ function EmptyThread({ name, ticket, itSide, onPick }: { name: string; ticket: s
             {t}
           </button>
         ))}
-      </div>
+      </div> : null}
     </div>
   );
 }

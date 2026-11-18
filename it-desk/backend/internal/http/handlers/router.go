@@ -110,6 +110,12 @@ func (s *Server) Handler() http.Handler {
 	read("GET /api/v1/it-requests/{id}/messages/{messageId}/files/{fileId}", auth.PermCommentRequest, s.getChatFile)
 	write("POST /api/v1/it-requests/{id}/messages", auth.PermCommentRequest, s.postChatMessage)
 	write("POST /api/v1/it-requests/{id}/messages/read", auth.PermCommentRequest, s.postChatRead)
+	read("GET /api/v1/direct-chats", auth.PermCommentRequest, s.getDirectChats)
+	read("GET /api/v1/direct-chats/unread", auth.PermCommentRequest, s.getDirectChatUnread)
+	read("GET /api/v1/direct-chats/{peerId}/messages", auth.PermCommentRequest, s.getDirectChatMessages)
+	read("GET /api/v1/direct-chats/files/{messageId}/{fileId}", auth.PermCommentRequest, s.getDirectChatFile)
+	write("POST /api/v1/direct-chats/{peerId}/messages", auth.PermCommentRequest, s.postDirectChatMessage)
+	write("POST /api/v1/direct-chats/{peerId}/messages/read", auth.PermCommentRequest, s.postDirectChatRead)
 	write("POST /api/v1/admin/it-staff", auth.PermManageUsers, s.postITStaff)
 	write("PATCH /api/v1/admin/it-staff/{id}", auth.PermManageUsers, s.patchITStaff)
 
@@ -134,7 +140,7 @@ func (s *Server) Handler() http.Handler {
 		mw.SecureHeaders(s.cfg.CookieSecure),
 		mw.CORS(s.cfg.AllowedOrigins),
 		mw.OriginGuard(s.cfg.AllowedOrigins),
-		mw.BodyLimit(12<<20), // chat screenshots travel as base64 inside the JSON body
+		mw.BodyLimit(12<<20),                         // chat screenshots travel as base64 inside the JSON body
 		mw.Timeout(s.cfg.RequestTimeout, EventsPath), // the event stream is long-lived
 	)
 }

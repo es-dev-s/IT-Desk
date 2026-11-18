@@ -1,26 +1,27 @@
 "use client";
 
 import { create } from "zustand";
-import { chatApi, type ChatUnread } from "@/lib/chat";
+import { chatApi, directChatApi, type ChatUnread } from "@/lib/chat";
 
 /** Nav badge state for Messages. The page and the background sync both feed it. */
 type ChatState = {
-  unread: ChatUnread | null;
-  setUnread: (u: ChatUnread) => void;
+  requestUnread: ChatUnread | null;
+  directUnread: ChatUnread | null;
+  setUnread: (u: ChatUnread, direct: boolean) => void;
   refresh: () => Promise<void>;
 };
 
 let inflight: Promise<void> | null = null;
 
 export const useChat = create<ChatState>((set) => ({
-  unread: null,
-  setUnread: (u) => set({ unread: u }),
+  requestUnread: null,
+  directUnread: null,
+  setUnread: (u, direct) => set(direct ? { directUnread: u } : { requestUnread: u }),
   refresh: () =>
-    (inflight ??= chatApi
-      .unread()
-      .then((u) => set({ unread: u }))
-      .catch(() => {})
-      .finally(() => {
-        inflight = null;
-      })),
+    (inflight ??= Promise.allSettled([
+      chatApi.unread().then((u) => set({ requestUnread: u })),
+      directChatApi.unread().then((u) => set({ directUnread: u })),
+    ]).then(() => {
+      inflight = null;
+    })),
 }));

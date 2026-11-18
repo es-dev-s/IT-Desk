@@ -1,8 +1,10 @@
 "use client";
 
-import { AlertTriangle, ArrowRight, CircleCheck, Hand, LifeBuoy, Loader2, Plus, RefreshCw, Eye, TriangleAlert } from "lucide-react";
+import { AlertTriangle, ArrowRight, CircleCheck, Hand, LifeBuoy, Loader2, MessagesSquare, Plus, RefreshCw, Eye, TriangleAlert } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { formatRelative } from "@/lib/format";
+import { requestChatsHref } from "@/lib/chat";
 import {
   CATEGORY_LABEL,
   EMPTY_REQUEST_FORM,
@@ -18,9 +20,10 @@ import { cn, pluralize } from "@/lib/utils";
 import { useTeams } from "@/store/selectors";
 import { useWorkspace } from "@/store/workspace-provider";
 import { useRequests } from "@/store/requests-store";
+import { useChat } from "@/store/chat-store";
 import { useSession } from "@/components/auth/session-provider";
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClass } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchField } from "@/components/ui/search-field";
@@ -59,6 +62,7 @@ export function RequestsView() {
   const canCreate = can("requests.create");
   const teams = useTeams();
   const { items, error, loading, load, openDialog, openDetail } = useRequests();
+  const unreadChats = useChat((s) => s.requestUnread?.unreadChats ?? 0);
 
   const [view, setView] = useState<View>("active");
   const [query, setQuery] = useState("");
@@ -252,6 +256,13 @@ export function RequestsView() {
           />
         ) : null}
         <div className={cn("flex shrink-0 items-center gap-2", !(isIt || isAdmin) ? "ml-auto" : "ml-auto @min-[1040px]:ml-0")}>
+          {can("requests.comment") ? (
+            <Link href={requestChatsHref} className={buttonClass("secondary", "sm")}>
+              <MessagesSquare aria-hidden />
+              <span className="max-sm:sr-only">Request chats</span>
+              {unreadChats > 0 ? <span className="tnum" aria-label={`${unreadChats} unread conversations`}>{unreadChats}</span> : null}
+            </Link>
+          ) : null}
           <FiltersPopover
             labelClassName="@max-[480px]:sr-only"
             canReset={filtersActive > 0}
